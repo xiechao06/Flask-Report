@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>
+    {% block report____title_block %}
+    {% endblock %}
+  </title>
+  {% block report____head_block %}
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link href="{{ url_for('report____.static', filename='bootstrap/css/bootstrap.css') }}" rel="stylesheet" media="screen"/>
+    <link href="{{ url_for('report____.static', filename='bootstrap/css/bootstrap-responsive.css') }}" rel="stylesheet" media="screen"/>
+    <link href="{{ url_for('report____.static', filename='select2/select2.css') }}" rel="stylesheet"/>
+    <link href="{{ url_for('report____.static', filename='css/font-awesome.min.css') }}" rel="stylesheet"/>
+    <script src="{{ url_for('report____.static', filename='js/jquery-1.8.2.min.js') }}"></script>
+    <script src="{{ url_for('report____.static', filename='select2/select2.js') }}"></script>
+    <script src="{{ url_for('report____.static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('report____.static', filename='js/sprintf-0.6.js') }}"></script>
+    {% block report____customized_head_block %}
+    {% endblock %}
+  {% endblock %}
+</head>
+<body cz-shortcut-listen="true">
+<a name="top"></a>
+{% block report____nav_bar_block %}
+{% endblock %}
+{% block page_body %}
+    <div class="page-body">
+      {% block body %}
+      {% endblock %}
+    </div>
+{% endblock %}
+{% block report____footer_block %}
+{% endblock %}
+{% block report____tail_block %}
+{% endblock %}
+{% block report____custom_external_block %}
+{% endblock %}
+</body>
+</html>

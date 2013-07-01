@@ -1,0 +1,72 @@
+# Translations template for PROJECT.
+# Copyright (C) 2013 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2013-07-01 15:09+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: templates/report/report.html:11 templates/report____/report.html:11
+msgid "hide detail"
+msgstr ""
+
+#: templates/report/report.html:14 templates/report/report.html:27
+#: templates/report____/report.html:14 templates/report____/report.html:27
+msgid "show detail"
+msgstr ""
+
+#: templates/report/report.html:32 templates/report____/report.html:32
+#, python-format
+msgid ""
+"created by \"%(creator)s\" at %(create_time)s, using data set "
+"\"%(data_set)s\", "
+msgstr ""
+
+#: templates/report/report.html:36 templates/report____/report.html:36
+#, python-format
+msgid "order by \"%(order_by)s\" %(order)s"
+msgstr ""
+
+#: templates/report/report.html:54 templates/report____/report.html:54
+msgid "the customized filter condition is: "
+msgstr ""
+
+#: templates/report/report.html:67 templates/report____/report.html:67
+msgid "download as: "
+msgstr ""
+
+#: templates/report/report.html:75 templates/report____/report.html:75
+msgid "BACK"
+msgstr ""
+
+#: templates/report/report.html:76 templates/report____/report.html:76
+msgid "EDIT"
+msgstr ""
+
+#: templates/report/report.html:77 templates/report____/report.html:77
+msgid "REFRESH"
+msgstr ""
+
+#: templates/report____/report.html:38
+msgid "descendingly"
+msgstr ""
+
+#: templates/report____/report.html:38
+msgid "ascendingly"
+msgstr ""
+
+#: templates/report____/report.html:41
+msgid "filter conditions are: "
+msgstr ""
+

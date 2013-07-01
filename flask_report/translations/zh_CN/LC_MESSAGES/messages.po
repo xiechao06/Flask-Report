@@ -1,0 +1,72 @@
+# Chinese (China) translations for PROJECT.
+# Copyright (C) 2013 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2013-07-01 15:09+0800\n"
+"PO-Revision-Date: 2013-07-01 14:56+0800\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: templates/report/report.html:11 templates/report____/report.html:11
+msgid "hide detail"
+msgstr "隐藏详情"
+
+#: templates/report/report.html:14 templates/report/report.html:27
+#: templates/report____/report.html:14 templates/report____/report.html:27
+msgid "show detail"
+msgstr "显示详情"
+
+#: templates/report/report.html:32 templates/report____/report.html:32
+#, python-format
+msgid ""
+"created by \"%(creator)s\" at %(create_time)s, using data set "
+"\"%(data_set)s\", "
+msgstr "由用户\"%(creator)s\"在%(create_time)s创建, 使用的数据集和是\"%(data_set)s\", "
+
+#: templates/report/report.html:36 templates/report____/report.html:36
+#, python-format
+msgid "order by \"%(order_by)s\" %(order)s"
+msgstr "按字段\"%(order_by)s\"进行%(order)s排列"
+
+#: templates/report/report.html:54 templates/report____/report.html:54
+msgid "the customized filter condition is: "
+msgstr "定制的过滤条件如下:"
+
+#: templates/report/report.html:67 templates/report____/report.html:67
+msgid "download as: "
+msgstr "以下列格式下载: "
+
+#: templates/report/report.html:75 templates/report____/report.html:75
+msgid "BACK"
+msgstr "返回"
+
+#: templates/report/report.html:76 templates/report____/report.html:76
+msgid "EDIT"
+msgstr "编辑"
+
+#: templates/report/report.html:77 templates/report____/report.html:77
+msgid "REFRESH"
+msgstr "刷新"
+
+#: templates/report____/report.html:38
+msgid "descendingly"
+msgstr "降序"
+
+#: templates/report____/report.html:38
+msgid "ascendingly"
+msgstr "升序"
+
+#: templates/report____/report.html:41
+msgid "filter conditions are: "
+msgstr "过滤条件如下:"
+
