@@ -8,8 +8,10 @@ Quick Start
 -----------
 
 ```
-# ./make_test_data
-# ./run_example
+# cd Flask-Report
+# python setup.py install
+# ./make_test_data.sh
+# ./run_example.sh
 ```
 
 then you could open "http://127.0.0.1/report/1" to see what happens.
