@@ -54,8 +54,23 @@ class FlaskReport(object):
         return render_template("report____/report.html", report=report, html_report=html_report,
                                customized_filter_condition=customized_filter_condition)
 
-    def report_csv(self, id_):
-        # TODO unimplemented
+    def _get_report(self, id_, ReportClass):
+        from flask.ext.report.reports import BaseReport
+        assert issubclass(ReportClass, BaseReport)
+        from flask.ext.report.models import Report
+
+        data = Report.query.get_or_404(id_)
+        wrapper = ReportWrapper(self, data)
+
+        report = ReportClass(queryset=wrapper.data, columns=wrapper.columns)
+        return report
+
+    def _get_report_value(self, id_, ReportClass, ReportGenerator, first_row_with_column_names=False):
+        from flask.ext.report.reports import BaseReport
+        assert issubclass(ReportClass, BaseReport)
+
+        from geraldo.generators import base
+        assert issubclass(ReportGenerator, base.ReportGenerator)
         try:
             from cStringIO import StringIO
         except ImportError:
@@ -63,31 +78,17 @@ class FlaskReport(object):
         return_fileobj = StringIO()
         from flask.ext.report.writer import UnicodeWriter
 
-        from flask.ext.report.models import Report
+        report = self._get_report(id_, ReportClass)
 
-        data = Report.query.get_or_404(id_)
-        wrapper = ReportWrapper(self, data)
+        report.generate_by(ReportGenerator, filename=return_fileobj, writer=UnicodeWriter(return_fileobj),
+                           first_row_with_column_names=first_row_with_column_names)
+        return return_fileobj
+
+    def report_csv(self, id_):
+        # TODO unimplemented
+        from flask.ext.report.reports import CSVReport
         from geraldo.generators import CSVGenerator
-        from geraldo import Report, ReportBand, ObjectValue, Label
-        from reportlab.lib.pagesizes import cm
-
-        class BaseReport(Report):
-            title = "test"
-            author = "test"
-
-            class band_detail(ReportBand):
-                height = 0.5 * cm
-
-                def get_func(index):
-                    return lambda v: v[index]
-
-                elements = [ObjectValue(name=c.get("name", str(c.get('idx', 0))), attribute_name=c,
-                                        get_value=get_func(c.get("idx", 0))) for c in
-                            wrapper.columns]
-
-        report = BaseReport(queryset=wrapper.data)
-        report.generate_by(CSVGenerator, filename=return_fileobj, writer=UnicodeWriter(return_fileobj),
-                           first_row_with_column_names=True)
+        return_fileobj = self._get_report_value(id_, CSVReport, CSVGenerator, True)
         from flask import Response
 
         response = Response(return_fileobj.getvalue(), mimetype="text/csv")
@@ -96,8 +97,22 @@ class FlaskReport(object):
 
     def report_pdf(self, id_):
         # TODO unimplemented
-        pass
+        from flask.ext.report.reports import PDFReport
+        from geraldo.generators import PDFGenerator
+        return_fileobj = self._get_report_value(id_, PDFReport, PDFGenerator, True)
+        from flask import Response
+
+        response = Response(return_fileobj.getvalue(), mimetype="application/pdf")
+        response.headers["Content-disposition"] = "attachment; filename={}.pdf".format(str(id_))
+        return response
 
     def report_txt(self, id_):
         # TODO unimplemented
-        pass
+        from flask.ext.report.reports import TxtReport
+        from geraldo.generators import TextGenerator
+        return_fileobj = self._get_report_value(id_, TxtReport, TextGenerator, True)
+        from flask import Response
+
+        response = Response(return_fileobj.getvalue(), mimetype="text/plan")
+        response.headers["Content-disposition"] = "attachment; filename={}.txt".format(str(id_))
+        return response
