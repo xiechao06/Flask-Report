@@ -1,0 +1,8 @@
+name: 三国文臣武将实力报告
+creator: 光荣
+create_time: 2013-07-02 08:30:00
+filters: 
+    User.is_lord: false
+order_by: -平均武力值
+columns: [0, 1, 2, 3]
+data_set_id: 1

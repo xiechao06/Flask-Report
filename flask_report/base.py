@@ -1,14 +1,11 @@
 # -*- coding: UTF-8 -*-
 import os
 from flask import render_template
-from flask.ext.report.wrappers import ReportWrapper
-
+from flask.ext.report.report import Report
 
 class FlaskReport(object):
-    def __init__(self, db, model_map, app, blueprint=None):
-        from flask.ext.report import models
 
-        models.setup_models(db)
+    def __init__(self, db, model_map, app, blueprint=None):
         self.db = db
         host = blueprint or app
         self.conf_dir = app.config.get("REPORT_DIR", "report_conf")
@@ -22,11 +19,12 @@ class FlaskReport(object):
         if not os.path.exists(self.data_set_dir):
             os.makedirs(self.data_set_dir)
 
-        host.route("/report-list")(self.report_list)
+        host.route("/report-list/")(self.report_list)
         host.route("/report/<int:id_>")(self.report)
         host.route("/report_csv/<int:id_>")(self.report_csv)
         host.route("/report_pdf/<int:id_>")(self.report_pdf)
         host.route("/report_txt/<int:id_>")(self.report_txt)
+
 
         from flask import Blueprint
         # register it for using the templates of data browser
@@ -40,16 +38,12 @@ class FlaskReport(object):
         return "this is report list"
 
     def report(self, id_):
-        from flask.ext.report.models import Report
-
-        report = Report.query.get_or_404(id_)
-        report_wrapper = ReportWrapper(self, report)
-        html_report = report_wrapper.html_template.render(data=report_wrapper.data, columns=report_wrapper.columns)
+        report = Report(self, id_)
+        html_report = report.html_template.render(data=report.data, columns=report.columns)
         from pygments import highlight
         from pygments.lexers import PythonLexer
         from pygments.formatters import HtmlFormatter
-
-        code = report_wrapper.read_literal_filter_condition()
+        code = report.read_literal_filter_condition()
         customized_filter_condition = highlight(code, PythonLexer(), HtmlFormatter())
         return render_template("report____/report.html", report=report, html_report=html_report,
                                customized_filter_condition=customized_filter_condition)
