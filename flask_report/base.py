@@ -3,8 +3,8 @@ import os
 from flask import render_template
 from flask.ext.report.report import Report
 
-class FlaskReport(object):
 
+class FlaskReport(object):
     def __init__(self, db, model_map, app, blueprint=None):
         self.db = db
         host = blueprint or app
@@ -25,7 +25,6 @@ class FlaskReport(object):
         host.route("/report_pdf/<int:id_>")(self.report_pdf)
         host.route("/report_txt/<int:id_>")(self.report_txt)
 
-
         from flask import Blueprint
         # register it for using the templates of data browser
         self.blueprint = Blueprint("report____", __name__,
@@ -43,23 +42,27 @@ class FlaskReport(object):
         from pygments import highlight
         from pygments.lexers import PythonLexer
         from pygments.formatters import HtmlFormatter
+
         code = report.read_literal_filter_condition()
         customized_filter_condition = highlight(code, PythonLexer(), HtmlFormatter())
         return render_template("report____/report.html", report=report, html_report=html_report,
                                customized_filter_condition=customized_filter_condition)
 
     def _get_report(self, id_, ReportClass):
-        from flask.ext.report.reports import BaseReport
+        from flask.ext.report.report_templates import BaseReport
+
         assert issubclass(ReportClass, BaseReport)
         data = Report(self, id_)
         report = ReportClass(queryset=data.data, columns=data.columns)
         return report
 
     def _get_report_value(self, id_, ReportClass, ReportGenerator, first_row_with_column_names=False):
-        from flask.ext.report.reports import BaseReport
+        from flask.ext.report.report_templates import BaseReport
+
         assert issubclass(ReportClass, BaseReport)
 
         from geraldo.generators import base
+
         assert issubclass(ReportGenerator, base.ReportGenerator)
         try:
             from cStringIO import StringIO
@@ -74,11 +77,22 @@ class FlaskReport(object):
                            first_row_with_column_names=first_row_with_column_names)
         return return_fileobj
 
+    def _get_report_class(self, id_, default=None):
+        if default is None:
+            raise ValueError
+        filter_def_file = os.path.join(self.report_dir, str(id_), "report_templates.py")
+        if os.path.exists(filter_def_file):
+            from import_file import import_file
+
+            lib = import_file(filter_def_file)
+            return getattr(lib, default.__name__, None) or default
+
     def report_csv(self, id_):
         # TODO unimplemented
-        from flask.ext.report.reports import CSVReport
         from geraldo.generators import CSVGenerator
-        return_fileobj = self._get_report_value(id_, CSVReport, CSVGenerator, True)
+        from flask.ext.report.report_templates import CSVReport
+
+        return_fileobj = self._get_report_value(id_, self._get_report_class(id_, CSVReport), CSVGenerator, True)
         from flask import Response
 
         response = Response(return_fileobj.getvalue(), mimetype="text/csv")
@@ -86,10 +100,10 @@ class FlaskReport(object):
         return response
 
     def report_pdf(self, id_):
-        # TODO unimplemented
-        from flask.ext.report.reports import PDFReport
+        from flask.ext.report.report_templates import PDFReport
         from geraldo.generators import PDFGenerator
-        return_fileobj = self._get_report_value(id_, PDFReport, PDFGenerator, True)
+
+        return_fileobj = self._get_report_value(id_, self._get_report_class(id_, PDFReport), PDFGenerator, True)
         from flask import Response
 
         response = Response(return_fileobj.getvalue(), mimetype="application/pdf")
@@ -97,10 +111,11 @@ class FlaskReport(object):
         return response
 
     def report_txt(self, id_):
-        # TODO unimplemented
-        from flask.ext.report.reports import TxtReport
+        from flask.ext.report.report_templates import TxtReport
+
         from geraldo.generators import TextGenerator
-        return_fileobj = self._get_report_value(id_, TxtReport, TextGenerator, True)
+
+        return_fileobj = self._get_report_value(id_, self._get_report_class(id_, TxtReport), TextGenerator, True)
         from flask import Response
 
         response = Response(return_fileobj.getvalue(), mimetype="text/plan")

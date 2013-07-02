@@ -75,9 +75,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     platforms='any',
-    install_requires=[
-        'flask>=0.10', 'geraldo'
-    ],
+    install_requires=open('requirements.txt').readlines(),
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
