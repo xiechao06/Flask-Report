@@ -76,7 +76,7 @@ class PDFReport(BaseReport):
         from reportlab.pdfbase.ttfonts import TTFont
 
         try:
-            pdfmetrics.registerFont(TTFont('hei', 'simhei.TTF'))
+            pdfmetrics.registerFont(TTFont('hei', '/usr/share/fonts/truetype/wqy/wqy-microhei.ttc'))
         except:
             raise
 

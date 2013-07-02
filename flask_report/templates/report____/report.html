@@ -41,6 +41,7 @@
     {{ _('filter conditions are: ') }}
   </small></p>
   <ul>
+    {% if report.filters %}
     {% for name, value in report.filters.items() %}
     <li>
     <small>
@@ -48,6 +49,7 @@
     </small>
     </li>
     {% endfor %}
+    {% endif %}
   </ul>
   <p>
     <small>

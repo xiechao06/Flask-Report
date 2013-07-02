@@ -44,10 +44,11 @@ class Report(object):
     @property
     def data(self):
         q = self.data_set.query
-        for name, value in self.filters.items():
-            model_name, column_name = name.split('.')
-            q = q.filter(operator.attrgetter(column_name)(self.report_view.model_map[model_name])==value)
-        if self.literal_filter_condition:
+        if self.filters:
+            for name, value in self.filters.items():
+                model_name, column_name = name.split('.')
+                q = q.filter(operator.attrgetter(column_name)(self.report_view.model_map[model_name])==value)
+        if self.literal_filter_condition is not None:
             q = q.filter(self.literal_filter_condition)
         all_columns = dict((c['name'], c) for c in self.data_set.columns)
         if self.order_by:
