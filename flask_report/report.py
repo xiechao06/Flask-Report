@@ -5,6 +5,7 @@ import operator
 import codecs
 from collections import namedtuple
 
+from flask import render_template
 import yaml
 from import_file import import_file
 from flask.ext.report.data_set import DataSet
@@ -77,3 +78,8 @@ class Report(object):
         filter_def_file = os.path.join(self.report_view.report_dir, str(self.id_), "filter_def.py")
         if os.path.exists(filter_def_file):
             return codecs.open(filter_def_file, encoding='utf-8').read()
+
+    @property
+    def short_description(self):
+        return render_template('report____/report_short_description.html', report=self)
+
