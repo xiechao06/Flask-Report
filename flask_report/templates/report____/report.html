@@ -41,10 +41,10 @@
     {{ _('filter conditions are: ') }}
   </small></p>
   <ul>
-    {% for filter_ in report.filter_conditions %}
+    {% for name, value in report.filters.items() %}
     <li>
     <small>
-      <Strong>{{ filter_.name }}</Strong> - {{ filter_.value }}
+      <Strong>{{ name }}</Strong> - {{ value }}
     </small>
     </li>
     {% endfor %}
@@ -66,9 +66,9 @@
 <span class='span-12'>
   {{ _("download as: ")}}
   <div class="btn-group pagination-centered">
-    <a href="{{ url_for('.report_pdf', id_=report.id) }}" class="btn btn-primary btn-info">PDF</a>
-    <a href="{{ url_for('.report_csv', id_=report.id) }}" class="btn btn-primary btn-info">CSV</a>
-    <a href="{{ url_for('.report_txt', id_=report.id) }}" class="btn btn-primary btn-info">TXT</a>
+    <a href="{{ url_for('.report_pdf', id_=report.id_) }}" class="btn btn-primary btn-info">PDF</a>
+    <a href="{{ url_for('.report_csv', id_=report.id_) }}" class="btn btn-primary btn-info">CSV</a>
+    <a href="{{ url_for('.report_txt', id_=report.id_) }}" class="btn btn-primary btn-info">TXT</a>
   </div>
 </span>
 <div class="pagination-centered span12">
