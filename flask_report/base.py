@@ -34,7 +34,9 @@ class FlaskReport(object):
 
 
     def report_list(self):
-        return "this is report list"
+        # directory 0 is reserved for special purpose
+        reports = [Report(self, int(dir_name)) for dir_name in os.listdir(self.report_dir) if dir_name.isdigit() and dir_name != '0']
+        return render_template('report____/report-list.html', reports=reports)
 
     def report(self, id_):
         report = Report(self, id_)
