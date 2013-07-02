@@ -81,6 +81,8 @@ class FlaskReport(object):
         if default is None:
             raise ValueError
         filter_def_file = os.path.join(self.report_dir, str(id_), "report_templates.py")
+        if not os.path.exists(filter_def_file):
+            filter_def_file = os.path.join(self.report_dir, "0", "report_templates.py")
         if os.path.exists(filter_def_file):
             from import_file import import_file
 
