@@ -76,7 +76,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
-        'flask>=0.10'
+        'flask>=0.10', 'geraldo'
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
