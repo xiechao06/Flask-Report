@@ -51,12 +51,8 @@ class FlaskReport(object):
     def _get_report(self, id_, ReportClass):
         from flask.ext.report.reports import BaseReport
         assert issubclass(ReportClass, BaseReport)
-        from flask.ext.report.models import Report
-
-        data = Report.query.get_or_404(id_)
-        wrapper = ReportWrapper(self, data)
-
-        report = ReportClass(queryset=wrapper.data, columns=wrapper.columns)
+        data = Report(self, id_)
+        report = ReportClass(queryset=data.data, columns=data.columns)
         return report
 
     def _get_report_value(self, id_, ReportClass, ReportGenerator, first_row_with_column_names=False):

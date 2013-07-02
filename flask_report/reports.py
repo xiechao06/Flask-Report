@@ -1,5 +1,7 @@
 #-*- coding:utf-8 -*-
-from geraldo import Report, ReportBand, ObjectValue
+from geraldo import Report, ReportBand, ObjectValue, SystemField, BAND_WIDTH, Label, Line
+from reportlab.lib.colors import navy
+from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.units import cm
 
 
@@ -21,8 +23,25 @@ class BandDetail(ReportBand):
         super(BandDetail, self).__init__(**kwargs)
 
 
+class BandHeader(ReportBand):
+    height = 1.3 * cm
+    borders = {'bottom': Line(stroke_color=navy)}
+
+    def __init__(self, **kwargs):
+        style = kwargs.get("style")
+
+        def get_labels(columns, dic):
+            return [Label(text=c.get("name", " "), top=0.8 * cm, left=0 + c.get("idx", 0) * 3 * cm, **dic) for c in
+                    columns]
+
+        self.elements = [SystemField(expression='%(report_title)s', top=0.1 * cm, left=0, width=BAND_WIDTH,
+                                     style={'fontName': 'Helvetica-Bold', 'fontSize': 14, 'alignment': TA_CENTER,
+                                            'textColor': navy})] + get_labels(kwargs.pop("columns", []),
+                                                                              {"style": style} if style else {})
+
+
 class BaseReport(Report):
-    title = "test"
+    title = "report"
     author = "test"
     margin_left = 2 * cm
     margin_top = 0.5 * cm
@@ -50,6 +69,7 @@ class PDFReport(BaseReport):
         super(BaseReport, self).__init__(queryset)
         self.band_detail = BandDetail(columns=columns, style={'fontName': 'hei', 'fontSize': 12})
         self.register_font()
+        self.band_page_header = BandHeader(columns=columns, style={'fontName': 'hei', 'fontSize': 12})
 
     def register_font(self):
         from reportlab.pdfbase import pdfmetrics
