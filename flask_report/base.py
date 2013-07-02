@@ -35,16 +35,14 @@ class FlaskReport(object):
 
 
     def report_list(self):
-        return "this is report list"
+        # directory 0 is reserved for special purpose
+        reports = [Report(self, int(dir_name)) for dir_name in os.listdir(self.report_dir) if dir_name.isdigit() and dir_name != '0']
+        return render_template('report____/report-list.html', reports=reports)
 
     def report(self, id_):
         report = Report(self, id_)
         html_report = report.html_template.render(data=report.data, columns=report.columns)
-        from pygments import highlight
-        from pygments.lexers import PythonLexer
-        from pygments.formatters import HtmlFormatter
-        code = report.read_literal_filter_condition()
-        customized_filter_condition = highlight(code, PythonLexer(), HtmlFormatter())
+        customized_filter_condition = report.literal_filter_condition_code
         return render_template("report____/report.html", report=report, html_report=html_report, customized_filter_condition=customized_filter_condition)
     
     def report_csv(self, id_):
