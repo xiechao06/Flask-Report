@@ -25,6 +25,7 @@ class Report(object):
         self.create_time = report_meta.get('create_time')
         self.filters = report_meta.get('filters')
         self.order_by = report_meta.get('order_by')
+        self.description = report_meta.get("description")
         if self.order_by:
             if self.order_by.startswith('-'):
                 name = self.order_by[1:]
