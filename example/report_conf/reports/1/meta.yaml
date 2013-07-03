@@ -1,5 +1,6 @@
 name: 三国文臣武将实力报告
 creator: 光荣
+description: 该报告指出了三国时期不包括吴国的另外两个国家文将之间的恩怨瓜葛
 create_time: 2013-07-02 08:30:00
 filters: 
     User.is_lord: false

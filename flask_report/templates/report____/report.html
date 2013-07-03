@@ -29,8 +29,9 @@
   </span>
   </h1>
   <div id="detail" class="collapse">
-  <p><small>{{ _('created by "%(creator)s" at %(create_time)s, using data set "%(data_set)s", ', 
-    creator=report.creator, create_time=report.creat_time, 
+  <p><small>{{ _('this report described %(description)s' + "<br>" , description=report.description) if report.description else "" }}{{ _('created by "%(creator)s" at %(create_time)s, using data set <span title="%(data_set_description)s">"%(data_set)s"</span>, ',
+    creator=report.creator, create_time=report.creat_time,
+    data_set_description=report.data_set.description,
     data_set=report.data_set.name) }}
     {% if report.order_by %}
       {{ _('order by "%(order_by)s" %(order)s',
@@ -59,6 +60,7 @@
   <p>
     {{ customized_filter_condition|safe }}
   </p>
+  <p><small></small></p>
 </div>
 </div>
 <hr />
