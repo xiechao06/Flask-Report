@@ -69,9 +69,7 @@ class PDFReport(BaseReport):
     """
 
     def __init__(self, columns, queryset, report_name=None):
-        super(BaseReport, self).__init__(queryset)
-        if report_name:
-            self.title = report_name
+        super(PDFReport, self).__init__(columns, queryset, report_name)
         self.band_detail = BandDetail(columns=columns, style={'fontName': 'hei', 'fontSize': 12})
         self.register_font()
         self.band_page_header = BandHeader(columns=columns, style={'fontName': 'hei', 'fontSize': 12})
