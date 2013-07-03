@@ -5,8 +5,32 @@
 {% endblock %}
 
 {% block report____customized_head_block %}
+<link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
+<script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="{{ url_for('report____.static', filename='DT_bootstrap.js') }}"></script>
 <script type="text/javascript">
+  $.extend( $.fn.dataTableExt.oStdClasses, {
+      "sWrapper": "dataTables_wrapper form-inline"
+  });
   $(function () {
+      $("#report").dataTable({
+        "oLanguage": {
+          "sSearch": "搜索: ",
+            "sLengthMenu": "每页展示_MENU_条记录",
+            "sZeroRecords": "对不起，找不到数据",
+            "sInfo": "共有_TOTAL_条数据，展示了其中_START_到_END_条",
+            "sInfoEmpty": "共0条数据",
+            "sInfoFiltered": "从_MAX_条记录中过滤产生",
+            'oPaginate': {
+              "sPrevious": "上一页",
+              "sNext": "下一页",
+              "sFirst": "首页",
+              'sLast': '末页',
+              },
+            },
+        "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>",
+        "iDisplayLength": 25,
+        });
       $("#detail").on('shown', function () {
         $('a[data-target="#detail"]').text("{{ _('hide detail') }}" + " <<");
         });
@@ -65,6 +89,8 @@
 <div>
 {{ html_report|safe }}
 </div>
+<hr />
+
 <span class='span-12'>
   {{ _("download as: ")}}
   <div class="btn-group pagination-centered">
