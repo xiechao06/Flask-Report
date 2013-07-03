@@ -73,7 +73,7 @@ class Report(object):
         if not os.path.exists(report_file):
             # read the default report template
             report_file = os.path.join(self.report_view.report_dir, '0', "report.html")
-        return Template(file(report_file).read())
+        return Template(codecs.open(report_file, encoding='utf-8').read())
 
     def read_literal_filter_condition(self):
         filter_def_file = os.path.join(self.report_view.report_dir, str(self.id_), "filter_def.py")
