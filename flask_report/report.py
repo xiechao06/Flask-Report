@@ -36,7 +36,7 @@ class Report(object):
             self.order_by = namedtuple("OrderBy", ['name', 'desc'])(name, desc_)
         self.data_set = DataSet(report_view, report_meta['data_set_id'])
         self.__columns = report_meta.get('columns')
-        self.__special_chars = {">": operator.gt, "<": operator.lt, ">=": operator.ge, "<=": operator.le}
+        self.__special_chars = {"gt": operator.gt, "lt": operator.lt, "ge": operator.ge, "le": operator.le, "eq": operator.eq}
 
     @property
     def columns(self):
@@ -44,10 +44,8 @@ class Report(object):
         return [all_columns[i] for i in self.__columns]
 
     def get_operator_and_value(self, value):
-        if isinstance(value, basestring):
-            for char in self.__special_chars:
-                if char in value:
-                    return self.__special_chars[char], value.split(char)[-1].strip()
+        if isinstance(value, dict) and value.get("operator"):
+            return self.__special_chars[value.get("operator")], value.get("value")
         else:
             return operator.eq, value
 
@@ -55,9 +53,9 @@ class Report(object):
     def data(self):
         q = self.data_set.query
         if self.filters:
-            for name, value in self.filters.items():
+            for name, params in self.filters.items():
                 model_name, column_name = name.split('.')
-                opt, value = self.get_operator_and_value(value)
+                opt, value = self.get_operator_and_value(params)
                 q = q.filter(opt(operator.attrgetter(column_name)(self.report_view.model_map[model_name]), value))
         if self.literal_filter_condition is not None:
             q = q.filter(self.literal_filter_condition)

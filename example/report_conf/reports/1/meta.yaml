@@ -4,7 +4,9 @@ description: 该报告指出了三国时期不包括吴国的另外两个国家�
 create_time: 2013-07-02 08:30:00
 filters: 
     User.is_lord: false
-    User.group_id: User.group_id >= 1
+    User.group_id:
+        operator: ge
+        value: 1
 order_by: -平均武力值
 columns: [0, 1, 2, 3]
 data_set_id: 1
