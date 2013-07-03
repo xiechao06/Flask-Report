@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 import os
-from flask import render_template
+from flask import render_template, abort
 from flask.ext.report.report import Report
 
 
@@ -36,8 +36,13 @@ class FlaskReport(object):
 
     def report_list(self):
         # directory 0 is reserved for special purpose
-        reports = [Report(self, int(dir_name)) for dir_name in os.listdir(self.report_dir) if dir_name.isdigit() and dir_name != '0']
-        return render_template('report____/report-list.html', reports=reports, **self.extra_params.get('report_list'))
+        reports = [Report(self, int(dir_name)) for dir_name in os.listdir(self.report_dir) if
+                   dir_name.isdigit() and dir_name != '0']
+        params = dict(reports=reports)
+        extra_params = self.extra_params.get('report_list')
+        if extra_params:
+            params.update(extra_params)
+        return render_template('report____/report-list.html', **params)
 
     def report(self, id_):
         report = Report(self, id_)
@@ -48,14 +53,19 @@ class FlaskReport(object):
 
         code = report.read_literal_filter_condition()
         customized_filter_condition = highlight(code, PythonLexer(), HtmlFormatter())
-        return render_template("report____/report.html", report=report, html_report=html_report,
-                               customized_filter_condition=customized_filter_condition, **self.extra_params.get('report'))
+        params = dict(report=report, html_report=html_report, customized_filter_condition=customized_filter_condition)
+        extra_params = self.extra_params.get("report")
+        if extra_params:
+            params.update(extra_params)
+        return render_template("report____/report.html", **params)
 
     def _get_report(self, id_, ReportClass):
         from flask.ext.report.report_templates import BaseReport
 
         assert issubclass(ReportClass, BaseReport)
         data = Report(self, id_)
+        if not data.data:
+            raise ValueError
         report = ReportClass(queryset=data.data, columns=data.columns)
         return report
 
@@ -97,7 +107,10 @@ class FlaskReport(object):
         from geraldo.generators import CSVGenerator
         from flask.ext.report.report_templates import CSVReport
 
-        return_fileobj = self._get_report_value(id_, self._get_report_class(id_, CSVReport), CSVGenerator, True)
+        try:
+            return_fileobj = self._get_report_value(id_, self._get_report_class(id_, CSVReport), CSVGenerator, True)
+        except ValueError:
+            return render_template("report____/error.html", error=u"没有该报告", message=u"无法导出空报告"), 403
         from flask import Response
 
         response = Response(return_fileobj.getvalue(), mimetype="text/csv")
@@ -108,7 +121,10 @@ class FlaskReport(object):
         from flask.ext.report.report_templates import PDFReport
         from geraldo.generators import PDFGenerator
 
-        return_fileobj = self._get_report_value(id_, self._get_report_class(id_, PDFReport), PDFGenerator, True)
+        try:
+            return_fileobj = self._get_report_value(id_, self._get_report_class(id_, PDFReport), PDFGenerator, True)
+        except ValueError:
+            return render_template("report____/error.html", error=u"没有该报告", message=u"无法导出空报告"), 403
         from flask import Response
 
         response = Response(return_fileobj.getvalue(), mimetype="application/pdf")
@@ -120,7 +136,10 @@ class FlaskReport(object):
 
         from geraldo.generators import TextGenerator
 
-        return_fileobj = self._get_report_value(id_, self._get_report_class(id_, TxtReport), TextGenerator, True)
+        try:
+            return_fileobj = self._get_report_value(id_, self._get_report_class(id_, TxtReport), TextGenerator, True)
+        except ValueError:
+            return render_template("report____/error.html", error=u"没有该报告", message=u"无法导出空报告"), 403
         from flask import Response
 
         response = Response(return_fileobj.getvalue(), mimetype="text/plan")
