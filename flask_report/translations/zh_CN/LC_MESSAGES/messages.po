@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-07-02 18:57+0800\n"
+"POT-Creation-Date: 2013-07-03 17:16+0800\n"
 "PO-Revision-Date: 2013-07-01 14:56+0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -22,55 +22,95 @@ msgstr ""
 msgid "report list"
 msgstr "报表列表"
 
-#: templates/report____/report.html:11
+#: templates/report____/report.html:18
+msgid "Search"
+msgstr "搜索"
+
+#: templates/report____/report.html:19
+msgid "Display _MENU_ records per page"
+msgstr "每页展示_MENU_条记录"
+
+#: templates/report____/report.html:20
+msgid "Nothing found - sorry"
+msgstr "对不起，找不到数据"
+
+#: templates/report____/report.html:21
+msgid "Showing _START_ to _END_ of _TOTAL_ records"
+msgstr "共有_TOTAL_条数据，展示了其中_START_到_END_条"
+
+#: templates/report____/report.html:22
+msgid "Showing 0 to 0 of 0 records"
+msgstr "共0条数据"
+
+#: templates/report____/report.html:23
+msgid "filtered from _MAX_ total records"
+msgstr "从_MAX_条记录中过滤产生"
+
+#: templates/report____/report.html:25
+msgid "Previous"
+msgstr "上一页"
+
+#: templates/report____/report.html:26
+msgid "Next"
+msgstr "下一页"
+
+#: templates/report____/report.html:27
+msgid "First"
+msgstr "首页"
+
+#: templates/report____/report.html:28
+msgid "Last"
+msgstr "末页"
+
+#: templates/report____/report.html:35
 msgid "hide detail"
 msgstr "隐藏详情"
 
-#: templates/report____/report.html:14 templates/report____/report.html:27
+#: templates/report____/report.html:38 templates/report____/report.html:51
 msgid "show detail"
 msgstr "显示详情"
 
-#: templates/report____/report.html:32
-#, python-format
+#: templates/report____/report.html:56
+#, fuzzy, python-format
 msgid ""
-"created by \"%(creator)s\" at %(create_time)s, using data set "
-"\"%(data_set)s\", "
+"created by \"%(creator)s\" at %(create_time)s, using data set <span "
+"title=\"%(data_set_description)s\">\"%(data_set)s\"</span>, "
 msgstr "由用户\"%(creator)s\"在%(create_time)s创建, 使用的数据集和是\"%(data_set)s\", "
 
-#: templates/report____/report.html:36
+#: templates/report____/report.html:61
 #, python-format
 msgid "order by \"%(order_by)s\" %(order)s"
 msgstr "按字段\"%(order_by)s\"进行%(order)s排列"
 
-#: templates/report____/report.html:38
+#: templates/report____/report.html:63
 msgid "descendingly"
 msgstr "降序"
 
-#: templates/report____/report.html:38
+#: templates/report____/report.html:63
 msgid "ascendingly"
 msgstr "升序"
 
-#: templates/report____/report.html:41
+#: templates/report____/report.html:66
 msgid "filter conditions are: "
 msgstr "过滤条件如下:"
 
-#: templates/report____/report.html:54
+#: templates/report____/report.html:81
 msgid "the customized filter condition is: "
 msgstr "定制的过滤条件如下:"
 
-#: templates/report____/report.html:67
+#: templates/report____/report.html:97
 msgid "download as: "
 msgstr "以下列格式下载: "
 
-#: templates/report____/report.html:75
+#: templates/report____/report.html:105
 msgid "BACK"
 msgstr "返回"
 
-#: templates/report____/report.html:76
+#: templates/report____/report.html:106
 msgid "EDIT"
 msgstr "编辑"
 
-#: templates/report____/report.html:77
+#: templates/report____/report.html:107
 msgid "REFRESH"
 msgstr "刷新"
 
@@ -79,6 +119,18 @@ msgid "creator"
 msgstr "创建人"
 
 #: templates/report____/report_short_description.html:2
-msgid "create_time"
+msgid "create time"
 msgstr "创建时间"
+
+#: templates/report____/report_short_description.html:3
+msgid "description"
+msgstr "描述"
+
+#: templates/report____/report_short_description.html:4
+msgid "data set"
+msgstr "数据集和"
+
+#: templates/report____/report_short_description.html:5
+msgid "data set description"
+msgstr "数据集合描述"
 
