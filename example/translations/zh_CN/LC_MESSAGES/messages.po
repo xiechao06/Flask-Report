@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-07-02 18:57+0800\n"
+"POT-Creation-Date: 2013-07-03 11:10+0800\n"
 "PO-Revision-Date: 2013-07-01 14:56+0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -54,23 +54,23 @@ msgstr "升序"
 msgid "filter conditions are: "
 msgstr "过滤条件如下:"
 
-#: templates/report____/report.html:54
+#: templates/report____/report.html:56
 msgid "the customized filter condition is: "
 msgstr "定制的过滤条件如下:"
 
-#: templates/report____/report.html:67
+#: templates/report____/report.html:69
 msgid "download as: "
 msgstr "以下列格式下载: "
 
-#: templates/report____/report.html:75
+#: templates/report____/report.html:77
 msgid "BACK"
 msgstr "返回"
 
-#: templates/report____/report.html:76
+#: templates/report____/report.html:78
 msgid "EDIT"
 msgstr "编辑"
 
-#: templates/report____/report.html:77
+#: templates/report____/report.html:79
 msgid "REFRESH"
 msgstr "刷新"
 
@@ -79,6 +79,10 @@ msgid "creator"
 msgstr "创建人"
 
 #: templates/report____/report_short_description.html:2
-msgid "create_time"
+msgid "create time"
 msgstr "创建时间"
+
+#: templates/report____/report_short_description.html:3
+msgid "data set"
+msgstr "数据集和"
 

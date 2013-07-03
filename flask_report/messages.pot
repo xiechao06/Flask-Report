@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-07-02 18:57+0800\n"
+"POT-Creation-Date: 2013-07-03 11:10+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -54,23 +54,23 @@ msgstr ""
 msgid "filter conditions are: "
 msgstr ""
 
-#: templates/report____/report.html:54
+#: templates/report____/report.html:56
 msgid "the customized filter condition is: "
 msgstr ""
 
-#: templates/report____/report.html:67
+#: templates/report____/report.html:69
 msgid "download as: "
 msgstr ""
 
-#: templates/report____/report.html:75
+#: templates/report____/report.html:77
 msgid "BACK"
 msgstr ""
 
-#: templates/report____/report.html:76
+#: templates/report____/report.html:78
 msgid "EDIT"
 msgstr ""
 
-#: templates/report____/report.html:77
+#: templates/report____/report.html:79
 msgid "REFRESH"
 msgstr ""
 
@@ -79,6 +79,10 @@ msgid "creator"
 msgstr ""
 
 #: templates/report____/report_short_description.html:2
-msgid "create_time"
+msgid "creater time"
+msgstr ""
+
+#: templates/report____/report_short_description.html:3
+msgid "data set"
 msgstr ""
 
