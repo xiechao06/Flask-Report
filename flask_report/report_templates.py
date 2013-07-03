@@ -35,7 +35,7 @@ class BandHeader(ReportBand):
                     columns]
 
         self.elements = [SystemField(expression='%(report_title)s', top=0.1 * cm, left=0, width=BAND_WIDTH,
-                                     style={'fontName': 'Helvetica-Bold', 'fontSize': 14, 'alignment': TA_CENTER,
+                                     style={'fontName': 'hei', 'fontSize': 14, 'alignment': TA_CENTER,
                                             'textColor': navy})] + get_labels(kwargs.pop("columns", []),
                                                                               {"style": style} if style else {})
 
@@ -49,9 +49,11 @@ class BaseReport(Report):
     margin_bottom = 0.5 * cm
 
 
-    def __init__(self, columns, queryset):
+    def __init__(self, columns, queryset, report_name=None):
         super(BaseReport, self).__init__(queryset)
         self.band_detail = BandDetail(columns=columns)
+        if report_name:
+            self.title = report_name
 
 
 class CSVReport(BaseReport):
@@ -65,8 +67,8 @@ class PDFReport(BaseReport):
     PDF需要特定的字体才能展示中文
     """
 
-    def __init__(self, columns, queryset):
-        super(BaseReport, self).__init__(queryset)
+    def __init__(self, columns, queryset, report_name=None):
+        super(PDFReport, self).__init__(columns, queryset, report_name)
         self.band_detail = BandDetail(columns=columns, style={'fontName': 'hei', 'fontSize': 12})
         self.register_font()
         self.band_page_header = BandHeader(columns=columns, style={'fontName': 'hei', 'fontSize': 12})
@@ -78,7 +80,14 @@ class PDFReport(BaseReport):
         try:
             pdfmetrics.registerFont(TTFont('hei', '/usr/share/fonts/truetype/wqy/wqy-microhei.ttc'))
         except:
-            raise
+            try:
+                import os
+                import os.path
+
+                pdfmetrics.registerFont(
+                    TTFont('hei', os.path.join(os.path.dirname(os.path.abspath(__file__)), r"fonts\simhei.ttf")))
+            except:
+                raise
 
 
 class TxtReport(BaseReport):
