@@ -50,7 +50,7 @@ class BaseReport(Report):
     margin_bottom = 0.5 * cm
 
 
-    def __init__(self, columns, queryset, report_name):
+    def __init__(self, columns, queryset, report_name=None):
         super(BaseReport, self).__init__(queryset)
         self.band_detail = BandDetail(columns=columns)
         if report_name:
