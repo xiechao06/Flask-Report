@@ -36,7 +36,7 @@ class Report(object):
             self.order_by = namedtuple("OrderBy", ['name', 'desc'])(name, desc_)
         self.data_set = DataSet(report_view, report_meta['data_set_id'])
         self.__columns = report_meta.get('columns')
-        self.__special_chars = {">": operator.gt, "<": operator.lt}
+        self.__special_chars = {">": operator.gt, "<": operator.lt, ">=": operator.ge, "<=": operator.le}
 
     @property
     def columns(self):
@@ -45,9 +45,9 @@ class Report(object):
 
     def get_operator_and_value(self, value):
         if isinstance(value, basestring):
-            for idx, char in enumerate(value):
-                if char in self.__special_chars:
-                    return self.__special_chars[char], value[idx+1:].strip()
+            for char in self.__special_chars:
+                if char in value:
+                    return self.__special_chars[char], value.split(char)[-1].strip()
         else:
             return operator.eq, value
 
