@@ -36,11 +36,20 @@ class Report(object):
             self.order_by = namedtuple("OrderBy", ['name', 'desc'])(name, desc_)
         self.data_set = DataSet(report_view, report_meta['data_set_id'])
         self.__columns = report_meta.get('columns')
+        self.__special_chars = {">": operator.gt, "<": operator.lt}
 
     @property
     def columns(self):
         all_columns = self.data_set.columns
         return [all_columns[i] for i in self.__columns]
+
+    def get_operator_and_value(self, value):
+        if isinstance(value, basestring):
+            for idx, char in enumerate(value):
+                if char in self.__special_chars:
+                    return self.__special_chars[char], value[idx+1:].strip()
+        else:
+            return operator.eq, value
 
     @property
     def data(self):
@@ -48,7 +57,8 @@ class Report(object):
         if self.filters:
             for name, value in self.filters.items():
                 model_name, column_name = name.split('.')
-                q = q.filter(operator.attrgetter(column_name)(self.report_view.model_map[model_name])==value)
+                opt, value = self.get_operator_and_value(value)
+                q = q.filter(opt(operator.attrgetter(column_name)(self.report_view.model_map[model_name]), value))
         if self.literal_filter_condition is not None:
             q = q.filter(self.literal_filter_condition)
         all_columns = dict((c['name'], c) for c in self.data_set.columns)
