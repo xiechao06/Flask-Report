@@ -14,6 +14,7 @@ class DataSet(object):
         self.name = data_set_meta['name'] 
         self.creator = data_set_meta.get('creator')
         self.create_time = data_set_meta.get('create_time')
+        self.description = data_set_meta.get("description")
 
     @cached_property
     def query(self):

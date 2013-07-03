@@ -7,7 +7,7 @@
 {% block report____customized_head_block %}
 <link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
 <script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
-<script type="text/javascript" src="{{ url_for('report____.static', filename='DT_bootstrap.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('report____.static', filename='js/DT_bootstrap.js') }}"></script>
 <script type="text/javascript">
   $.extend( $.fn.dataTableExt.oStdClasses, {
       "sWrapper": "dataTables_wrapper form-inline"
@@ -15,17 +15,17 @@
   $(function () {
       $("#report").dataTable({
         "oLanguage": {
-          "sSearch": "搜索: ",
-            "sLengthMenu": "每页展示_MENU_条记录",
-            "sZeroRecords": "对不起，找不到数据",
-            "sInfo": "共有_TOTAL_条数据，展示了其中_START_到_END_条",
-            "sInfoEmpty": "共0条数据",
-            "sInfoFiltered": "从_MAX_条记录中过滤产生",
+            "sSearch": '{{ _("Search") }}' + " :",
+            "sLengthMenu": '{{ _("Display _MENU_ records per page") }}',
+            "sZeroRecords": '{{ _("Nothing found - sorry") }}',
+            "sInfo": '{{ _("Showing _START_ to _END_ of _TOTAL_ records") }}',
+            "sInfoEmpty": '{{ _("Showing 0 to 0 of 0 records") }}',
+            "sInfoFiltered": "(" + '{{ _("filtered from _MAX_ total records") }}' + ")",
             'oPaginate': {
-              "sPrevious": "上一页",
-              "sNext": "下一页",
-              "sFirst": "首页",
-              'sLast': '末页',
+              "sPrevious": '{{ _("Previous") }} ',
+              "sNext": '{{ _("Next") }}',
+              "sFirst": '{{ _("First") }}',
+              'sLast': '{{ _("Last") }}',
               },
             },
         "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>",
@@ -53,8 +53,9 @@
   </span>
   </h1>
   <div id="detail" class="collapse">
-  <p><small>{{ _('created by "%(creator)s" at %(create_time)s, using data set "%(data_set)s", ', 
-    creator=report.creator, create_time=report.creat_time, 
+  <p><small>{{ report.description +"<br>"|safe if report.description else "" }}{{ _('created by "%(creator)s" at %(create_time)s, using data set <span title="%(data_set_description)s">"%(data_set)s"</span>, ',
+    creator=report.creator, create_time=report.creat_time,
+    data_set_description=report.data_set.description,
     data_set=report.data_set.name) }}
     {% if report.order_by %}
       {{ _('order by "%(order_by)s" %(order)s',
@@ -83,6 +84,7 @@
   <p>
     {{ customized_filter_condition|safe }}
   </p>
+  <p><small></small></p>
 </div>
 </div>
 <hr />

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-07-03 11:10+0800\n"
+"POT-Creation-Date: 2013-07-03 17:16+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,55 +22,95 @@ msgstr ""
 msgid "report list"
 msgstr ""
 
-#: templates/report____/report.html:11
+#: templates/report____/report.html:18
+msgid "Search"
+msgstr ""
+
+#: templates/report____/report.html:19
+msgid "Display _MENU_ records per page"
+msgstr ""
+
+#: templates/report____/report.html:20
+msgid "Nothing found - sorry"
+msgstr ""
+
+#: templates/report____/report.html:21
+msgid "Showing _START_ to _END_ of _TOTAL_ records"
+msgstr ""
+
+#: templates/report____/report.html:22
+msgid "Showing 0 to 0 of 0 records"
+msgstr ""
+
+#: templates/report____/report.html:23
+msgid "filtered from _MAX_ total records"
+msgstr ""
+
+#: templates/report____/report.html:25
+msgid "Previous"
+msgstr ""
+
+#: templates/report____/report.html:26
+msgid "Next"
+msgstr ""
+
+#: templates/report____/report.html:27
+msgid "First"
+msgstr ""
+
+#: templates/report____/report.html:28
+msgid "Last"
+msgstr ""
+
+#: templates/report____/report.html:35
 msgid "hide detail"
 msgstr ""
 
-#: templates/report____/report.html:14 templates/report____/report.html:27
+#: templates/report____/report.html:38 templates/report____/report.html:51
 msgid "show detail"
 msgstr ""
 
-#: templates/report____/report.html:32
+#: templates/report____/report.html:56
 #, python-format
 msgid ""
-"created by \"%(creator)s\" at %(create_time)s, using data set "
-"\"%(data_set)s\", "
+"created by \"%(creator)s\" at %(create_time)s, using data set <span "
+"title=\"%(data_set_description)s\">\"%(data_set)s\"</span>, "
 msgstr ""
 
-#: templates/report____/report.html:36
+#: templates/report____/report.html:61
 #, python-format
 msgid "order by \"%(order_by)s\" %(order)s"
 msgstr ""
 
-#: templates/report____/report.html:38
+#: templates/report____/report.html:63
 msgid "descendingly"
 msgstr ""
 
-#: templates/report____/report.html:38
+#: templates/report____/report.html:63
 msgid "ascendingly"
 msgstr ""
 
-#: templates/report____/report.html:41
+#: templates/report____/report.html:66
 msgid "filter conditions are: "
 msgstr ""
 
-#: templates/report____/report.html:56
+#: templates/report____/report.html:81
 msgid "the customized filter condition is: "
 msgstr ""
 
-#: templates/report____/report.html:69
+#: templates/report____/report.html:97
 msgid "download as: "
 msgstr ""
 
-#: templates/report____/report.html:77
+#: templates/report____/report.html:105
 msgid "BACK"
 msgstr ""
 
-#: templates/report____/report.html:78
+#: templates/report____/report.html:106
 msgid "EDIT"
 msgstr ""
 
-#: templates/report____/report.html:79
+#: templates/report____/report.html:107
 msgid "REFRESH"
 msgstr ""
 
@@ -79,10 +119,18 @@ msgid "creator"
 msgstr ""
 
 #: templates/report____/report_short_description.html:2
-msgid "creater time"
+msgid "create time"
 msgstr ""
 
 #: templates/report____/report_short_description.html:3
+msgid "description"
+msgstr ""
+
+#: templates/report____/report_short_description.html:4
 msgid "data set"
+msgstr ""
+
+#: templates/report____/report_short_description.html:5
+msgid "data set description"
 msgstr ""
 
