@@ -6,3 +6,4 @@ filters:
 order_by: -平均武力值
 columns: [0, 1, 2, 3]
 data_set_id: 1
+title: 该报告展示的所有文臣的平均实力
