@@ -5,6 +5,13 @@
       <th>{{c.name}}</th>
       {% endfor %}
     </tr>
+    <tr role="row">
+      {% for c in columns %}
+      <td rowspan="1" colspan="1">
+        <input class="search_init" type="text" value='搜索' + '{{ c.name }}'>
+      </td>
+      {% endfor %}
+    </tr>
   </thead>
   <tbody>
     {% for r in data %} 
@@ -18,3 +25,4 @@
     {% endfor %}
   </tbody>
 </table>
+

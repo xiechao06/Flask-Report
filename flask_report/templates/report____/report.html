@@ -13,7 +13,7 @@
       "sWrapper": "dataTables_wrapper form-inline"
   });
   $(function () {
-      $("#report").dataTable({
+      var oTable = $("#report").dataTable({
         "oLanguage": {
             "sSearch": '{{ _("Search") }}' + " :",
             "sLengthMenu": '{{ _("Display _MENU_ records per page") }}',
@@ -28,6 +28,10 @@
               'sLast': '{{ _("Last") }}',
               },
             },
+        "bSortCellsTop": true,
+        "aoColumnDefs": [
+          { "bVisible": false, "aTargets": [ 2 ] }
+        ],
         "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>",
         "iDisplayLength": 25,
         });
@@ -37,6 +41,38 @@
       $("#detail").on('hidden', function () {
         $('a[data-target="#detail"]').text("{{ _('show detail') }}" + " >>");
         });
+
+	
+      /* Add the events etc before DataTables hides a column */
+      $("thead input").keyup( function () {
+          /* Filter on the column (the index) of this element */
+          oTable.fnFilter( this.value, oTable.oApi._fnVisibleToColumnIndex( 
+              oTable.fnSettings(), $("thead input").index(this) ) );
+          });
+	
+      /*
+       * Support functions to provide a little bit of 'user friendlyness' to the textboxes
+       */
+      $("thead input").each( function (i) {
+        this.initVal = this.value;
+      });
+	
+      $("thead input").focus( function () {
+        if ( this.className == "search_init" )
+        {
+          this.className = "";
+          this.value = "";
+        }
+      });
+	
+      $("thead input").blur( function (i) {
+        if ( this.value == "" )
+        {
+          this.className = "search_init";
+          this.value = this.initVal;
+        }
+      });
+	
       });
 </script>
 {% endblock %}
