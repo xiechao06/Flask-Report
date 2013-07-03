@@ -14,6 +14,7 @@ class DataSet(object):
         self.name = data_set_meta['name'] 
         self.creator = data_set_meta.get('creator')
         self.create_time = data_set_meta.get('create_time')
+        self.titles = data_set_meta.copy()
 
     @cached_property
     def query(self):
@@ -31,7 +32,7 @@ class DataSet(object):
                 name = str(c['expr'])
                 key = name
             
-            return dict(idx=idx, name=name, key=key, expr=c['expr'])
+            return dict(idx=idx, name=name, key=key, expr=c['expr'], title=self.titles.get(name, ""))
 
         return tuple(_make_dict(idx, c) for idx, c in enumerate(self.query.column_descriptions))
 
