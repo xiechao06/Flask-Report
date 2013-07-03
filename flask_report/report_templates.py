@@ -3,6 +3,7 @@ from geraldo import Report, ReportBand, ObjectValue, SystemField, BAND_WIDTH, La
 from reportlab.lib.colors import navy
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.units import cm
+from reportlab.pdfbase.ttfonts import TTFError
 
 
 class BandDetail(ReportBand):
@@ -49,7 +50,7 @@ class BaseReport(Report):
     margin_bottom = 0.5 * cm
 
 
-    def __init__(self, columns, queryset, report_name=None):
+    def __init__(self, columns, queryset, report_name):
         super(BaseReport, self).__init__(queryset)
         self.band_detail = BandDetail(columns=columns)
         if report_name:
@@ -68,7 +69,9 @@ class PDFReport(BaseReport):
     """
 
     def __init__(self, columns, queryset, report_name=None):
-        super(PDFReport, self).__init__(columns, queryset, report_name)
+        super(BaseReport, self).__init__(queryset)
+        if report_name:
+            self.title = report_name
         self.band_detail = BandDetail(columns=columns, style={'fontName': 'hei', 'fontSize': 12})
         self.register_font()
         self.band_page_header = BandHeader(columns=columns, style={'fontName': 'hei', 'fontSize': 12})
@@ -79,14 +82,14 @@ class PDFReport(BaseReport):
 
         try:
             pdfmetrics.registerFont(TTFont('hei', '/usr/share/fonts/truetype/wqy/wqy-microhei.ttc'))
-        except:
-            try:
-                import os
-                import os.path
+        except TTFError:
+            import os
+            import os.path
 
+            try:
                 pdfmetrics.registerFont(
                     TTFont('hei', os.path.join(os.path.dirname(os.path.abspath(__file__)), r"fonts\simhei.ttf")))
-            except:
+            except TTFError:
                 raise
 
 
