@@ -3,6 +3,7 @@ from geraldo import Report, ReportBand, ObjectValue, SystemField, BAND_WIDTH, La
 from reportlab.lib.colors import navy
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.units import cm
+from reportlab.pdfbase.ttfonts import TTFError
 
 
 class BandDetail(ReportBand):
@@ -79,14 +80,14 @@ class PDFReport(BaseReport):
 
         try:
             pdfmetrics.registerFont(TTFont('hei', '/usr/share/fonts/truetype/wqy/wqy-microhei.ttc'))
-        except:
-            try:
-                import os
-                import os.path
+        except TTFError:
+            import os
+            import os.path
 
+            try:
                 pdfmetrics.registerFont(
                     TTFont('hei', os.path.join(os.path.dirname(os.path.abspath(__file__)), r"fonts\simhei.ttf")))
-            except:
+            except TTFError:
                 raise
 
 
