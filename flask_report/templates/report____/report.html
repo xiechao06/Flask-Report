@@ -5,8 +5,32 @@
 {% endblock %}
 
 {% block report____customized_head_block %}
+<link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
+<script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="{{ url_for('report____.static', filename='js/DT_bootstrap.js') }}"></script>
 <script type="text/javascript">
+  $.extend( $.fn.dataTableExt.oStdClasses, {
+      "sWrapper": "dataTables_wrapper form-inline"
+  });
   $(function () {
+      $("#report").dataTable({
+        "oLanguage": {
+            "sSearch": '{{ _("Search") }}' + " :",
+            "sLengthMenu": '{{ _("Display _MENU_ records per page") }}',
+            "sZeroRecords": '{{ _("Nothing found - sorry") }}',
+            "sInfo": '{{ _("Showing _START_ to _END_ of _TOTAL_ records") }}',
+            "sInfoEmpty": '{{ _("Showing 0 to 0 of 0 records") }}',
+            "sInfoFiltered": "(" + '{{ _("filtered from _MAX_ total records") }}' + ")",
+            'oPaginate': {
+              "sPrevious": '{{ _("Previous") }} ',
+              "sNext": '{{ _("Next") }}',
+              "sFirst": '{{ _("First") }}',
+              'sLast': '{{ _("Last") }}',
+              },
+            },
+        "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>",
+        "iDisplayLength": 25,
+        });
       $("#detail").on('shown', function () {
         $('a[data-target="#detail"]').text("{{ _('hide detail') }}" + " <<");
         });
@@ -67,6 +91,8 @@
 <div>
 {{ html_report|safe }}
 </div>
+<hr />
+
 <span class='span-12'>
   {{ _("download as: ")}}
   <div class="btn-group pagination-centered">
