@@ -1,9 +1,15 @@
 #-*- coding:utf-8 -*-
-from geraldo import Report, ReportBand, ObjectValue, SystemField, BAND_WIDTH, Label, Line
+from geraldo import Report, ReportBand, ObjectValue, SystemField, BAND_WIDTH, Label, Line, FIELD_ACTION_COUNT, \
+    FIELD_ACTION_SUM, FIELD_ACTION_AVG
 from reportlab.lib.colors import navy
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.units import cm
 from reportlab.pdfbase.ttfonts import TTFError
+from flask.ext.babel import _
+
+
+def get_func(index):
+    return lambda v: v[index]
 
 
 class BandDetail(ReportBand):
@@ -11,10 +17,6 @@ class BandDetail(ReportBand):
 
     def __init__(self, **kwargs):
         def get_elements(columns, dic):
-            def get_func(index):
-                return lambda v: v[index]
-
-
             return [ObjectValue(name=c.get("name", str(c.get('idx', 0))), attribute_name=c,
                                 get_value=get_func(c.get("idx", 0)), left=0 + c.get("idx", 0) * 3 * cm, **dic) for c in
                     columns]
@@ -41,6 +43,29 @@ class BandHeader(ReportBand):
                                                                               {"style": style} if style else {})
 
 
+class BandSummary(ReportBand):
+    height = 0.7 * cm
+    borders = {'all': True}
+
+    def __init__(self, **kwargs):
+        def get_columns(columns, action=FIELD_ACTION_SUM, display_str="sum is %s"):
+            return [ReportBand(height=0.6 * cm, elements=[
+                Label(text=c.get("name", " "), top=0.1 * cm, left=0, style={'fontName': 'hei', 'fontSize': 14}),
+                ObjectValue(attribute_name='', top=0.1 * cm,
+                            left=3 * cm,
+                            action=action,
+                            style={'fontName': 'hei', 'fontSize': 12},
+                            get_value=get_func(c.get("idx", 0)),
+                            display_format=display_str)]) for c in
+                    columns]
+
+        self.elements = [Label(text=_("That's all"), top=0.1 * cm, left=0),
+                         ObjectValue(attribute_name='name', top=0.1 * cm, left=3 * cm, action=FIELD_ACTION_COUNT,
+                                     display_format='%s records found')]
+        self.child_bands = get_columns(kwargs.pop("sum_columns", []), FIELD_ACTION_SUM) + \
+            get_columns(kwargs.pop("avg_columns", []), FIELD_ACTION_AVG, "avg is %s")
+
+
 class BaseReport(Report):
     title = "report"
     author = "test"
@@ -50,7 +75,7 @@ class BaseReport(Report):
     margin_bottom = 0.5 * cm
 
 
-    def __init__(self, columns, queryset, report_name=None):
+    def __init__(self, columns, queryset, report_name=None, **kwargs):
         super(BaseReport, self).__init__(queryset)
         self.band_detail = BandDetail(columns=columns)
         if report_name:
@@ -68,11 +93,12 @@ class PDFReport(BaseReport):
     PDF需要特定的字体才能展示中文
     """
 
-    def __init__(self, columns, queryset, report_name=None):
+    def __init__(self, columns, queryset, report_name=None, sum_columns=None, avg_columns=None):
         super(PDFReport, self).__init__(columns, queryset, report_name)
         self.band_detail = BandDetail(columns=columns, style={'fontName': 'hei', 'fontSize': 12})
         self.register_font()
         self.band_page_header = BandHeader(columns=columns, style={'fontName': 'hei', 'fontSize': 12})
+        self.band_summary = BandSummary(sum_columns=sum_columns or [], avg_columns=avg_columns or [])
 
     def register_font(self):
         from reportlab.pdfbase import pdfmetrics

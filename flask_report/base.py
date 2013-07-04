@@ -66,7 +66,8 @@ class FlaskReport(object):
         data = Report(self, id_)
         if not data.data:
             raise ValueError
-        report = ReportClass(queryset=data.data, columns=data.columns, report_name=data.name)
+        report = ReportClass(queryset=data.data, columns=data.columns, report_name=data.name,
+                             sum_columns=data.sum_columns, avg_columns=data.avg_columns)
         return report
 
     def _get_report_value(self, id_, ReportClass, ReportGenerator, first_row_with_column_names=False):

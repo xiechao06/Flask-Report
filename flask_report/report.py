@@ -37,11 +37,23 @@ class Report(object):
         self.data_set = DataSet(report_view, report_meta['data_set_id'])
         self.__columns = report_meta.get('columns')
         self.__special_chars = {"gt": operator.gt, "lt": operator.lt, "ge": operator.ge, "le": operator.le, "eq": operator.eq}
+        self._sum_columns = report_meta.get("sum_columns")
+        self._avg_columns = report_meta.get("avg_columns")
 
     @property
     def columns(self):
         all_columns = self.data_set.columns
         return [all_columns[i] for i in self.__columns]
+
+    @property
+    def sum_columns(self):
+        all_columns = self.data_set.columns
+        return [all_columns[i] for i in self._sum_columns]
+
+    @property
+    def avg_columns(self):
+        all_columns = self.data_set.columns
+        return [all_columns[i] for i in self._avg_columns]
 
     def _get_operator_and_value(self, value):
         if isinstance(value, dict) and value.get("operator"):
