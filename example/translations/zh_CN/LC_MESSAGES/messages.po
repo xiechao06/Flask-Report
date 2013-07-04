@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-07-03 17:16+0800\n"
+"POT-Creation-Date: 2013-07-04 12:13+0800\n"
 "PO-Revision-Date: 2013-07-01 14:56+0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -16,6 +16,11 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
+
+#: templates/report____/default_html_report.html:11
+#, python-format
+msgid "search %(col_name)s"
+msgstr "搜索%(col_name)s"
 
 #: templates/report____/report-list.html:4
 #: templates/report____/report-list.html:18
@@ -62,55 +67,55 @@ msgstr "首页"
 msgid "Last"
 msgstr "末页"
 
-#: templates/report____/report.html:35
+#: templates/report____/report.html:39
 msgid "hide detail"
 msgstr "隐藏详情"
 
-#: templates/report____/report.html:38 templates/report____/report.html:51
+#: templates/report____/report.html:42 templates/report____/report.html:87
 msgid "show detail"
 msgstr "显示详情"
 
-#: templates/report____/report.html:56
+#: templates/report____/report.html:92
 #, fuzzy, python-format
 msgid ""
 "created by \"%(creator)s\" at %(create_time)s, using data set <span "
 "title=\"%(data_set_description)s\">\"%(data_set)s\"</span>, "
 msgstr "由用户\"%(creator)s\"在%(create_time)s创建, 使用的数据集和是\"%(data_set)s\", "
 
-#: templates/report____/report.html:61
+#: templates/report____/report.html:97
 #, python-format
 msgid "order by \"%(order_by)s\" %(order)s"
 msgstr "按字段\"%(order_by)s\"进行%(order)s排列"
 
-#: templates/report____/report.html:63
+#: templates/report____/report.html:99
 msgid "descendingly"
 msgstr "降序"
 
-#: templates/report____/report.html:63
+#: templates/report____/report.html:99
 msgid "ascendingly"
 msgstr "升序"
 
-#: templates/report____/report.html:66
+#: templates/report____/report.html:102
 msgid "filter conditions are: "
 msgstr "过滤条件如下:"
 
-#: templates/report____/report.html:81
+#: templates/report____/report.html:117
 msgid "the customized filter condition is: "
 msgstr "定制的过滤条件如下:"
 
-#: templates/report____/report.html:97
+#: templates/report____/report.html:133
 msgid "download as: "
 msgstr "以下列格式下载: "
 
-#: templates/report____/report.html:105
+#: templates/report____/report.html:141
 msgid "BACK"
 msgstr "返回"
 
-#: templates/report____/report.html:106
+#: templates/report____/report.html:142
 msgid "EDIT"
 msgstr "编辑"
 
-#: templates/report____/report.html:107
+#: templates/report____/report.html:143
 msgid "REFRESH"
 msgstr "刷新"
 
