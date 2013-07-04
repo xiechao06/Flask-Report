@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-07-04 11:47+0800\n"
+"POT-Creation-Date: 2013-07-04 12:13+0800\n"
 "PO-Revision-Date: 2013-07-01 14:56+0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -16,6 +16,11 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
+
+#: templates/report____/default_html_report.html:11
+#, python-format
+msgid "search %(col_name)s"
+msgstr "搜索%(col_name)s"
 
 #: templates/report____/report-list.html:4
 #: templates/report____/report-list.html:18
