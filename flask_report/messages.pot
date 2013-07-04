@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-07-03 17:16+0800\n"
+"POT-Creation-Date: 2013-07-04 11:47+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -62,55 +62,55 @@ msgstr ""
 msgid "Last"
 msgstr ""
 
-#: templates/report____/report.html:35
+#: templates/report____/report.html:39
 msgid "hide detail"
 msgstr ""
 
-#: templates/report____/report.html:38 templates/report____/report.html:51
+#: templates/report____/report.html:42 templates/report____/report.html:87
 msgid "show detail"
 msgstr ""
 
-#: templates/report____/report.html:56
+#: templates/report____/report.html:92
 #, python-format
 msgid ""
 "created by \"%(creator)s\" at %(create_time)s, using data set <span "
 "title=\"%(data_set_description)s\">\"%(data_set)s\"</span>, "
 msgstr ""
 
-#: templates/report____/report.html:61
+#: templates/report____/report.html:97
 #, python-format
 msgid "order by \"%(order_by)s\" %(order)s"
 msgstr ""
 
-#: templates/report____/report.html:63
+#: templates/report____/report.html:99
 msgid "descendingly"
 msgstr ""
 
-#: templates/report____/report.html:63
+#: templates/report____/report.html:99
 msgid "ascendingly"
 msgstr ""
 
-#: templates/report____/report.html:66
+#: templates/report____/report.html:102
 msgid "filter conditions are: "
 msgstr ""
 
-#: templates/report____/report.html:81
+#: templates/report____/report.html:117
 msgid "the customized filter condition is: "
 msgstr ""
 
-#: templates/report____/report.html:97
+#: templates/report____/report.html:133
 msgid "download as: "
 msgstr ""
 
-#: templates/report____/report.html:105
+#: templates/report____/report.html:141
 msgid "BACK"
 msgstr ""
 
-#: templates/report____/report.html:106
+#: templates/report____/report.html:142
 msgid "EDIT"
 msgstr ""
 
-#: templates/report____/report.html:107
+#: templates/report____/report.html:143
 msgid "REFRESH"
 msgstr ""
 

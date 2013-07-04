@@ -7,6 +7,7 @@ from flask.ext.report.report import Report
 class FlaskReport(object):
     def __init__(self, db, model_map, app, blueprint=None, extra_params=None):
         self.db = db
+        self.app = app
         host = blueprint or app
         self.conf_dir = app.config.get("REPORT_DIR", "report_conf")
         self.report_dir = os.path.join(self.conf_dir, "reports")

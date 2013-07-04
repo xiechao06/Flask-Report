@@ -8,7 +8,7 @@
     <tr role="row">
       {% for c in columns %}
       <td rowspan="1" colspan="1">
-        <input class="search_init" type="text" value='搜索' + '{{ c.name }}'>
+        <input class="search_init" type="text" placeholder="{{ _('search %(col_name)s', col_name=c.name) }}">
       </td>
       {% endfor %}
     </tr>
