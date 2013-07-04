@@ -3,10 +3,12 @@ creator: 光荣
 description: 该报告指出了三国时期不包括吴国的另外两个国家文将之间的恩怨瓜葛
 create_time: 2013-07-02 08:30:00
 filters: 
-    User.is_lord: false
+    User.is_lord:
+          operator: eq
+          value: false
     User.group_id:
-        operator: ge
-        value: 1
+        - {operator: ge, value: 1}
+        - {operator: le, value: 10}
 order_by: -平均武力值
 columns: [0, 1, 2, 3]
 data_set_id: 1
