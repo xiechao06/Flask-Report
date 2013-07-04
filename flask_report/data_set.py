@@ -3,6 +3,7 @@ import os
 import yaml
 from import_file import import_file
 from werkzeug.utils import cached_property
+import sqlalchemy
 
 class DataSet(object):
 
@@ -25,14 +26,15 @@ class DataSet(object):
     @cached_property
     def columns(self):
         def _make_dict(idx, c):
-            if hasattr(c['expr'], '_element'): # is label
+            if hasattr(c['expr'], 'element'): # is label
                 name = c['name'] or dict(name=str(c['expr']))
-                key = c['expr']._element.name
+                key = str(c['expr'].element)
+                if isinstance(c['expr'].element, sqlalchemy.sql.expression.Function):
+                    key = key.replace('"', '')
             else:
                 name = str(c['expr'])
-                key = name
+                key = c.table.name + "." + c.name
             
             return dict(idx=idx, name=name, key=key, expr=c['expr'])
 
         return tuple(_make_dict(idx, c) for idx, c in enumerate(self.query.column_descriptions))
-

@@ -19,10 +19,16 @@
       {% for c in columns %}
       <td>
         {{ r[c.idx] }}
+        {% set drill_down_link = c.get_drill_down_link(r) %}
+        {% if drill_down_link %}
+          <a href="#" data-target="{{ drill_down_link }}" data-role='drill-down-link' data-col='{{ c.name }}' data-idx='{{ c.idx }}' ><i class="icon-plus-sign-alt"></i></a>
+        {% endif %}
       </td>
       {% endfor %}
     </tr>
     {% endfor %}
   </tbody>
 </table>
+
+
 

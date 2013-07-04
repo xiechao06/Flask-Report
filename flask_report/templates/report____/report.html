@@ -29,9 +29,6 @@
               },
             },
         "bSortCellsTop": true,
-        "aoColumnDefs": [
-          { "bVisible": false, "aTargets": [ 2 ] }
-        ],
         "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>",
         "iDisplayLength": 25,
         });
@@ -71,14 +68,23 @@
           this.className = "search_init";
           this.value = this.initVal;
         }
-      });
-	
-      });
+        });
+
+      $('#report a[data-role="drill-down-link"]').click(
+          function () {
+            var modal = $('#drill-down-detail');
+            modal.find('.modal-header h3').text(sprintf('{{ _("detail of %%s") }}', $(this).attr('data-col')));
+            modal.modal('show');
+            var content = modal.find('.modal-body p')
+            content.html('<i class="icon-refresh icon-spin icon-4x"></i>');
+            content.load($(this).attr('data-target'));
+          });	
+  });
 </script>
 {% endblock %}
 
 {% block body %}
-<div class="container">
+<div class="">
 <div class="alert alert-info">
   <h1>
   <span>
@@ -142,5 +148,18 @@
   <a href="" class="btn btn-primary btn-large">{{ _('EDIT') }}</a>
   <a href="" class="btn btn-primary btn-large">{{ _('REFRESH') }}</a>
 </div>
+</div>
+
+<div id="drill-down-detail" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <h3></h3>
+  </div>
+  <div class="modal-body">
+    <p class="pagination-centered">
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">{{ _('Close') }}</button>
+  </div>
 </div>
 {% endblock %}

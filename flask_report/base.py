@@ -1,18 +1,22 @@
 # -*- coding: UTF-8 -*-
 import os
-from flask import render_template, abort
+import json
+from flask import render_template, abort, request
 from flask.ext.report.report import Report
+from flask.ext.report.utils import get_column_operated
 
 
 class FlaskReport(object):
-    def __init__(self, db, model_map, app, blueprint=None, extra_params=None):
+    def __init__(self, db, model_map, app, blueprint=None, extra_params=None, table_label_map=None):
         self.db = db
         self.app = app
         host = blueprint or app
         self.conf_dir = app.config.get("REPORT_DIR", "report_conf")
         self.report_dir = os.path.join(self.conf_dir, "reports")
         self.data_set_dir = os.path.join(self.conf_dir, "data_sets")
-        self.model_map = model_map
+        self.model_map = model_map # model name -> model
+        self.table_label_map = table_label_map or {}
+        self.table_map = dict((model.__tablename__, model) for model in model_map.values()) # table name -> model
         if not os.path.exists(self.conf_dir):
             os.makedirs(self.conf_dir)
         if not os.path.exists(self.report_dir):
@@ -25,6 +29,7 @@ class FlaskReport(object):
         host.route("/report_csv/<int:id_>")(self.report_csv)
         host.route("/report_pdf/<int:id_>")(self.report_pdf)
         host.route("/report_txt/<int:id_>")(self.report_txt)
+        host.route("/drill-down-detail/<int:report_id>/<int:col_id>")(self.drill_down_detail)
 
         from flask import Blueprint
         # register it for using the templates of data browser
@@ -146,3 +151,15 @@ class FlaskReport(object):
         response = Response(return_fileobj.getvalue(), mimetype="text/plan")
         response.headers["Content-disposition"] = "attachment; filename={}.txt".format(str(id_))
         return response
+
+
+    def get_model_label(self, table):
+        return self.table_label_map.get(table.name) or self.table_map[table.name].__name__
+
+    def drill_down_detail(self, report_id, col_id):
+        filters = request.args
+        report = Report(self, report_id)
+        col = report.data_set.columns[col_id]['expr']
+        col = get_column_operated(getattr(col, 'element', col))
+        model = self.get_model_label(col.table)
+        return report.get_drill_down_detail_template(col_id).render(items=report.get_drill_down_detail(col_id, **filters), key=col.key, model=model)

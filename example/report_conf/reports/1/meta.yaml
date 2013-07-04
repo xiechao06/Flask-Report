@@ -8,5 +8,5 @@ filters:
         operator: ge
         value: 1
 order_by: -平均武力值
-columns: [0, 1, 2, 3]
+columns: [0, 1, 2, 3, 4, 5, 6, 7]
 data_set_id: 1
