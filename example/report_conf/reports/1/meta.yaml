@@ -10,3 +10,5 @@ filters:
 order_by: -平均武力值
 columns: [0, 1, 2, 3]
 data_set_id: 1
+sum_columns: [1, 2]
+avg_columns: [2]
