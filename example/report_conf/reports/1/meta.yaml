@@ -10,7 +10,7 @@ filters:
         - {operator: ge, value: 1}
         - {operator: le, value: 10}
 order_by: -平均武力值
-columns: [0, 1, 2, 3]
+columns: [0, 1, 2, 3, 4, 5, 6, 7]
 data_set_id: 1
 sum_columns: [1, 2]
 avg_columns: [2]
