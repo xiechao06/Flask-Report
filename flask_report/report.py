@@ -42,6 +42,8 @@ class Report(object):
         self.data_set = DataSet(report_view, report_meta['data_set_id'])
         self.__columns = report_meta.get('columns')
         self.__special_chars = {"gt": operator.gt, "lt": operator.lt, "ge": operator.ge, "le": operator.le, "eq": operator.eq}
+        self._sum_columns = report_meta.get("sum_columns")
+        self._avg_columns = report_meta.get("avg_columns")
 
     @cached_property
     def columns(self):
@@ -75,9 +77,19 @@ class Report(object):
             params[col_name] = r[d[col_name]['idx']]
         return url_for('.drill_down_detail', report_id=self.id_, col_id=col_id, **params)
 
+    @property
+    def sum_columns(self):
+        all_columns = self.data_set.columns
+        return [all_columns[i] for i in self._sum_columns]
+
+    @property
+    def avg_columns(self):
+        all_columns = self.data_set.columns
+        return [all_columns[i] for i in self._avg_columns]
+
     def _get_operator_and_value(self, value):
         if isinstance(value, dict) and value.get("operator"):
-            return self.__special_chars[value.get("operator")], value.get("value")
+            return self.__special_chars[value["operator"]], value.get("value")
         else:
             return operator.eq, value
 
@@ -87,8 +99,11 @@ class Report(object):
         if self.filters:
             for name, params in self.filters.items():
                 model_name, column_name = name.split('.')
-                op, value = self._get_operator_and_value(params)
-                q = q.filter(op(operator.attrgetter(column_name)(self.report_view.model_map[model_name]), value))
+                if not isinstance(params, list):
+                    params = [params]
+                for param in params:
+                    op, value = self._get_operator_and_value(param)
+                    q = q.filter(op(operator.attrgetter(column_name)(self.report_view.model_map[model_name]), value))
         if self.literal_filter_condition is not None:
             q = q.filter(self.literal_filter_condition)
         all_columns = dict((c['name'], c) for c in self.data_set.columns)
