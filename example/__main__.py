@@ -9,8 +9,8 @@ def main():
     from flask.ext import report
     from flask import Blueprint
     report_page = Blueprint("report", __name__, static_folder="static", 
-                           template_folder="templates")
-    report.FlaskReport(db, utils.collect_models(models), app, report_page)
+                            template_folder="templates")
+    report.FlaskReport(db, utils.collect_models(models), app, report_page, table_label_map={'TB_USER': u'角色'})
     app.register_blueprint(report_page, url_prefix="/report")
     app.run(debug=True, port=5001, host="0.0.0.0")
 

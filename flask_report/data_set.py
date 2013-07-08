@@ -33,7 +33,7 @@ class DataSet(object):
                     key = key.replace('"', '')
             else:
                 name = str(c['expr'])
-                key = c.table.name + "." + c.name
+                key = c['expr'].table.name + "." + c['expr'].name
             
             return dict(idx=idx, name=name, key=key, expr=c['expr'])
 

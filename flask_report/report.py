@@ -53,7 +53,8 @@ class Report(object):
             col['get_drill_down_link'] = lambda r: None
             if hasattr(col_expr, 'element'):
                 col_expr = col_expr.element
-            if isinstance(col_expr, sqlalchemy.sql.expression.Function) and col_expr.name == 'sum':
+
+            if (isinstance(col_expr, sqlalchemy.sql.expression.Function) or isinstance(col_expr, sqlalchemy.sql.expression.ClauseElement)) and col_expr.name == 'sum':
                 col['get_drill_down_link'] = partial(self._gen_drill_down_link, i)
             ret.append(col)
         return ret
@@ -129,46 +130,27 @@ class Report(object):
         return render_template('report____/report_short_description.html', report=self)
 
     def get_drill_down_detail_template(self, col_id):
-        template_file = os.path.join(self.report_view.report_dir, str(self.id_), "drill_downs", str(col_id))
+        template_file = os.path.join(self.report_view.report_dir, str(self.id_), "drill_downs", str(col_id)+".html")
         if not os.path.exists(template_file):
             # read the default template
             return self.report_view.app.jinja_env.get_template("report____/default_drill_down_html_report.html")
         return self.report_view.app.jinja_env.from_string(codecs.open(template_file, encoding='utf-8').read())
 
-
-    def get_drill_down_detail(self, col_id, **filters):
+    def get_drill_down_detail_query(self, col_id, **filters):
         q = self.query
         target_col = self.data_set.columns[col_id]['expr']
-        target_col = get_column_operated(getattr(target_col, 'element', target_col))
-        table = target_col.table
+        target_col = getattr(target_col, 'element', target_col) # convert label
+        real_target_col = get_column_operated(target_col)
+        table = real_target_col.table
         Model = self.report_view.table_map[table.name]
-        Group = self.report_view.model_map['Group']
-        User = self.report_view.model_map['User']
-        from sqlalchemy import join
         s = select([table], from_obj=q.statement.froms, whereclause=q.whereclause)
         for k, v in filters.items():
             model_name, column_name = k.split('.')
             s = s.where(k+'="'+v[0]+'"')
-        # resamble the origin Model
-        columns = [c.key for c in table.columns]
-        ret = []
-        pk = get_primary_key(Model)
-        FakeModel = namedtuple(Model.__name__, columns)
-        for r in self.report_view.db.session.execute(s).fetchall():
-            try:
-                model = Model(**dict(izip(columns, r)))
-                ret.append([getattr(model, pk), model])
-            except TypeError:
-                model = FakeModel(**dict(izip(columns, r))) 
-                class _Proxy(object):
-                    def __init__(self, fake_model, report_view):
-                        self.fake_model = fake_model
-                        self.report_view = report_view
 
-                    def __unicode__(self):
-                        return self.report_view.get_model_label(table) + str(getattr(self.fake_model, pk))
-
-                    def __getattr__(self, attr):
-                        return getattr(self.fake_model, attr)
-                ret.append([getattr(model, pk), _Proxy(model, self.report_view)])
-        return ret 
+        if hasattr(target_col, 'table'): # in case target column is from a sub query
+            target_col_table = target_col.table
+            target_col_table = getattr(target_col_table, 'element', target_col_table) # convert alias
+            if target_col_table._whereclause is not None:
+                s = s.where(target_col_table._whereclause)
+        return Model.query.from_statement(s)

@@ -52,7 +52,7 @@ class FlaskReport(object):
 
     def report(self, id_):
         report = Report(self, id_)
-        html_report = report.html_template.render(data=report.data, columns=report.columns)
+        html_report = report.html_template.render(data=report.data, columns=report.columns, report=report)
         from pygments import highlight
         from pygments.lexers import PythonLexer
         from pygments.formatters import HtmlFormatter
@@ -109,7 +109,6 @@ class FlaskReport(object):
             return getattr(lib, default.__name__, None) or default
 
     def report_csv(self, id_):
-        # TODO unimplemented
         from geraldo.generators import CSVGenerator
         from flask.ext.report.report_templates import CSVReport
 
@@ -161,5 +160,8 @@ class FlaskReport(object):
         report = Report(self, report_id)
         col = report.data_set.columns[col_id]['expr']
         col = get_column_operated(getattr(col, 'element', col))
-        model = self.get_model_label(col.table)
-        return report.get_drill_down_detail_template(col_id).render(items=report.get_drill_down_detail(col_id, **filters), key=col.key, model=model)
+        model_name = self.get_model_label(col.table)
+        return report.get_drill_down_detail_template(col_id).render(items=report.get_drill_down_detail_query(col_id, **filters).all(), 
+                                                                    key=col.key, 
+                                                                    model_name=model_name, 
+                                                                    report=report)

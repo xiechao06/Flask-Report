@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+import sqlalchemy
 
 def collect_models(module):
     ret = {}
@@ -33,4 +34,6 @@ def get_primary_key(model):
     return None
 
 def get_column_operated(func):
+    if isinstance(func, sqlalchemy.sql.expression.ColumnElement): # sub query
+        func = list(enumerate(func.base_columns))[0][1]
     return func.clauses.clauses[0]

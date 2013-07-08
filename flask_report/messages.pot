@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-07-04 11:47+0800\n"
+"POT-Creation-Date: 2013-07-08 10:41+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,11 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
+
+#: templates/report____/default_html_report.html:11
+#, python-format
+msgid "search %(col_name)s"
+msgstr ""
 
 #: templates/report____/report-list.html:4
 #: templates/report____/report-list.html:18
@@ -62,56 +67,65 @@ msgstr ""
 msgid "Last"
 msgstr ""
 
-#: templates/report____/report.html:39
+#: templates/report____/report.html:36
 msgid "hide detail"
 msgstr ""
 
-#: templates/report____/report.html:42 templates/report____/report.html:87
+#: templates/report____/report.html:39 templates/report____/report.html:93
 msgid "show detail"
 msgstr ""
 
-#: templates/report____/report.html:92
+#: templates/report____/report.html:76
+#, python-format
+msgid "detail of %%s"
+msgstr ""
+
+#: templates/report____/report.html:98
 #, python-format
 msgid ""
 "created by \"%(creator)s\" at %(create_time)s, using data set <span "
 "title=\"%(data_set_description)s\">\"%(data_set)s\"</span>, "
 msgstr ""
 
-#: templates/report____/report.html:97
+#: templates/report____/report.html:103
 #, python-format
 msgid "order by \"%(order_by)s\" %(order)s"
 msgstr ""
 
-#: templates/report____/report.html:99
+#: templates/report____/report.html:105
 msgid "descendingly"
 msgstr ""
 
-#: templates/report____/report.html:99
+#: templates/report____/report.html:105
 msgid "ascendingly"
 msgstr ""
 
-#: templates/report____/report.html:102
+#: templates/report____/report.html:108
 msgid "filter conditions are: "
 msgstr ""
 
-#: templates/report____/report.html:117
+#: templates/report____/report.html:123
 msgid "the customized filter condition is: "
 msgstr ""
 
-#: templates/report____/report.html:133
+#: templates/report____/report.html:139
 msgid "download as: "
 msgstr ""
 
-#: templates/report____/report.html:141
+#: templates/report____/report.html:147
 msgid "BACK"
 msgstr ""
 
-#: templates/report____/report.html:142
+#: templates/report____/report.html:148
 msgid "EDIT"
 msgstr ""
 
-#: templates/report____/report.html:143
+#: templates/report____/report.html:149
 msgid "REFRESH"
+msgstr ""
+
+#: templates/report____/report.html:162
+msgid "Close"
 msgstr ""
 
 #: templates/report____/report_short_description.html:1
