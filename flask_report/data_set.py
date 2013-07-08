@@ -22,6 +22,7 @@ class DataSet(object):
         self.__special_chars = {"gt": operator.gt, "lt": operator.lt, "ge": operator.ge, "le": operator.le,
                                 "eq": operator.eq, "ne": operator.ne}
         self._filters = data_set_meta.get("filters")
+        self._order_bys = data_set_meta.get("order_bys")
 
     @cached_property
     def query(self):
@@ -53,7 +54,7 @@ class DataSet(object):
             return self.report_view.app.jinja_env.get_template("report____/default_data_set_html.html")
         return self.report_view.app.jinja_env.from_string(codecs.open(report_file, encoding='utf-8').read())
 
-    def get_query(self, filters):
+    def get_query(self, filters, order_bys=None):
         def get_column(column):
             for c in self.columns:
                 if column == c["name"]:
@@ -68,7 +69,15 @@ class DataSet(object):
         query = self.query
         for filter in filters:
             query = query.filter(get_operator(filter["op"])(get_column(filter["col"]), filter["val"]))
-
+        if order_bys:
+            all_columns = dict((c['name'], c) for c in self.columns)
+            for order_by in order_bys:
+                o = all_columns.get(order_by[0], None)
+                if o:
+                    o = o['expr']
+                    if order_by[1] == "desc":
+                        o = sqlalchemy.desc(o)
+                    query = query.order_by(o)
         return query
 
     @property
@@ -82,6 +91,10 @@ class DataSet(object):
             filters.append(
                 {"name": v.get("name"), "col": k, "ops": v.get("operators"), "type": _get_type(v.get("value_type"))})
         return filters
+
+    @property
+    def order_bys(self):
+        return self._order_bys
 
     def get_current_filters(self, currents):
         def _match(to_matcher):
@@ -108,4 +121,15 @@ class DataSet(object):
                     val = [val]
                 val.append({'operator': current["op"], 'value': current["val"]})
                 filters[current["col"]] = val
-        return yaml.safe_dump(filters,allow_unicode=True).decode("utf-8")
+        return yaml.safe_dump(filters, allow_unicode=True).decode("utf-8")
+
+    def parse_order_bys(self, order_bys_data):
+        result = yaml.safe_dump(order_bys_data, allow_unicode=True).decode("utf-8")
+        if result[-5:] == "\n...\n":
+            return result[:-5]
+
+    def get_current_order_bys(self, order_by):
+        if order_by[:1] == "-":
+            return order_by[1:], "desc"
+        else:
+            return order_by, "asc"

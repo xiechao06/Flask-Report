@@ -8,5 +8,6 @@ filters:
     operators: [eq, ne]
     value_type: str
 
-order_by:
-  - Group.name
+order_bys:
+  - 国家
+  - User.group_id

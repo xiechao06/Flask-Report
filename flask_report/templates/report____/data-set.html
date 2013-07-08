@@ -67,7 +67,7 @@
       $(".collapse").collapse();
 
 
-      jQuery.fn.addRow = function (text, available_opts, type, op, value) {
+      jQuery.fn.addFilter = function (text, available_opts, type, op, value) {
         var tr = $("<tr name='filter'></tr>");
         var td1 = $("<td></td>").html($("<button type='button' class='btn' name='remove-tr'></button>").html($("<i class='icon-remove icon-large'></i>")));
         var td2 = $("<td></td>").text(text);
@@ -105,18 +105,49 @@
         this.find("tbody").append(tr);
       };
 
+      jQuery.fn.addOrderBy = function (text, op){
+        var tr = $("<tr name='order_by'></tr>");
+        var td1 = $("<td></td>").html($("<button type='button' class='btn' name='remove-tr'></button>").html($("<i class='icon-remove icon-large'></i>")));
+        var td2 = $("<td></td>").text(text);
+        var td3 = $("<td></td>");
+        var select = $("<select></select>");
+        $.each([{"key":"desc", "value": "desc"}, {"key": "asc", "value": "asc"}], function(idx, value){
+          select.append($("<option></option>").val(value.value).text(value.key));
+        });
+        if(op){
+          select.val(op);
+        }
+        td3.append(select);
+
+        tr.append(td1, td2, td3);
+        this.find("tbody").append(tr);
+      };
 
       $("#add_filter").change(function () {
         var e = $($(this).find(":selected"));
 
-        $("#clause").addRow(e.text(), $.parseJSON(e.attr("data-ops")), e.attr("data-type"));
+        $("#clause").addFilter(e.text(), $.parseJSON(e.attr("data-ops")), e.attr("data-type"));
         $(this).val([]);
+      });
+
+      $("#add_order_by").change(function(){
+        if ($("tr[name=order_by]").size() > 0){
+          alert("{{ _("only one order_by supported") }}");
+          return false;
+        }
+        var e = $($(this).find(":selected"));
+        $("#order_by").addOrderBy(e.text());
+        $(this).val([])
       });
 
       {% if current_filters %}
         $.each({{ current_filters|tojson|safe }}, function (idx, filter) {
-          $("#clause").addRow(filter.name, filter.ops, filter.type, filter.op, filter.val);
+          $("#clause").addFilter(filter.name, filter.ops, filter.type, filter.op, filter.val);
         });
+      {% endif %}
+
+      {% if current_order_bys %}
+        $("#order_by").addOrderBy("{{ current_order_bys[0]|safe }}", "{{ current_order_bys[1]|safe }}");
       {% endif %}
 
       $("[name=remove-tr]").live("click", function () {
@@ -128,14 +159,17 @@
         if (form.get(0).checkValidity()) {
           var filters = [];
           $.each(form.find("tr[name='filter']"), function (idx, tr) {
-            filters.push({"col": $($(tr).find("td")[1]).text(), "op": $($(tr).find("select")).val(), "val": $($(tr).find("input")[0]).val()})
+            filters.push({"col": $($(tr).find("td")[1]).text(), "op": $($(tr).find("select")).val(), "val": $($(tr).find("input")[0]).val()});
           });
-          form.find("input[type=hidden]").val(JSON.stringify(filters));
+          var tr = form.find("tr[name=order_by]");
+          var order_bys = $($(tr).find("td")[1]).text();
+          if ($($(tr).find("select")).val() == "desc"){
+            order_bys = "-" + order_bys;
+          }
+          form.find("input[type=hidden][name=filters]").val(JSON.stringify(filters));
+          form.find("input[type=hidden][name=order_bys]").val(order_bys);
           form.submit();
         }
-      });
-      $("#save-button").click(function () {
-
       });
       $("textarea").autosize();
     });
@@ -150,17 +184,17 @@
       </h1>
     </div>
     <hr/>
-    <form>
+    <form action="{{ url_for(".data_set", id_=data_set.id_) }}">
       <fieldset>
         <legend>{{ _("filters") }}</legend>
         <table id="clause">
           <tbody>
           <tr>
-            <td class="and" colspan="2">
+            <td colspan="2">
               <label for="add_filter">新增</label>
               <select id="add_filter">
                 <option></option>
-                {% for filter in filters %}
+                {% for filter in data_set.filters %}
                   <option value="{{ filter.col }}" data-type="{{ filter.type }}" data-ops='{{ filter.ops|tojson|safe }}'>{{ filter.name }}</option>
                 {% endfor %}
               </select>
@@ -171,19 +205,45 @@
       </fieldset>
       <fieldset>
         <legend>{{ _("order by") }}</legend>
-        <div>
-          1234
-        </div>
+        <table id="order_by">
+          <tbody>
+          <tr>
+            <td colspan="2">
+              <label for="add_order_by">新增</label>
+              <select id="add_order_by">
+                <option></option>
+                {% for order_by in data_set.order_bys %}
+                  <option value="{{ order_by }}">{{ order_by }}</option>
+                {% endfor %}
+              </select>
+            </td>
+          </tr>
+          </tbody>
+        </table>
       </fieldset>
-      <div>
-        <input type="hidden" name="filters"/>
-        <button class="btn btn-primary" id="search">{{ _("Search") }}</button>
+      <input type="hidden" name="filters"/>
+      <input type="hidden" name="order_bys"/>
+      <div class="control-group">
+        <div class="controls">
+          <button class="btn btn-primary" id="search"><i class="icon-search"></i>&nbsp;{{ _("Search") }}</button>
+        </div>
       </div>
     </form>
+
+    <legend>{{ _("RESULT") }}</legend>
     {% if filters_yaml %}
-      <code>
-        filters: {{ filters_yaml }}
-      </code>
+      <div>
+        <code>
+          filters: {{ filters_yaml }}
+        </code>
+      </div>
+    {% endif %}
+    {% if order_by_yaml %}
+      <div>
+        <code>
+          order_by: {{ order_by_yaml }}
+        </code>
+      </div>
     {% endif %}
     <div>
       {% if request.args.get("filters") %}
@@ -228,7 +288,7 @@
             <label class="control-label" for="report_desc">{{ _("report_desc") }}</label>
 
             <div class="controls">
-              <input type="text" name="report_desc" id="report_desc"/>
+              <textarea name="report_desc" id="report_desc"></textarea>
             </div>
           </div>
           <div class="control-group">
@@ -242,7 +302,7 @@
             <label class="control-label" for="report_order_by">{{ _("report_order_by") }}</label>
 
             <div class="controls">
-              <input type="text" name="report_order_by" id="report_order_by" value="{{ order_by }}"/>
+              <input type="text" name="report_order_by" id="report_order_by" value="{{ order_by_yaml }}" readonly/>
             </div>
           </div>
           <div class="control-group">

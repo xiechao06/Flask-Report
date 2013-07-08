@@ -54,18 +54,25 @@ class FlaskReport(object):
         return render_template("report____/data-sets.html", **params)
 
     def data_set(self, id_):
+        order_by_yaml = None
         data_set = DataSet(self, id_)
         data = []
         current_filters = []
-        yaml = None
+        current_order_bys = []
+        filters_yaml = None
         if request.args.get("filters"):
-            data = json.loads(request.args.get("filters"))
-            current_filters = data_set.get_current_filters(data)
-            yaml = data_set.parse_filters(data)
-            data = data_set.get_query(data).all()
+            filters_data = json.loads(request.args.get("filters"))
+            current_filters = data_set.get_current_filters(filters_data)
+            order_bys_data = request.args.get("order_bys")
+            current_order_bys = data_set.get_current_order_bys(order_bys_data)
+            filters_yaml = data_set.parse_filters(filters_data)
+            order_by_yaml = data_set.parse_order_bys(order_bys_data)
+
+            data = data_set.get_query(filters_data, current_order_bys).all()
         html = data_set.html_template.render(columns=data_set.columns, data=data)
-        params = dict(data_set=data_set, html=html, filters=data_set.filters, current_filters=current_filters,
-                      filters_yaml=yaml)
+        params = dict(data_set=data_set, html=html, current_filters=current_filters,
+                      current_order_bys=current_order_bys,
+                      filters_yaml=filters_yaml, order_by_yaml=order_by_yaml)
         return render_template("report____/data-set.html", **params)
 
     def report_list(self):
@@ -110,7 +117,7 @@ class FlaskReport(object):
                  "data_set_id": form.get("data_set_id", type=int),
                  "filters": yaml.load(form["report_filters"]), "columns": form.getlist("report_columns", type=int)}
         if form.get("report_order_by"):
-            dict_["order_by"] = form["report_order_by"]
+            dict_["order_by"] = yaml.load(form["report_order_by"])
         dict_["creator"] = form["report_creator"]
         import datetime
         dict_["create_time"] = datetime.datetime.now()
