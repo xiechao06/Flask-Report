@@ -1,4 +1,4 @@
-{% if SQL%}
+{% if SQL %}
   <h4>{{ _("SQL") }}</h4>
   <p>
     <code>
@@ -16,7 +16,6 @@
     <tr role="row">
       {% for c in columns %}
       <td rowspan="1" colspan="1">
-        <input class="search_init" type="text" value="{{ _('search %(col_name)s', col_name=c.name) }}" placeholder="{{ _('search %(col_name)s', col_name=c.name) }}">
       </td>
       {% endfor %}
     </tr>
@@ -26,21 +25,11 @@
     <tr>
       {% for c in columns %}
       <td>
-        {% if r[c.idx] is none %}
-          0
-        {% else %}
-          {{ r[c.idx] }}
-          {% set drill_down_link = c.get_drill_down_link(r) %}
-          {% if drill_down_link %}
-            <a href="#" data-target="{{ drill_down_link }}" data-role='drill-down-link' data-col='{{ c.name }}' data-idx='{{ c.idx }}' ><i class="icon-plus-sign-alt"></i></a>
-          {% endif %}
-        {% endif %}
+        {{ r[c.idx] }}
       </td>
       {% endfor %}
     </tr>
     {% endfor %}
   </tbody>
 </table>
-
-
 

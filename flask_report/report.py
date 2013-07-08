@@ -41,7 +41,8 @@ class Report(object):
             self.order_by = namedtuple("OrderBy", ['name', 'desc'])(name, desc_)
         self.data_set = DataSet(report_view, report_meta['data_set_id'])
         self.__columns = report_meta.get('columns')
-        self.__special_chars = {"gt": operator.gt, "lt": operator.lt, "ge": operator.ge, "le": operator.le, "eq": operator.eq}
+        self.__special_chars = {"gt": operator.gt, "lt": operator.lt, "ge": operator.ge, "le": operator.le,
+                                "eq": operator.eq, "ne": operator.ne}
         self._sum_columns = report_meta.get("sum_columns")
         self._avg_columns = report_meta.get("avg_columns")
 
