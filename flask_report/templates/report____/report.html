@@ -6,6 +6,7 @@
 
 {% block report____customized_head_block %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('report____.static', filename='datatables/css/jquery.dataTables.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('report____.static', filename='css/customer.css') }}">
 <script type="text/javascript" charset="utf8" src="{{ url_for('report____.static', filename='datatables/js/jquery.dataTables.min.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('report____.static', filename='js/DT_bootstrap.js') }}"></script>
 <script type="text/javascript">
@@ -112,9 +113,7 @@
     {% for name, value in report.filters.items() %}
     <li>
     <small>
-      <Strong>{{ name }}</Strong> - {% for k, v in value.items() %}
-        {% if loop.first %}{{ "{" }}{% endif %}{{ "'%s':'%s'"|format(k,v) }}{% if not loop.last %},{% endif %}{% if loop.last %}{{ "}" }}{% endif %}
-      {% endfor %}
+      <Strong>{{ name }}</Strong> - {{ value|dpprint }}
     </small>
     </li>
     {% endfor %}
@@ -122,7 +121,7 @@
   </ul>
   <p>
     <small>
-      {{ _("the customized filter condition is: ") }} 
+      {{ _("the customized filter condition is: ") }}
     </small>
   </p>
   <p>
