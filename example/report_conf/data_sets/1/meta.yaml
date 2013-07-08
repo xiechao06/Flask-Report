@@ -2,3 +2,11 @@ name: 三国实力报告
 description: 三国时期各个国家的情况分析
 creator: 智冠 
 create_time: 2013-07-02 07:30:00
+filters:
+  Group.name:
+    name: 国家
+    operators: [eq, ne]
+    value_type: str
+
+order_by:
+  - Group.name
