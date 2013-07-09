@@ -105,17 +105,16 @@ class FlaskReport(object):
             report = Report(self, id_)
             from flask.ext.report.utils import query_to_sql
 
-            html_report = report.html_template.render(data=report.data, columns=report.columns, report=report,
-                                                      SQL=query_to_sql(report.query))
+            html_report = report.html_template.render(data=report.data, columns=report.columns, report=report)
             from pygments import highlight
             from pygments.lexers import PythonLexer
             from pygments.formatters import HtmlFormatter
 
             code = report.read_literal_filter_condition()
-            params = dict(report=report, html_report=html_report)
+            params = dict(report=report, html_report=html_report, SQL=query_to_sql(report.query))
             if code is not None:
                 customized_filter_condition = highlight(code, PythonLexer(), HtmlFormatter())
-                params[customized_filter_condition] = customized_filter_condition
+                params['customized_filter_condition'] = customized_filter_condition
             extra_params = self.extra_params.get("report")
             if extra_params:
                 params.update(extra_params)
