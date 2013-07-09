@@ -47,6 +47,8 @@ class Report(object):
         self._avg_columns = report_meta.get("avg_columns")
         self._bar = report_meta.get("bar")
         self._pie = report_meta.get("pie")
+        self._bar_charts = None
+        self._pie_charts = None
 
     @cached_property
     def columns(self):
@@ -198,43 +200,43 @@ class Report(object):
             else:
                 return (_get_random_color(),) * length
 
-
-
     @property
     def bar_charts(self):
-        import uuid
+        if self._bar_charts is None:
+            import uuid
 
-        result = []
-        all_columns = self.data_set.columns
-        for bar_chart in self._bar if isinstance(self._bar, list) else [self._bar]:
-            data = {}
-            bar_columns = bar_chart.get("columns", [])
-            colors = bar_chart.get("colors", [])
-            columns = [all_columns[i] for i in bar_columns]
-            for column in columns:
-                labels = data.setdefault("labels", [])
-                if column["name"] not in labels:
-                    labels.append(column["name"])
-            for idx, i in enumerate(self.data):
-                color1, color2 = self._get_color(idx, colors, 2)
-                dataset = {"fillColor": color1, "strokeColor": color2, "data": [i[c["idx"]] for c in columns]}
-                datasets = data.setdefault("datasets", [])
-                datasets.append(dataset)
-            result.append({"name": bar_chart.get("name"), "id_": uuid.uuid1(), "data": data})
-        return result
+            self._bar_charts = []
+            all_columns = self.data_set.columns
+            for bar_chart in self._bar if isinstance(self._bar, list) else [self._bar]:
+                data = {}
+                bar_columns = bar_chart.get("columns", [])
+                colors = bar_chart.get("colors", [])
+                columns = [all_columns[i] for i in bar_columns]
+                for column in columns:
+                    labels = data.setdefault("labels", [])
+                    if column["name"] not in labels:
+                        labels.append(column["name"])
+                for idx, i in enumerate(self.data):
+                    color1, color2 = self._get_color(idx, colors, 2)
+                    dataset = {"fillColor": color1, "strokeColor": color2, "data": [i[c["idx"]] for c in columns]}
+                    datasets = data.setdefault("datasets", [])
+                    datasets.append(dataset)
+                self._bar_charts.append({"name": bar_chart.get("name"), "id_": uuid.uuid1(), "data": data})
+        return self._bar_charts
 
     @property
     def pie_charts(self):
-        import uuid
+        if self._pie_charts is None:
+            import uuid
 
-        all_columns = self.data_set.columns
-        l = []
-        for pie in self._pie if isinstance(self._pie, list) else [self._pie]:
-            pie_column_idx = pie.get("column")
-            column = all_columns[pie_column_idx]
-            colors = pie.get("colors")
-            result = {"name": pie.get("name"), "id_": uuid.uuid1(),
-                      "data": [{"value": i[column["idx"]], "color": self._get_color(idx, colors)} for idx, i in
-                               enumerate(self.data)]}
-            l.append(result)
-        return l
+            all_columns = self.data_set.columns
+            self._pie_charts = []
+            for pie in self._pie if isinstance(self._pie, list) else [self._pie]:
+                pie_column_idx = pie.get("column")
+                column = all_columns[pie_column_idx]
+                colors = pie.get("colors")
+                result = {"name": pie.get("name"), "id_": uuid.uuid1(),
+                          "data": [{"value": i[column["idx"]], "color": self._get_color(idx, colors)} for idx, i in
+                                   enumerate(self.data)]}
+                self._pie_charts.append(result)
+        return self._pie_charts

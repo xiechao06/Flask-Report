@@ -1,8 +1,6 @@
 {% macro newBar(id, name, data) %}
-  <div>
-    <h4>{{ name }}</h4>
-    <canvas id="{{ id }}" width="600" height="400" data-type="Bar"></canvas>
-    <script src="{{ url_for('report____.static', filename='js/Chart.min.js') }}"></script>
+  <div id="div-{{ id }}" class="tab-pane">
+    <canvas id="{{ id }}" width="500" height="330" data-type="Bar"></canvas>
     <script type="text/javascript">
       $(function () {
         var ctx = $("#{{ id }}").get(0).getContext("2d");

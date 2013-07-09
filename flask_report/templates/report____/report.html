@@ -9,6 +9,7 @@
 <link rel="stylesheet" type="text/css" href="{{ url_for('report____.static', filename='css/customer.css') }}">
 <script type="text/javascript" charset="utf8" src="{{ url_for('report____.static', filename='datatables/js/jquery.dataTables.min.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('report____.static', filename='js/DT_bootstrap.js') }}"></script>
+<script src="{{ url_for('report____.static', filename='js/Chart.min.js') }}"></script>
 <script type="text/javascript">
   $.extend( $.fn.dataTableExt.oStdClasses, {
       "sWrapper": "dataTables_wrapper form-inline"
@@ -79,7 +80,12 @@
             var content = modal.find('.modal-body p')
             content.html('<i class="icon-refresh icon-spin icon-4x"></i>');
             content.load($(this).attr('data-target'));
-          });	
+          });
+    $('#myTab a').click(function (e) {
+      e.preventDefault();
+      $(this).tab('show');
+    });
+    $('#myTab a:first').tab('show');
   });
 </script>
 {% endblock %}
@@ -131,6 +137,7 @@
 </div>
 </div>
 <hr />
+<a href="#graph" role="button" class="btn" data-toggle="modal">{{ _("View Graphs") }}</a>
 <div>
 {{ html_report|safe }}
 </div>
@@ -150,16 +157,6 @@
   <a href="" class="btn btn-primary btn-large">{{ _('REFRESH') }}</a>
 </div>
 </div>
-<div class="container">
-{% import "report____/bar.html" as bar %}
-{% for bar_chart in report.bar_charts %}
-  {{ bar.newBar(bar_chart.id_, bar_chart.name, bar_chart.data) }}
-{% endfor %}
-{% import "report____/pie-chart.html" as pie %}
-{% for pie_chart in report.pie_charts %}
-  {{ pie.newPie(pie_chart.id_, pie_chart.name, pie_chart.data) }}
-{% endfor %}
-</div>
 
 <div id="drill-down-detail" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-header">
@@ -174,4 +171,32 @@
   </div>
 </div>
 
+<div class="modal hide fade" tabindex="-1" role="dialog" data-toggle="modal" id="graph">
+  <div class="modal-header">
+    <h3>图表</h3>
+  </div>
+  <div class="modal-body">
+    <ul class="nav nav-tabs" id="myTab">
+      {% for bar_chart in report.bar_charts %}
+        <li><a href="#div-{{ bar_chart.id_ }}">{{ bar_chart.name }}</a></li>
+      {% endfor %}
+      {% for pie_chart in report.pie_charts %}
+        <li><a href="#div-{{ pie_chart.id_ }}">{{ pie_chart.name }}</a></li>
+      {% endfor %}
+    </ul>
+    <div class="tab-content">
+      {% import "report____/bar.html" as bar %}
+      {% for bar_chart in report.bar_charts %}
+        {{ bar.newBar(bar_chart.id_, bar_chart.name, bar_chart.data) }}
+      {% endfor %}
+      {% import "report____/pie-chart.html" as pie %}
+      {% for pie_chart in report.pie_charts %}
+        {{ pie.newPie(pie_chart.id_, pie_chart.name, pie_chart.data) }}
+      {% endfor %}
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+  </div>
+</div>
 {% endblock %}
