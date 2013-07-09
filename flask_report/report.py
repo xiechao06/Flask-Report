@@ -18,8 +18,8 @@ from werkzeug.utils import cached_property
 from jinja2 import Template
 from sqlalchemy import desc, select
 
-class Report(object):
 
+class Report(object):
     def __init__(self, report_view, id_):
         self.report_view = report_view
         self.id_ = id_
@@ -57,7 +57,8 @@ class Report(object):
             if hasattr(col_expr, 'element'):
                 col_expr = col_expr.element
 
-            if (isinstance(col_expr, sqlalchemy.sql.expression.Function) or isinstance(col_expr, sqlalchemy.sql.expression.ClauseElement)) and col_expr.name == 'sum':
+            if (isinstance(col_expr, sqlalchemy.sql.expression.Function) or isinstance(col_expr,
+                                                                                       sqlalchemy.sql.expression.ClauseElement)) and col_expr.name == 'sum':
                 col['get_drill_down_link'] = partial(self._gen_drill_down_link, i)
             ret.append(col)
         return ret
@@ -66,7 +67,7 @@ class Report(object):
         group_by_columns = self.query.statement._group_by_clause.clauses
         params = {}
         d = dict((col['key'], col) for col in self.data_set.columns)
-        
+
         for col in group_by_columns:
             if col.foreign_keys:
                 remote_side = list(enumerate(col.foreign_keys))[0][1].column
@@ -94,7 +95,7 @@ class Report(object):
         else:
             return operator.eq, value
 
-    @cached_property 
+    @cached_property
     def query(self):
         q = self.data_set.query
         if self.filters:
@@ -146,7 +147,7 @@ class Report(object):
         return render_template('report____/report_short_description.html', report=self)
 
     def get_drill_down_detail_template(self, col_id):
-        template_file = os.path.join(self.report_view.report_dir, str(self.id_), "drill_downs", str(col_id)+".html")
+        template_file = os.path.join(self.report_view.report_dir, str(self.id_), "drill_downs", str(col_id) + ".html")
         if not os.path.exists(template_file):
             # read the default template
             return self.report_view.app.jinja_env.get_template("report____/default_drill_down_html_report.html")
@@ -162,7 +163,7 @@ class Report(object):
         s = select([table], from_obj=q.statement.froms, whereclause=q.whereclause)
         for k, v in filters.items():
             model_name, column_name = k.split('.')
-            s = s.where(k+'="'+v[0]+'"')
+            s = s.where(k + '="' + v[0] + '"')
 
         if hasattr(target_col, 'table'): # in case target column is from a sub query
             target_col_table = target_col.table
@@ -170,3 +171,13 @@ class Report(object):
             if target_col_table._whereclause is not None:
                 s = s.where(target_col_table._whereclause)
         return Model.query.from_statement(s)
+
+    @property
+    def sum_fields(self):
+        return [{"col": column["name"], "value": sum(d[column["idx"]] for d in self.data)} for column in
+                self.sum_columns]
+
+    @property
+    def avg_fields(self):
+        return [{"col": column["name"], "value": sum(d[column["idx"]] for d in self.data) / len(self.data)} for column
+                in self.avg_columns]

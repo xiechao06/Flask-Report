@@ -42,5 +42,25 @@
   </tbody>
 </table>
 
+<div id="statistics">
+  <div id="sum-field">
+    <h4>{{ _("SUM") }}</h4>
+    {% for sum_field in report.sum_fields %}
+      <p class="text-center">
+        {{ sum_field["col"] }} - {{ sum_field["value"] }}
+      </p>
+    {% endfor %}
+
+  </div>
+  <div id="avg-field">
+    <h4>{{ _("AVG") }}</h4>
+    {% for avg_field in report.avg_fields %}
+        <p class="text-center">
+          {{ avg_field["col"] }} - {{ avg_field["value"] }}
+        </p>
+    {% endfor %}
+
+  </div>
+</div>
 
 
