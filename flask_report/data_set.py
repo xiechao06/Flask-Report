@@ -54,7 +54,7 @@ class DataSet(object):
             return self.report_view.app.jinja_env.get_template("report____/default_data_set_html.html")
         return self.report_view.app.jinja_env.from_string(codecs.open(report_file, encoding='utf-8').read())
 
-    def get_query(self, filters, order_bys=None):
+    def get_query(self, filters, order_by=None):
         def get_column(column):
             for c in self.columns:
                 if column == c["name"]:
@@ -69,15 +69,14 @@ class DataSet(object):
         query = self.query
         for filter in filters:
             query = query.filter(get_operator(filter["op"])(get_column(filter["col"]), filter["val"]))
-        if order_bys:
+        if order_by:
             all_columns = dict((c['name'], c) for c in self.columns)
-            for order_by in order_bys:
-                o = all_columns.get(order_by[0], None)
-                if o:
-                    o = o['expr']
-                    if order_by[1] == "desc":
-                        o = sqlalchemy.desc(o)
-                    query = query.order_by(o)
+            o = all_columns.get(order_by[0], None)
+            if o:
+                o = o['expr']
+                if order_by[1] == "desc":
+                    o = sqlalchemy.desc(o)
+                query = query.order_by(o)
         return query
 
     @property
@@ -128,8 +127,11 @@ class DataSet(object):
         if result[-5:] == "\n...\n":
             return result[:-5]
 
-    def get_current_order_bys(self, order_by):
-        if order_by[:1] == "-":
-            return order_by[1:], "desc"
+    def get_current_order_by(self, order_by):
+        if order_by:
+            if order_by[:1] == "-":
+                return order_by[1:], "desc"
+            else:
+                return order_by, "asc"
         else:
-            return order_by, "asc"
+            return []

@@ -73,20 +73,20 @@ class FlaskReport(object):
         data_set = DataSet(self, id_)
         query = None
         current_filters = []
-        current_order_bys = []
+        current_order_by = None
         filters_yaml = None
         if request.args.get("filters"):
             filters_data = json.loads(request.args.get("filters"))
             current_filters = data_set.get_current_filters(filters_data)
             order_bys_data = request.args.get("order_bys")
-            current_order_bys = data_set.get_current_order_bys(order_bys_data)
+            current_order_by = data_set.get_current_order_by(order_bys_data)
             filters_yaml = data_set.parse_filters(filters_data)
             order_by_yaml = data_set.parse_order_bys(order_bys_data)
-            query = data_set.get_query(filters_data, current_order_bys)
+            query = data_set.get_query(filters_data, current_order_by)
         from flask.ext.report.utils import query_to_sql
-        html = data_set.html_template.render(columns=data_set.columns, data=query.all(), SQL=query_to_sql(query))
+        html = data_set.html_template.render(columns=data_set.columns, data=query.all() if query else [], SQL=query_to_sql(query))
         params = dict(data_set=data_set, html=html, current_filters=current_filters,
-                      current_order_bys=current_order_bys,
+                      current_order_by=current_order_by,
                       filters_yaml=filters_yaml, order_by_yaml=order_by_yaml)
         return render_template("report____/data-set.html", **params)
 

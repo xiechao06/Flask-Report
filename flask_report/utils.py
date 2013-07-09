@@ -49,6 +49,8 @@ def query_to_sql(statement, bind=None):
     for security, you should always separate queries from their values
     please also note that this function is quite slow
     """
+    if not statement:
+        return ""
     import sqlalchemy.orm
     if isinstance(statement, sqlalchemy.orm.Query):
         if bind is None:

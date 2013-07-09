@@ -146,8 +146,8 @@
         });
       {% endif %}
 
-      {% if current_order_bys %}
-        $("#order_by").addOrderBy("{{ current_order_bys[0]|safe }}", "{{ current_order_bys[1]|safe }}");
+      {% if current_order_by %}
+        $("#order_by").addOrderBy("{{ current_order_by[0]|safe }}", "{{ current_order_by[1]|safe }}");
       {% endif %}
 
       $("[name=remove-tr]").live("click", function () {

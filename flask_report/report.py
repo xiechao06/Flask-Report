@@ -158,16 +158,10 @@ class Report(object):
         return self.report_view.app.jinja_env.from_string(codecs.open(template_file, encoding='utf-8').read())
 
     def get_drill_down_detail_query(self, col_id, **filters):
-        q = self.query
-        target_col = self.data_set.columns[col_id]['expr']
-        target_col = getattr(target_col, 'element', target_col) # convert label
-        real_target_col = get_column_operated(target_col)
-        table = real_target_col.table
-        Model = self.report_view.table_map[table.name]
         lib = import_file(os.path.join(self.report_view.report_dir, str(self.id_), "drill_downs", str(col_id), "query_def.py"))
         return lib.query_def(self.report_view.db, self.report_view.model_map, **filters)
     
-     @property
+    @property
     def sum_fields(self):
         return [{"col": column["name"], "value": sum(d[column["idx"]] for d in self.data)} for column in
                 self.sum_columns]
