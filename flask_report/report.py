@@ -183,7 +183,7 @@ class Report(object):
             if length == 1:
                 return _get_random_color()
             else:
-                return (_get_random_color(),) * length
+                return [_get_random_color() for i in xrange(length)]
 
     @property
     def bar_charts(self):
@@ -201,12 +201,16 @@ class Report(object):
                     labels = data.setdefault("labels", [])
                     if column["name"] not in labels:
                         labels.append(column["name"])
+                display_names = []
                 for idx, i in enumerate(self.data):
                     color1, color2 = self._get_color(idx, colors, 2)
                     dataset = {"fillColor": color1, "strokeColor": color2, "data": [i[c["idx"]] for c in columns]}
+                    display_names.append(
+                        {"name": i[all_columns[bar_chart.get("display_column", 0)]["idx"]], "color": color1})
                     datasets = data.setdefault("datasets", [])
                     datasets.append(dataset)
-                self._bar_charts.append({"name": bar_chart.get("name"), "id_": uuid.uuid1(), "data": data})
+                self._bar_charts.append({"name": bar_chart.get("name"), "id_": uuid.uuid1(), "data": data,
+                                         "display_names": display_names})
         return self._bar_charts
 
     @property
@@ -220,8 +224,12 @@ class Report(object):
                 pie_column_idx = pie.get("column")
                 column = all_columns[pie_column_idx]
                 colors = pie.get("colors")
-                result = {"name": pie.get("name"), "id_": uuid.uuid1(),
-                          "data": [{"value": i[column["idx"]], "color": self._get_color(idx, colors)} for idx, i in
-                                   enumerate(self.data)]}
+                data = []
+                display_names = []
+                for idx, row in enumerate(self.data):
+                    color = self._get_color(idx, colors)
+                    data.append({"value": row[column["idx"]], "color": color})
+                    display_names.append({"name": row[all_columns[pie.get("display_column", 0)]["idx"]], "color": color})
+                result = {"name": pie.get("name"), "id_": uuid.uuid1(), "display_names": display_names, "data": data}
                 self._pie_charts.append(result)
         return self._pie_charts

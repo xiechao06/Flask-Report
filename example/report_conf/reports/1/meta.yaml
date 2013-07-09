@@ -15,7 +15,7 @@ data_set_id: 1
 sum_columns: [2]
 avg_columns: [3]
 bar:
-  {name: 各国战力图, columns: [2,4,6], colors: [['rgba(220,220,220,0.5)', 'rgba(220,220,220,1)'], ['rgba(151,187,205,0.5)', 'rgba(151,187,205,1)']]}
+  {name: 各国战力图, columns: [2,4,6], colors: [['rgba(220,220,220,0.5)', 'rgba(220,220,220,1)'], ], display_column: 1}
 pie:
-  - {name: 智力图, column: 4, colors: ["#F38630", "#E0E4CC"]}
-  - {name: 武力图, column: 6, colors: ["#F38630", "#E0E4CC"]}
+  - {name: 智力图, column: 4, colors: ["#F38630", "#E0E4CC"], display_column: 1}
+  - {name: 武力图, column: 6, colors: ["#F38630", "#E0E4CC"], display_column: 1}
