@@ -112,7 +112,9 @@
     {% for name, value in report.filters.items() %}
     <li>
     <small>
-      <Strong>{{ name }}</Strong> - {{ value }}
+      <Strong>{{ name }}</Strong> - {% for k, v in value.items() %}
+        {% if loop.first %}{{ "{" }}{% endif %}{{ "'%s':'%s'"|format(k,v) }}{% if not loop.last %},{% endif %}{% if loop.last %}{{ "}" }}{% endif %}
+      {% endfor %}
     </small>
     </li>
     {% endfor %}
