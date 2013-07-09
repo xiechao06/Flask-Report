@@ -150,6 +150,16 @@
   <a href="" class="btn btn-primary btn-large">{{ _('REFRESH') }}</a>
 </div>
 </div>
+<div class="container">
+{% import "report____/bar.html" as bar %}
+{% for bar_chart in report.bar_charts %}
+  {{ bar.newBar(bar_chart.id_, bar_chart.name, bar_chart.data) }}
+{% endfor %}
+{% import "report____/pie-chart.html" as pie %}
+{% for pie_chart in report.pie_charts %}
+  {{ pie.newPie(pie_chart.id_, pie_chart.name, pie_chart.data) }}
+{% endfor %}
+</div>
 
 <div id="drill-down-detail" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-header">
@@ -163,4 +173,5 @@
     <button class="btn" data-dismiss="modal" aria-hidden="true">{{ _('Close') }}</button>
   </div>
 </div>
+
 {% endblock %}
