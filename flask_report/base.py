@@ -164,7 +164,8 @@ class FlaskReport(object):
         col = report.data_set.columns[col_id]['expr']
         col = get_column_operated(getattr(col, 'element', col))
         model_name = self.get_model_label(col.table)
-        return report.get_drill_down_detail_template(col_id).render(items=report.get_drill_down_detail_query(col_id, **filters).all(), 
+        items=report.get_drill_down_detail_query(col_id, **filters).all() 
+        return report.get_drill_down_detail_template(col_id).render(items=items,
                                                                     key=col.key, 
                                                                     model_name=model_name, 
                                                                     report=report)
