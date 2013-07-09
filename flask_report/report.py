@@ -43,8 +43,8 @@ class Report(object):
         self.__columns = report_meta.get('columns')
         self.__special_chars = {"gt": operator.gt, "lt": operator.lt, "ge": operator.ge, "le": operator.le,
                                 "eq": operator.eq, "ne": operator.ne}
-        self._sum_columns = report_meta.get("sum_columns")
-        self._avg_columns = report_meta.get("avg_columns")
+        self._sum_columns = report_meta.get("sum_columns", [])
+        self._avg_columns = report_meta.get("avg_columns", [])
         self._bar = report_meta.get("bar")
         self._pie = report_meta.get("pie")
         self._bar_charts = None
