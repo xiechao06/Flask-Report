@@ -1,0 +1,35 @@
+{% if SQL %}
+  <h4>{{ _("SQL") }}</h4>
+  <p>
+    <code>
+      {{ SQL }}
+    </code>
+  </p>
+{% endif %}
+<table cellpadding="0" cellspacing="0" border="0" class="display" class="table table-striped table-bordered" id="report">
+  <thead>
+    <tr class="info">
+      {% for c in columns %}
+      <th>{{c.name}}</th>
+      {% endfor %}
+    </tr>
+    <tr role="row">
+      {% for c in columns %}
+      <td rowspan="1" colspan="1">
+      </td>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in data %} 
+    <tr>
+      {% for c in columns %}
+      <td>
+        {{ r[c.idx] }}
+      </td>
+      {% endfor %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+

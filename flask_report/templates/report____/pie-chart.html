@@ -1,0 +1,46 @@
+{% macro newPie(id, name, data, display_names) %}
+  <div id="div-{{ id }}" class="tab-pane">
+    <canvas id="{{ id }}" width="500" height="330" data-type="Pie"></canvas>
+    <div>
+      {% for display in display_names %}
+        <span>{{ display["name"] }} - <i class="icon-sign-blank icon-large" style="color:{{ display["color"] }}"></i> </span>
+      {% endfor %}
+    </div>
+
+    <script type="text/javascript">
+      $(function () {
+        var ctx = $("#{{ id }}").get(0).getContext("2d");
+        var data = {{ data|safe }};
+        options = {
+          //Boolean - Whether we should show a stroke on each segment
+          segmentShowStroke: true,
+
+          //String - The colour of each segment stroke
+          segmentStrokeColor: "#fff",
+
+          //Number - The width of each segment stroke
+          segmentStrokeWidth: 2,
+
+          //Boolean - Whether we should animate the chart
+          animation: true,
+
+          //Number - Amount of animation steps
+          animationSteps: 100,
+
+          //String - Animation easing effect
+          animationEasing: "easeOutBounce",
+
+          //Boolean - Whether we animate the rotation of the Pie
+          animateRotate: true,
+
+          //Boolean - Whether we animate scaling the Pie from the centre
+          animateScale: false,
+
+          //Function - Will fire on animation completion.
+          onAnimationComplete: null
+        };
+        var myChart = new Chart(ctx).Pie(data, options);
+      })
+    </script>
+  </div>
+{% endmacro %}

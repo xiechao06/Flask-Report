@@ -1,8 +1,9 @@
 # -*- coding: UTF-8 -*-
 import os
 import json
-from flask import render_template, abort, request
+from flask import render_template, abort, request, url_for, redirect
 from flask.ext.report.report import Report
+from flask.ext.report.data_set import DataSet
 from flask.ext.report.utils import get_column_operated
 
 
@@ -25,11 +26,15 @@ class FlaskReport(object):
             os.makedirs(self.data_set_dir)
 
         host.route("/report-list/")(self.report_list)
+        host.route("/report/", methods=["GET", "POST"])(self.report)
         host.route("/report/<int:id_>")(self.report)
         host.route("/report_csv/<int:id_>")(self.report_csv)
         host.route("/report_pdf/<int:id_>")(self.report_pdf)
         host.route("/report_txt/<int:id_>")(self.report_txt)
         host.route("/drill-down-detail/<int:report_id>/<int:col_id>")(self.drill_down_detail)
+
+        host.route("/data-sets/")(self.data_set_list)
+        host.route("/data-set/<int:id_>")(self.data_set)
 
         from flask import Blueprint
         # register it for using the templates of data browser
@@ -39,6 +44,51 @@ class FlaskReport(object):
         app.register_blueprint(self.blueprint, url_prefix="/__report__")
         self.extra_params = extra_params or {'report': {}, 'report_list': {}}
 
+        @app.template_filter("dpprint")
+        def dict_pretty_print(value):
+            if not isinstance(value, list):
+                value = [value]
+            s = "{"
+            for val in value:
+                idx = 0
+                for k, v in val.items():
+                    idx += 1
+                    s += "'%s':'%s'" % (k, v)
+                    if idx != len(val):
+                        s += ","
+            s += "}"
+            return s
+
+    def data_set_list(self):
+        data_sets = [DataSet(self, int(dir_name)) for dir_name in os.listdir(self.data_set_dir) if
+                     dir_name.isdigit() and dir_name != '0']
+        params = dict(data_sets=data_sets)
+        extra_params = self.extra_params.get("data_sets")
+        if extra_params:
+            params.update(extra_params)
+        return render_template("report____/data-sets.html", **params)
+
+    def data_set(self, id_):
+        order_by_yaml = None
+        data_set = DataSet(self, id_)
+        query = None
+        current_filters = []
+        current_order_by = None
+        filters_yaml = None
+        if request.args.get("filters"):
+            filters_data = json.loads(request.args.get("filters"))
+            current_filters = data_set.get_current_filters(filters_data)
+            order_bys_data = request.args.get("order_bys")
+            current_order_by = data_set.get_current_order_by(order_bys_data)
+            filters_yaml = data_set.parse_filters(filters_data)
+            order_by_yaml = data_set.parse_order_bys(order_bys_data)
+            query = data_set.get_query(filters_data, current_order_by)
+        from flask.ext.report.utils import query_to_sql
+        html = data_set.html_template.render(columns=data_set.columns, data=query.all() if query else [], SQL=query_to_sql(query))
+        params = dict(data_set=data_set, html=html, current_filters=current_filters,
+                      current_order_by=current_order_by,
+                      filters_yaml=filters_yaml, order_by_yaml=order_by_yaml)
+        return render_template("report____/data-set.html", **params)
 
     def report_list(self):
         # directory 0 is reserved for special purpose
@@ -50,22 +100,47 @@ class FlaskReport(object):
             params.update(extra_params)
         return render_template('report____/report-list.html', **params)
 
-    def report(self, id_):
-        report = Report(self, id_)
-        html_report = report.html_template.render(data=report.data, columns=report.columns, report=report)
-        from pygments import highlight
-        from pygments.lexers import PythonLexer
-        from pygments.formatters import HtmlFormatter
+    def report(self, id_=None):
+        if id_ is not None:
+            report = Report(self, id_)
+            from flask.ext.report.utils import query_to_sql
 
-        code = report.read_literal_filter_condition()
-        params = dict(report=report, html_report=html_report)
-        if code is not None:
-            customized_filter_condition = highlight(code, PythonLexer(), HtmlFormatter())
-            params[customized_filter_condition] = customized_filter_condition
-        extra_params = self.extra_params.get("report")
-        if extra_params:
-            params.update(extra_params)
-        return render_template("report____/report.html", **params)
+            html_report = report.html_template.render(data=report.data, columns=report.columns, report=report,
+                                                      SQL=query_to_sql(report.query))
+            from pygments import highlight
+            from pygments.lexers import PythonLexer
+            from pygments.formatters import HtmlFormatter
+
+            code = report.read_literal_filter_condition()
+            params = dict(report=report, html_report=html_report)
+            if code is not None:
+                customized_filter_condition = highlight(code, PythonLexer(), HtmlFormatter())
+                params[customized_filter_condition] = customized_filter_condition
+            extra_params = self.extra_params.get("report")
+            if extra_params:
+                params.update(extra_params)
+            return render_template("report____/report.html", **params)
+        else:
+            id_ = max([int(dir_name) for dir_name in os.listdir(self.report_dir) if
+                       dir_name.isdigit() and dir_name != '0']) + 1
+            new_dir = os.path.join(self.report_dir, str(id_))
+            if not os.path.exists(new_dir):
+                os.mkdir(new_dir)
+            self._write(os.path.join(new_dir, "meta.yaml"), request.form)
+            return redirect(url_for(".report", id_=id_, _method="GET"))
+
+    def _write(self, file_name, form):
+        import yaml
+        dict_ = {"name": form["report_name"], "description": form["report_desc"],
+                 "data_set_id": form.get("data_set_id", type=int),
+                 "filters": yaml.load(form["report_filters"]), "columns": form.getlist("report_columns", type=int)}
+        if form.get("report_order_by"):
+            dict_["order_by"] = yaml.load(form["report_order_by"])
+        dict_["creator"] = form["report_creator"]
+        import datetime
+        dict_["create_time"] = datetime.datetime.now()
+        with file(file_name, "w") as f:
+            yaml.safe_dump(dict_, allow_unicode=True, stream=f)
 
     def _get_report(self, id_, ReportClass):
         from flask.ext.report.report_templates import BaseReport

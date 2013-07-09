@@ -1,0 +1,16 @@
+td.and{
+    white-space: nowrap;
+}
+
+td label{
+    display: inline;
+}
+
+form {
+    overflow: auto;
+}
+
+code {
+    white-space:normal;
+    word-wrap:break-word
+}

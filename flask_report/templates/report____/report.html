@@ -6,8 +6,10 @@
 
 {% block report____customized_head_block %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('report____.static', filename='datatables/css/jquery.dataTables.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('report____.static', filename='css/customer.css') }}">
 <script type="text/javascript" charset="utf8" src="{{ url_for('report____.static', filename='datatables/js/jquery.dataTables.min.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('report____.static', filename='js/DT_bootstrap.js') }}"></script>
+<script src="{{ url_for('report____.static', filename='js/Chart.min.js') }}"></script>
 <script type="text/javascript">
   $.extend( $.fn.dataTableExt.oStdClasses, {
       "sWrapper": "dataTables_wrapper form-inline"
@@ -78,7 +80,12 @@
             var content = modal.find('.modal-body p')
             content.html('<i class="icon-refresh icon-spin icon-4x"></i>');
             content.load($(this).attr('data-target'));
-          });	
+          });
+    $('#myTab a').click(function (e) {
+      e.preventDefault();
+      $(this).tab('show');
+    });
+    $('#myTab a:first').tab('show');
   });
 </script>
 {% endblock %}
@@ -112,7 +119,7 @@
     {% for name, value in report.filters.items() %}
     <li>
     <small>
-      <Strong>{{ name }}</Strong> - {{ value }}
+      <Strong>{{ name }}</Strong> - {{ value|dpprint }}
     </small>
     </li>
     {% endfor %}
@@ -120,7 +127,7 @@
   </ul>
   <p>
     <small>
-      {{ _("the customized filter condition is: ") }} 
+      {{ _("the customized filter condition is: ") }}
     </small>
   </p>
   <p>
@@ -130,6 +137,7 @@
 </div>
 </div>
 <hr />
+<a href="#graph" role="button" class="btn" data-toggle="modal">{{ _("View Graphs") }}</a>
 <div>
 {{ html_report|safe }}
 </div>
@@ -160,6 +168,35 @@
   </div>
   <div class="modal-footer">
     <button class="btn" data-dismiss="modal" aria-hidden="true">{{ _('Close') }}</button>
+  </div>
+</div>
+
+<div class="modal hide fade" tabindex="-1" role="dialog" data-toggle="modal" id="graph">
+  <div class="modal-header">
+    <h3>图表</h3>
+  </div>
+  <div class="modal-body">
+    <ul class="nav nav-tabs" id="myTab">
+      {% for bar_chart in report.bar_charts %}
+        <li><a href="#div-{{ bar_chart.id_ }}">{{ bar_chart.name }}</a></li>
+      {% endfor %}
+      {% for pie_chart in report.pie_charts %}
+        <li><a href="#div-{{ pie_chart.id_ }}">{{ pie_chart.name }}</a></li>
+      {% endfor %}
+    </ul>
+    <div class="tab-content">
+      {% import "report____/bar.html" as bar %}
+      {% for bar_chart in report.bar_charts %}
+        {{ bar.newBar(bar_chart.id_, bar_chart.name, bar_chart.data, bar_chart.display_names) }}
+      {% endfor %}
+      {% import "report____/pie-chart.html" as pie %}
+      {% for pie_chart in report.pie_charts %}
+        {{ pie.newPie(pie_chart.id_, pie_chart.name, pie_chart.data, pie_chart.display_names) }}
+      {% endfor %}
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
   </div>
 </div>
 {% endblock %}
