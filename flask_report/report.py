@@ -151,7 +151,7 @@ class Report(object):
         return render_template('report____/report_short_description.html', report=self)
 
     def get_drill_down_detail_template(self, col_id):
-        template_file = os.path.join(self.report_view.report_dir, str(self.id_), "drill_downs", str(col_id) + ".html")
+        template_file = os.path.join(self.report_view.report_dir, str(self.id_), "drill_downs", str(col_id), "template.html")
         if not os.path.exists(template_file):
             # read the default template
             return self.report_view.app.jinja_env.get_template("report____/default_drill_down_html_report.html")
@@ -164,19 +164,10 @@ class Report(object):
         real_target_col = get_column_operated(target_col)
         table = real_target_col.table
         Model = self.report_view.table_map[table.name]
-        s = select([table], from_obj=q.statement.froms, whereclause=q.whereclause)
-        for k, v in filters.items():
-            model_name, column_name = k.split('.')
-            s = s.where(k + '="' + v[0] + '"')
-
-        if hasattr(target_col, 'table'): # in case target column is from a sub query
-            target_col_table = target_col.table
-            target_col_table = getattr(target_col_table, 'element', target_col_table) # convert alias
-            if target_col_table._whereclause is not None:
-                s = s.where(target_col_table._whereclause)
-        return Model.query.from_statement(s)
-
-    @property
+        lib = import_file(os.path.join(self.report_view.report_dir, str(self.id_), "drill_downs", str(col_id), "query_def.py"))
+        return lib.query_def(self.report_view.db, self.report_view.model_map, **filters)
+    
+     @property
     def sum_fields(self):
         return [{"col": column["name"], "value": sum(d[column["idx"]] for d in self.data)} for column in
                 self.sum_columns]
