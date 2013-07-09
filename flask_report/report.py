@@ -18,8 +18,8 @@ from werkzeug.utils import cached_property
 from jinja2 import Template
 from sqlalchemy import desc, select
 
-class Report(object):
 
+class Report(object):
     def __init__(self, report_view, id_):
         self.report_view = report_view
         self.id_ = id_
@@ -41,9 +41,14 @@ class Report(object):
             self.order_by = namedtuple("OrderBy", ['name', 'desc'])(name, desc_)
         self.data_set = DataSet(report_view, report_meta['data_set_id'])
         self.__columns = report_meta.get('columns')
-        self.__special_chars = {"gt": operator.gt, "lt": operator.lt, "ge": operator.ge, "le": operator.le, "eq": operator.eq}
+        self.__special_chars = {"gt": operator.gt, "lt": operator.lt, "ge": operator.ge, "le": operator.le,
+                                "eq": operator.eq, "ne": operator.ne}
         self._sum_columns = report_meta.get("sum_columns")
         self._avg_columns = report_meta.get("avg_columns")
+        self._bar = report_meta.get("bar")
+        self._pie = report_meta.get("pie")
+        self._bar_charts = None
+        self._pie_charts = None
 
     @cached_property
     def columns(self):
@@ -56,7 +61,8 @@ class Report(object):
             if hasattr(col_expr, 'element'):
                 col_expr = col_expr.element
 
-            if (isinstance(col_expr, sqlalchemy.sql.expression.Function) or isinstance(col_expr, sqlalchemy.sql.expression.ClauseElement)) and col_expr.name == 'sum':
+            if (isinstance(col_expr, sqlalchemy.sql.expression.Function) or isinstance(col_expr,
+                                                                                       sqlalchemy.sql.expression.ClauseElement)) and col_expr.name == 'sum':
                 col['get_drill_down_link'] = partial(self._gen_drill_down_link, i)
             ret.append(col)
         return ret
@@ -65,7 +71,7 @@ class Report(object):
         group_by_columns = self.query.statement._group_by_clause.clauses
         params = {}
         d = dict((col['key'], col) for col in self.data_set.columns)
-        
+
         for col in group_by_columns:
             if col.foreign_keys:
                 remote_side = list(enumerate(col.foreign_keys))[0][1].column
@@ -93,7 +99,7 @@ class Report(object):
         else:
             return operator.eq, value
 
-    @cached_property 
+    @cached_property
     def query(self):
         q = self.data_set.query
         if self.filters:
@@ -152,11 +158,78 @@ class Report(object):
         return self.report_view.app.jinja_env.from_string(codecs.open(template_file, encoding='utf-8').read())
 
     def get_drill_down_detail_query(self, col_id, **filters):
-        q = self.query
-        target_col = self.data_set.columns[col_id]['expr']
-        target_col = getattr(target_col, 'element', target_col) # convert label
-        real_target_col = get_column_operated(target_col)
-        table = real_target_col.table
-        Model = self.report_view.table_map[table.name]
         lib = import_file(os.path.join(self.report_view.report_dir, str(self.id_), "drill_downs", str(col_id), "query_def.py"))
         return lib.query_def(self.report_view.db, self.report_view.model_map, **filters)
+    
+    @property
+    def sum_fields(self):
+        return [{"col": column["name"], "value": sum(d[column["idx"]] for d in self.data)} for column in
+                self.sum_columns]
+
+    @property
+    def avg_fields(self):
+        return [{"col": column["name"], "value": sum(d[column["idx"]] for d in self.data) / len(self.data)} for column
+                in self.avg_columns]
+
+    def _get_color(self, idx, colors, length=1):
+        try:
+            return colors[idx]
+        except IndexError:
+            def _get_random_color():
+                import random
+                r = lambda: random.randint(0, 255)
+                return '#%02X%02X%02X' % (r(), r(), r())
+
+            if length == 1:
+                return _get_random_color()
+            else:
+                return [_get_random_color() for i in xrange(length)]
+
+    @property
+    def bar_charts(self):
+        if self._bar_charts is None:
+            import uuid
+
+            self._bar_charts = []
+            all_columns = self.data_set.columns
+            for bar_chart in self._bar if isinstance(self._bar, list) else [self._bar]:
+                data = {}
+                bar_columns = bar_chart.get("columns", [])
+                colors = bar_chart.get("colors", [])
+                columns = [all_columns[i] for i in bar_columns]
+                for column in columns:
+                    labels = data.setdefault("labels", [])
+                    if column["name"] not in labels:
+                        labels.append(column["name"])
+                display_names = []
+                for idx, i in enumerate(self.data):
+                    color1, color2 = self._get_color(idx, colors, 2)
+                    dataset = {"fillColor": color1, "strokeColor": color2, "data": [i[c["idx"]] for c in columns]}
+                    display_names.append(
+                        {"name": i[all_columns[bar_chart.get("display_column", 0)]["idx"]], "color": color1})
+                    datasets = data.setdefault("datasets", [])
+                    datasets.append(dataset)
+                self._bar_charts.append({"name": bar_chart.get("name"), "id_": uuid.uuid1(), "data": data,
+                                         "display_names": display_names})
+        return self._bar_charts
+
+    @property
+    def pie_charts(self):
+        if self._pie_charts is None:
+            import uuid
+
+            all_columns = self.data_set.columns
+            self._pie_charts = []
+            for pie in self._pie if isinstance(self._pie, list) else [self._pie]:
+                pie_column_idx = pie.get("column")
+                column = all_columns[pie_column_idx]
+                colors = pie.get("colors")
+                data = []
+                display_names = []
+                for idx, row in enumerate(self.data):
+                    color = self._get_color(idx, colors)
+                    data.append({"value": row[column["idx"]], "color": color})
+                    display_names.append({"name": row[all_columns[pie.get("display_column", 0)]["idx"]], "color": color})
+                result = {"name": pie.get("name"), "id_": uuid.uuid1(), "display_names": display_names, "data": data}
+                self._pie_charts.append(result)
+        return self._pie_charts

@@ -15,7 +15,7 @@ class UnicodeWriter:
                                  **kwds)
         self.stream = f
         self.encoder = codecs.getincrementalencoder("UTF-8")()
-        self.stream.write(codecs.BOM_UTF8)
+        self.stream._write(codecs.BOM_UTF8)
 
     def writerow(self, row):
         self.writer.writerow([s.encode("utf-8") for s in row])
@@ -25,7 +25,7 @@ class UnicodeWriter:
         # ... and reencode it into the target encoding
         data = self.encoder.encode(data)
         # write to the target stream
-        self.stream.write(data)
+        self.stream._write(data)
         # empty queue
         self.queue.truncate(0)
 

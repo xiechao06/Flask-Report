@@ -1,0 +1,328 @@
+{% extends "report____/layout.html" %}
+
+{% block report____title_block %}
+  {{ data_set.name }}
+{% endblock %}
+
+{% block report____customized_head_block %}
+  <link rel="stylesheet" type="text/css" href="{{ url_for('report____.static', filename='datatables/css/jquery.dataTables.css') }}">
+  <link rel="stylesheet" href="{{ url_for('report____.static', filename='css/customer.css') }}"/>
+  <script type="text/javascript" charset="utf8" src="{{ url_for('report____.static', filename='datatables/js/jquery.dataTables.min.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('report____.static', filename='js/DT_bootstrap.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('report____.static', filename='js/jquery.autosize-min.js') }}"></script>
+  <script type="text/javascript">
+    $.extend($.fn.dataTableExt.oStdClasses, {
+      "sWrapper": "dataTables_wrapper form-inline"
+    });
+    $(function () {
+      var oTable = $("#report").dataTable({
+        "oLanguage": {
+          "sSearch": '{{ _("Search") }}' + " :",
+          "sLengthMenu": '{{ _("Display _MENU_ records per page") }}',
+          "sZeroRecords": '{{ _("Nothing found - sorry") }}',
+          "sInfo": '{{ _("Showing _START_ to _END_ of _TOTAL_ records") }}',
+          "sInfoEmpty": '{{ _("Showing 0 to 0 of 0 records") }}',
+          "sInfoFiltered": "(" + '{{ _("filtered from _MAX_ total records") }}' + ")",
+          'oPaginate': {
+            "sPrevious": '{{ _("Previous") }} ',
+            "sNext": '{{ _("Next") }}',
+            "sFirst": '{{ _("First") }}',
+            'sLast': '{{ _("Last") }}'
+          }
+        },
+        "bFilter": false,
+        "bPaginate": false,
+        "bSortCellsTop": true,
+        "aoColumnDefs": [
+          { "bVisible": false, "aTargets": [ 2 ] }
+        ],
+        "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>",
+        "iDisplayLength": 25
+      });
+      $("#detail").on('shown',function () {
+        $('a[data-target="#detail"]').text("{{ _('hide detail') }}" + " <<");
+      }).on('hidden', function () {
+            $('a[data-target="#detail"]').text("{{ _('show detail') }}" + " >>");
+          });
+
+
+      /* Add the events etc before DataTables hides a column */
+      $("thead input").keyup(function () {
+        /* Filter on the column (the index) of this element */
+        oTable.fnFilter(this.value, oTable.oApi._fnVisibleToColumnIndex(
+            oTable.fnSettings(), $("thead input").index(this)));
+      }).each(function (i) {
+            this.initVal = this.value;
+          }).focus(function () {
+            if (this.className == "search_init") {
+              this.className = "";
+              this.value = "";
+            }
+          }).blur(function (i) {
+            if (this.value == "") {
+              this.className = "search_init";
+              this.value = this.initVal;
+            }
+          });
+      $(".collapse").collapse();
+
+
+      jQuery.fn.addFilter = function (text, available_opts, type, op, value) {
+        var tr = $("<tr name='filter'></tr>");
+        var td1 = $("<td></td>").html($("<button type='button' class='btn' name='remove-tr'></button>").html($("<i class='icon-remove icon-large'></i>")));
+        var td2 = $("<td></td>").text(text);
+        var select = $("<select></select>");
+        $.each([
+          {"key": "eq", "value": "等于"},
+          {"key": "gt", "value": "大于"},
+          {"key": "lt", "value": "小于"},
+          {"key": "ge", "value": "大于等于"},
+          {"key": "le", "value": "小于等于"},
+          {"key": "ne", "value": "不等于"}
+        ], function (idx, opt) {
+          if (available_opts) {
+            if ($.inArray(opt.key, available_opts) != -1) {
+              select.append($("<option></option>").val(opt.key).text(opt.value));
+            }
+          } else {
+            select.append($("<option></option>").val(opt.key).text(opt.value));
+          }
+        });
+        if (op) {
+          select.val(op);
+        }
+        var td3 = $("<td></td>").html(select);
+        var input_str = "<input type='text' required></input>";
+        if (type) {
+          input_str.replace("'text'", "'" + type + "'");
+        }
+        var input = $(input_str);
+        if (value) {
+          input.val(value)
+        }
+        var td4 = $("<td></td>").html(input);
+        tr.append(td1, td2, td3, td4);
+        this.find("tbody").append(tr);
+      };
+
+      jQuery.fn.addOrderBy = function (text, op){
+        var tr = $("<tr name='order_by'></tr>");
+        var td1 = $("<td></td>").html($("<button type='button' class='btn' name='remove-tr'></button>").html($("<i class='icon-remove icon-large'></i>")));
+        var td2 = $("<td></td>").text(text);
+        var td3 = $("<td></td>");
+        var select = $("<select></select>");
+        $.each([{"key":"desc", "value": "desc"}, {"key": "asc", "value": "asc"}], function(idx, value){
+          select.append($("<option></option>").val(value.value).text(value.key));
+        });
+        if(op){
+          select.val(op);
+        }
+        td3.append(select);
+
+        tr.append(td1, td2, td3);
+        this.find("tbody").append(tr);
+      };
+
+      $("#add_filter").change(function () {
+        var e = $($(this).find(":selected"));
+
+        $("#clause").addFilter(e.text(), $.parseJSON(e.attr("data-ops")), e.attr("data-type"));
+        $(this).val([]);
+      });
+
+      $("#add_order_by").change(function(){
+        if ($("tr[name=order_by]").size() > 0){
+          alert("{{ _("only one order_by supported") }}");
+          return false;
+        }
+        var e = $($(this).find(":selected"));
+        $("#order_by").addOrderBy(e.text());
+        $(this).val([])
+      });
+
+      {% if current_filters %}
+        $.each({{ current_filters|tojson|safe }}, function (idx, filter) {
+          $("#clause").addFilter(filter.name, filter.ops, filter.type, filter.op, filter.val);
+        });
+      {% endif %}
+
+      {% if current_order_by %}
+        $("#order_by").addOrderBy("{{ current_order_by[0]|safe }}", "{{ current_order_by[1]|safe }}");
+      {% endif %}
+
+      $("[name=remove-tr]").live("click", function () {
+        $(this).closest("tr").remove();
+      });
+
+      $("#search").click(function () {
+        var form = $(this).parents("form");
+        if (form.get(0).checkValidity()) {
+          var filters = [];
+          $.each(form.find("tr[name='filter']"), function (idx, tr) {
+            filters.push({"col": $($(tr).find("td")[1]).text(), "op": $($(tr).find("select")).val(), "val": $($(tr).find("input")[0]).val()});
+          });
+          var tr = form.find("tr[name=order_by]");
+          var order_bys = $($(tr).find("td")[1]).text();
+          if ($($(tr).find("select")).val() == "desc"){
+            order_bys = "-" + order_bys;
+          }
+          form.find("input[type=hidden][name=filters]").val(JSON.stringify(filters));
+          form.find("input[type=hidden][name=order_bys]").val(order_bys);
+          form.submit();
+        }
+      });
+      $("textarea").autosize();
+    });
+  </script>
+{% endblock %}
+
+{% block body %}
+  <div class="container">
+    <div class="alert alert-info">
+      <h1>
+        {{ data_set.name }}
+      </h1>
+    </div>
+    <hr/>
+    <form action="{{ url_for(".data_set", id_=data_set.id_) }}">
+      <fieldset>
+        <legend>{{ _("filters") }}</legend>
+        <table id="clause">
+          <tbody>
+          <tr>
+            <td colspan="2">
+              <label for="add_filter">新增</label>
+              <select id="add_filter">
+                <option></option>
+                {% for filter in data_set.filters %}
+                  <option value="{{ filter.col }}" data-type="{{ filter.type }}" data-ops='{{ filter.ops|tojson|safe }}'>{{ filter.name }}</option>
+                {% endfor %}
+              </select>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </fieldset>
+      <fieldset>
+        <legend>{{ _("order by") }}</legend>
+        <table id="order_by">
+          <tbody>
+          <tr>
+            <td colspan="2">
+              <label for="add_order_by">新增</label>
+              <select id="add_order_by">
+                <option></option>
+                {% for order_by in data_set.order_bys %}
+                  <option value="{{ order_by }}">{{ order_by }}</option>
+                {% endfor %}
+              </select>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </fieldset>
+      <input type="hidden" name="filters"/>
+      <input type="hidden" name="order_bys"/>
+      <div class="control-group">
+        <div class="controls">
+          <button class="btn btn-primary" id="search"><i class="icon-search"></i>&nbsp;{{ _("Search") }}</button>
+        </div>
+      </div>
+    </form>
+
+    <legend>{{ _("RESULT") }}</legend>
+    {% if filters_yaml %}
+      <div>
+        <code>
+          filters: {{ filters_yaml }}
+        </code>
+      </div>
+    {% endif %}
+    {% if order_by_yaml %}
+      <div>
+        <code>
+          order_by: {{ order_by_yaml }}
+        </code>
+      </div>
+    {% endif %}
+    <div>
+      {% if request.args.get("filters") %}
+        {{ html|safe }}
+      {% else %}
+        <div class="alert alert-warnning">
+          {{ _("please config the filters") }}
+        </div>
+      {% endif %}
+    </div>
+    <hr/>
+
+    <div class="pagination-centered span12">
+      <a href="{{ url_for('.data_set_list') }}" class="btn btn-primary btn-large">{{ _('BACK') }}</a>
+      <button type="button" data-toggle="modal" data-target="#saveModal" class="btn btn-primary btn-large">{{ _("SAVE") }}</button>
+      <a href="" class="btn btn-primary btn-large">{{ _('REFRESH') }}</a>
+    </div>
+  </div>
+  <div class="modal hide fade" id="saveModal" tabindex="-1">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      <h3>保存</h3>
+    </div>
+    <form action="{{ url_for(".report") }}" method="POST">
+      <div class="modal-body ">
+        <fieldset class="form-horizontal">
+          <div class="control-group">
+            <label for="report_name" class="control-label">{{ _("report_name") }}</label>
+
+            <div class="controls">
+              <input type="text" name="report_name" required="required" id="report_name"/>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="report_creator">{{ _("report_creator") }}</label>
+
+            <div class="controls">
+              <input type="text" name="report_creator" id="report_creator"/>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="report_desc">{{ _("report_desc") }}</label>
+
+            <div class="controls">
+              <textarea name="report_desc" id="report_desc"></textarea>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">{{ _("report_filters") }}</label>
+
+            <div class="controls">
+              <textarea name="report_filters" readonly>{{ filters_yaml }}</textarea>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="report_order_by">{{ _("report_order_by") }}</label>
+
+            <div class="controls">
+              <input type="text" name="report_order_by" id="report_order_by" value="{{ order_by_yaml }}" readonly/>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="report_columns">{{ _("report_columns") }}</label>
+
+            <div class="controls">
+              <select name="report_columns" id="report_columns" multiple>
+                {% for c in data_set.columns %}
+                  <option value="{{ c.idx }}" selected>{{ c.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <input type="hidden" name="data_set_id" value="{{ data_set.id_ }}"/>
+        </fieldset>
+      </div>
+      <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal">Close</a>
+        <button class="btn btn-primary">{{ _("SAVE REPORT") }}</button>
+      </div>
+    </form>
+  </div>
+{% endblock %}
