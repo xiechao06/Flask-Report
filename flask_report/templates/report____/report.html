@@ -43,15 +43,13 @@
         var visibleIndex = this.fnSettings().oApi._fnColumnIndexToVisible(this.fnSettings(), i);
         if (visibleIndex != null && ( sum_columns.length == 0 || $.inArray(visibleIndex, sum_columns) > -1)) {
           if (sums[i]) {
-            $('#report tfoot th:eq(' + visibleIndex + ')').html('<b>Tot: ' + sums[i] + '</b>');
+            $('#report tfoot th:eq(' + visibleIndex + ')').html('<b>' + '{{ _("Total") }}' + ': ' + sums[i] + '</b>');
           } else {
             $('#report tfoot th:eq(' + visibleIndex + ')').html('');
           }
         }
       }
     }
-
-
       var oTable = $("#report").dataTable({
         "oLanguage": {
             "sSearch": '{{ _("Search") }}' + " :",
