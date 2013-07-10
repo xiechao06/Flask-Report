@@ -12,7 +12,7 @@ filters:
 order_by: -平均武力值
 columns: [0, 1, 2, 3, 4, 5, 6, 7]
 data_set_id: 1
-sum_columns: [2]
+sum_columns: [2, 3, 4, 5, 6]
 avg_columns: [3]
 bar:
   {name: 各国战力图, columns: [2,4,6],  display_columns: [1]}

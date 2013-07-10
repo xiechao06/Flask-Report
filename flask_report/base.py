@@ -45,7 +45,7 @@ class FlaskReport(object):
                                    static_folder="static",
                                    template_folder="templates")
         app.register_blueprint(self.blueprint, url_prefix="/__report__")
-        self.extra_params = extra_params or {'report': lambda : {},
+        self.extra_params = extra_params or {'report': lambda id_: {},
                                              'report_list': lambda: {}, 
                                              'data_set': lambda id_: {},
                                              'data_sets': lambda: {}}
