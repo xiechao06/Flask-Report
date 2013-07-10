@@ -24,6 +24,34 @@
             content.html('<i class="icon-refresh icon-spin icon-4x"></i>');
             content.load($(this).attr('data-target'));
           });
+    var sum_columns = {{ report._sum_columns }};
+    var sumsCallback = function (nRow, aaData, iStart, iEnd, aiDisplay) {
+      var sums = [];
+      for (i = iStart; i < iEnd; i++) {
+        for (j = 0; j < aaData[aiDisplay[i]].length; j++) {
+          var num = parseFloat(aaData[aiDisplay[i]][j]);
+          if (!isNaN(num)) {
+            if (sums[j]) {
+              sums[j] += num;
+            } else {
+              sums[j] = num;
+            }
+          }
+        }
+      }
+      for (var i = 0; i < sums.length; i++) {
+        var visibleIndex = this.fnSettings().oApi._fnColumnIndexToVisible(this.fnSettings(), i);
+        if (visibleIndex != null && ( sum_columns.length == 0 || $.inArray(visibleIndex, sum_columns) > -1)) {
+          if (sums[i]) {
+            $('#report tfoot th:eq(' + visibleIndex + ')').html('<b>Tot: ' + sums[i] + '</b>');
+          } else {
+            $('#report tfoot th:eq(' + visibleIndex + ')').html('');
+          }
+        }
+      }
+    }
+
+
       var oTable = $("#report").dataTable({
         "oLanguage": {
             "sSearch": '{{ _("Search") }}' + " :",
@@ -42,6 +70,7 @@
         "bSortCellsTop": true,
         "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>",
         "iDisplayLength": 25,
+        "fnFooterCallback": sumsCallback
         });
       $("#detail").on('shown', function () {
         $('a[data-target="#detail"]').text("{{ _('hide detail') }}" + " <<");
@@ -81,11 +110,6 @@
         }
         });
 
-    $('#myTab a').click(function (e) {
-      e.preventDefault();
-      $(this).tab('show');
-    });
-    $('#myTab a:first').tab('show');
   });
 </script>
 {% endblock %}
