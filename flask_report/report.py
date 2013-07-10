@@ -163,12 +163,12 @@ class Report(object):
     
     @property
     def sum_fields(self):
-        return [{"col": column["name"], "value": sum(d[column["idx"]] for d in self.data)} for column in
+        return [{"col": column["name"], "value": sum(d[column["idx"]] or 0 for d in self.data)} for column in
                 self.sum_columns]
 
     @property
     def avg_fields(self):
-        return [{"col": column["name"], "value": sum(d[column["idx"]] for d in self.data) / len(self.data)} for column
+        return [{"col": column["name"], "value": sum((d[column["idx"]] or 0) for d in self.data) / len(self.data)} for column
                 in self.avg_columns]
 
     def _get_color(self, idx, colors, length=1):
@@ -204,9 +204,11 @@ class Report(object):
                 display_names = []
                 for idx, i in enumerate(self.data):
                     color1, color2 = self._get_color(idx, colors, 2)
-                    dataset = {"fillColor": color1, "strokeColor": color2, "data": [i[c["idx"]] for c in columns]}
+                    dataset = {"fillColor": color1, "strokeColor": color2, "data": [int(i[c["idx"]]) for c in columns]}
+                    display_columns = bar_chart['display_columns']
+                    name = "(" + ", ".join(str(i[all_columns[c]['idx']]) for c in display_columns) + ')'
                     display_names.append(
-                        {"name": i[all_columns[bar_chart.get("display_column", 0)]["idx"]], "color": color1})
+                        {"name": name, "color": color1})
                     datasets = data.setdefault("datasets", [])
                     datasets.append(dataset)
                 self._bar_charts.append({"name": bar_chart.get("name"), "id_": uuid.uuid1(), "data": data,

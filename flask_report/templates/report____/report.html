@@ -8,6 +8,7 @@
 <link rel="stylesheet" type="text/css" href="{{ url_for('report____.static', filename='datatables/css/jquery.dataTables.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ url_for('report____.static', filename='css/customer.css') }}">
 <script type="text/javascript" charset="utf8" src="{{ url_for('report____.static', filename='datatables/js/jquery.dataTables.min.js') }}"></script>
+<script type="text/javascript" charset="utf8" src="{{ url_for('report____.static', filename='js/sprintf-0.6.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('report____.static', filename='js/DT_bootstrap.js') }}"></script>
 <script src="{{ url_for('report____.static', filename='js/Chart.min.js') }}"></script>
 <script type="text/javascript">
@@ -133,25 +134,44 @@
   <p>
     {{ customized_filter_condition|safe }}
   </p>
+  {% if SQL%}
+    <small>
+      <div>{{ _("SQL statement") }}: </div>
+      <p>
+        <code>
+          {{ SQL }}
+        </code>
+      </p>
+    </small>
+  {% endif %}
   <p><small></small></p>
 </div>
 </div>
 <hr />
-<a href="#graph" role="button" class="btn" data-toggle="modal">{{ _("View Graphs") }}</a>
 <div>
 {{ html_report|safe }}
 </div>
 <hr />
 
-<span class='span-12'>
-  {{ _("download as: ")}}
-  <div class="btn-group pagination-centered">
-    <a href="{{ url_for('.report_pdf', id_=report.id_) }}" class="btn btn-primary btn-info">PDF</a>
-    <a href="{{ url_for('.report_csv', id_=report.id_) }}" class="btn btn-primary btn-info">CSV</a>
-{#    <a href="{{ url_for('.report_txt', id_=report.id_) }}" class="btn btn-primary btn-info">TXT</a>#}
+<div class='row'>
+  <div class='span-8'>
+    {{ _("download as: ")}}
+    <div class="btn-group pagination-centered">
+      <a href="{{ url_for('.report_pdf', id_=report.id_) }}" class="btn btn-primary btn-info">PDF</a>
+      <a href="{{ url_for('.report_csv', id_=report.id_) }}" class="btn btn-primary btn-info">CSV</a>
+      {#    <a href="{{ url_for('.report_txt', id_=report.id_) }}" class="btn btn-primary btn-info">TXT</a>#}
+    </div>
   </div>
-</span>
-<div class="pagination-centered span12">
+  <div class='span-6 offset2'>
+    <a href="#graph" role="button" class="btn btn-inverse" data-toggle="modal">
+      <i class="icon-bar-chart"></i>
+      {{ _("View Graphs") }}
+    </a>
+  </div>
+</div>
+<hr />
+
+<div class="row pagination-centered">
   <a href="{{ url_for('.report_list') }}" class="btn btn-primary btn-large">{{ _('BACK') }}</a>
   <a href="" class="btn btn-primary btn-large">{{ _('EDIT') }}</a>
   <a href="" class="btn btn-primary btn-large">{{ _('REFRESH') }}</a>
@@ -173,7 +193,7 @@
 
 <div class="modal hide fade" tabindex="-1" role="dialog" data-toggle="modal" id="graph">
   <div class="modal-header">
-    <h3>图表</h3>
+    <h3>{{ _('Graphs') }}</h3>
   </div>
   <div class="modal-body">
     <ul class="nav nav-tabs" id="myTab">

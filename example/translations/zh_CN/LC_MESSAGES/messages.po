@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-07-04 12:13+0800\n"
+"POT-Creation-Date: 2013-07-09 20:41+0800\n"
 "PO-Revision-Date: 2013-07-01 14:56+0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -17,107 +17,209 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
+#: data_set.py:64
+msgid "no such column"
+msgstr "没有该字段"
+
+#: report_templates.py:62
+msgid "That's all"
+msgstr ""
+
+#: templates/report____/data-set.html:20 templates/report____/data-set.html:228
+#: templates/report____/report.html:20
+msgid "Search"
+msgstr "搜索"
+
+#: templates/report____/data-set.html:21 templates/report____/report.html:21
+msgid "Display _MENU_ records per page"
+msgstr "每页展示_MENU_条记录"
+
+#: templates/report____/data-set.html:22 templates/report____/report.html:22
+msgid "Nothing found - sorry"
+msgstr "对不起，找不到数据"
+
+#: templates/report____/data-set.html:23 templates/report____/report.html:23
+msgid "Showing _START_ to _END_ of _TOTAL_ records"
+msgstr "共有_TOTAL_条数据，展示了其中_START_到_END_条"
+
+#: templates/report____/data-set.html:24 templates/report____/report.html:24
+msgid "Showing 0 to 0 of 0 records"
+msgstr "共0条数据"
+
+#: templates/report____/data-set.html:25 templates/report____/report.html:25
+msgid "filtered from _MAX_ total records"
+msgstr "从_MAX_条记录中过滤产生"
+
+#: templates/report____/data-set.html:27 templates/report____/report.html:27
+msgid "Previous"
+msgstr "上一页"
+
+#: templates/report____/data-set.html:28 templates/report____/report.html:28
+msgid "Next"
+msgstr "下一页"
+
+#: templates/report____/data-set.html:29 templates/report____/report.html:29
+msgid "First"
+msgstr "首页"
+
+#: templates/report____/data-set.html:30 templates/report____/report.html:30
+msgid "Last"
+msgstr "末页"
+
+#: templates/report____/data-set.html:43 templates/report____/report.html:38
+msgid "hide detail"
+msgstr "隐藏详情"
+
+#: templates/report____/data-set.html:45 templates/report____/report.html:41
+#: templates/report____/report.html:100
+msgid "show detail"
+msgstr "显示详情"
+
+#: templates/report____/data-set.html:135
+msgid "only one order by columns supported"
+msgstr ""
+
+#: templates/report____/data-set.html:189
+msgid "filters"
+msgstr "过滤条件"
+
+#: templates/report____/data-set.html:207
+#: templates/report____/data-set.html:302
+msgid "order by"
+msgstr "排序规则"
+
+#: templates/report____/data-set.html:233
+msgid "RESULT"
+msgstr "结果"
+
+#: templates/report____/data-set.html:253
+msgid "please config the filters"
+msgstr "请配置过滤条件"
+
+#: templates/report____/data-set.html:260 templates/report____/report.html:174
+msgid "BACK"
+msgstr "返回"
+
+#: templates/report____/data-set.html:261
+msgid "SAVE"
+msgstr "保存"
+
+#: templates/report____/data-set.html:262 templates/report____/report.html:176
+msgid "REFRESH"
+msgstr "刷新"
+
+#: templates/report____/data-set.html:274
+msgid "Report name"
+msgstr "报表名称"
+
+#: templates/report____/data-set.html:281
+msgid "Report creator"
+msgstr "创建人"
+
+#: templates/report____/data-set.html:288
+msgid "Report desc"
+msgstr "报表列表"
+
+#: templates/report____/data-set.html:295
+msgid "Report filters"
+msgstr "报表列表"
+
+#: templates/report____/data-set.html:309
+msgid "columns"
+msgstr "报表字段"
+
+#: templates/report____/data-set.html:324
+msgid "SAVE REPORT"
+msgstr "保存报表"
+
+#: templates/report____/data-sets.html:4 templates/report____/data-sets.html:18
+msgid "Data sets"
+msgstr "数据集和"
+
+#: templates/report____/default_data_set_html.html:2
+msgid "SQL"
+msgstr ""
+
+#: templates/report____/default_drill_down_html_report.html:4
+msgid "id"
+msgstr "编号"
+
 #: templates/report____/default_html_report.html:11
 #, python-format
 msgid "search %(col_name)s"
 msgstr "搜索%(col_name)s"
+
+#: templates/report____/default_html_report.html:43
+#, python-format
+msgid "%(value)s in total"
+msgstr "总计%(value)s"
+
+#: templates/report____/default_html_report.html:52
+#, python-format
+msgid "%(value)s%% in avg."
+msgstr "平均%(value)s%%"
 
 #: templates/report____/report-list.html:4
 #: templates/report____/report-list.html:18
 msgid "report list"
 msgstr "报表列表"
 
-#: templates/report____/report.html:18
-msgid "Search"
-msgstr "搜索"
+#: templates/report____/report.html:78
+#, python-format
+msgid "detail of %%s"
+msgstr "%%s详情"
 
-#: templates/report____/report.html:19
-msgid "Display _MENU_ records per page"
-msgstr "每页展示_MENU_条记录"
-
-#: templates/report____/report.html:20
-msgid "Nothing found - sorry"
-msgstr "对不起，找不到数据"
-
-#: templates/report____/report.html:21
-msgid "Showing _START_ to _END_ of _TOTAL_ records"
-msgstr "共有_TOTAL_条数据，展示了其中_START_到_END_条"
-
-#: templates/report____/report.html:22
-msgid "Showing 0 to 0 of 0 records"
-msgstr "共0条数据"
-
-#: templates/report____/report.html:23
-msgid "filtered from _MAX_ total records"
-msgstr "从_MAX_条记录中过滤产生"
-
-#: templates/report____/report.html:25
-msgid "Previous"
-msgstr "上一页"
-
-#: templates/report____/report.html:26
-msgid "Next"
-msgstr "下一页"
-
-#: templates/report____/report.html:27
-msgid "First"
-msgstr "首页"
-
-#: templates/report____/report.html:28
-msgid "Last"
-msgstr "末页"
-
-#: templates/report____/report.html:39
-msgid "hide detail"
-msgstr "隐藏详情"
-
-#: templates/report____/report.html:42 templates/report____/report.html:87
-msgid "show detail"
-msgstr "显示详情"
-
-#: templates/report____/report.html:92
-#, fuzzy, python-format
+#: templates/report____/report.html:105
+#, python-format
 msgid ""
 "created by \"%(creator)s\" at %(create_time)s, using data set <span "
 "title=\"%(data_set_description)s\">\"%(data_set)s\"</span>, "
 msgstr "由用户\"%(creator)s\"在%(create_time)s创建, 使用的数据集和是\"%(data_set)s\", "
 
-#: templates/report____/report.html:97
+#: templates/report____/report.html:110
 #, python-format
 msgid "order by \"%(order_by)s\" %(order)s"
 msgstr "按字段\"%(order_by)s\"进行%(order)s排列"
 
-#: templates/report____/report.html:99
+#: templates/report____/report.html:112
 msgid "descendingly"
 msgstr "降序"
 
-#: templates/report____/report.html:99
+#: templates/report____/report.html:112
 msgid "ascendingly"
 msgstr "升序"
 
-#: templates/report____/report.html:102
+#: templates/report____/report.html:115
 msgid "filter conditions are: "
 msgstr "过滤条件如下:"
 
-#: templates/report____/report.html:117
+#: templates/report____/report.html:130
 msgid "the customized filter condition is: "
 msgstr "定制的过滤条件如下:"
 
-#: templates/report____/report.html:133
+#: templates/report____/report.html:138
+msgid "SQL statement"
+msgstr "SQL语句"
+
+#: templates/report____/report.html:157
 msgid "download as: "
 msgstr "以下列格式下载: "
 
-#: templates/report____/report.html:141
-msgid "BACK"
-msgstr "返回"
+#: templates/report____/report.html:167
+msgid "View Graphs"
+msgstr "查看统计图"
 
-#: templates/report____/report.html:142
+#: templates/report____/report.html:175
 msgid "EDIT"
 msgstr "编辑"
 
-#: templates/report____/report.html:143
-msgid "REFRESH"
-msgstr "刷新"
+#: templates/report____/report.html:189
+msgid "Close"
+msgstr "关闭"
+
+#: templates/report____/report.html:195
+msgid "Graphs"
+msgstr "图表"
 
 #: templates/report____/report_short_description.html:1
 msgid "creator"

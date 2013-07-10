@@ -30,12 +30,7 @@
             'sLast': '{{ _("Last") }}'
           }
         },
-        "bFilter": false,
-        "bPaginate": false,
         "bSortCellsTop": true,
-        "aoColumnDefs": [
-          { "bVisible": false, "aTargets": [ 2 ] }
-        ],
         "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>",
         "iDisplayLength": 25
       });
@@ -132,7 +127,7 @@
 
       $("#add_order_by").change(function(){
         if ($("tr[name=order_by]").size() > 0){
-          alert("{{ _("only one order_by supported") }}");
+          alert("{{ _("only one order by columns supported") }}");
           return false;
         }
         var e = $($(this).find(":selected"));
@@ -203,6 +198,7 @@
           </tbody>
         </table>
       </fieldset>
+      {% if data_set.order_bys %}
       <fieldset>
         <legend>{{ _("order by") }}</legend>
         <table id="order_by">
@@ -221,6 +217,7 @@
           </tbody>
         </table>
       </fieldset>
+      {% endif %}
       <input type="hidden" name="filters"/>
       <input type="hidden" name="order_bys"/>
       <div class="control-group">
@@ -271,42 +268,42 @@
       <div class="modal-body ">
         <fieldset class="form-horizontal">
           <div class="control-group">
-            <label for="report_name" class="control-label">{{ _("report_name") }}</label>
+            <label for="report_name" class="control-label">{{ _("Report name") }}</label>
 
             <div class="controls">
               <input type="text" name="report_name" required="required" id="report_name"/>
             </div>
           </div>
           <div class="control-group">
-            <label class="control-label" for="report_creator">{{ _("report_creator") }}</label>
+            <label class="control-label" for="report_creator">{{ _("Report creator") }}</label>
 
             <div class="controls">
               <input type="text" name="report_creator" id="report_creator"/>
             </div>
           </div>
           <div class="control-group">
-            <label class="control-label" for="report_desc">{{ _("report_desc") }}</label>
+            <label class="control-label" for="report_desc">{{ _("Report desc") }}</label>
 
             <div class="controls">
               <textarea name="report_desc" id="report_desc"></textarea>
             </div>
           </div>
           <div class="control-group">
-            <label class="control-label">{{ _("report_filters") }}</label>
+            <label class="control-label">{{ _("Report filters") }}</label>
 
             <div class="controls">
               <textarea name="report_filters" readonly>{{ filters_yaml }}</textarea>
             </div>
           </div>
           <div class="control-group">
-            <label class="control-label" for="report_order_by">{{ _("report_order_by") }}</label>
+            <label class="control-label" for="report_order_by">{{ _("order by") }}</label>
 
             <div class="controls">
               <input type="text" name="report_order_by" id="report_order_by" value="{{ order_by_yaml }}" readonly/>
             </div>
           </div>
           <div class="control-group">
-            <label class="control-label" for="report_columns">{{ _("report_columns") }}</label>
+            <label class="control-label" for="report_columns">{{ _("columns") }}</label>
 
             <div class="controls">
               <select name="report_columns" id="report_columns" multiple>

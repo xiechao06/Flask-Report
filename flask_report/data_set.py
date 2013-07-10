@@ -93,7 +93,7 @@ class DataSet(object):
 
     @property
     def order_bys(self):
-        return self._order_bys
+        return self._order_bys or []
 
     def get_current_filters(self, currents):
         def _match(to_matcher):

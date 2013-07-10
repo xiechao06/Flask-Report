@@ -73,5 +73,10 @@ def query_to_sql(statement, bind=None):
                     literal_binds=literal_binds, **kwargs
             )
 
+        def render_literal_value(self, value, type_):
+            if isinstance(type_, sqlalchemy.types.DateTime) or isinstance(type_, sqlalchemy.types.Date):
+                return '"' + str(value) + '"'
+            return super(LiteralCompiler, self).render_literal_value(value, type_)
+
     compiler = LiteralCompiler(dialect, statement)
     return compiler.process(statement)
