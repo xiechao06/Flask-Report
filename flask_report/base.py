@@ -44,7 +44,7 @@ class FlaskReport(object):
                                    static_folder="static",
                                    template_folder="templates")
         app.register_blueprint(self.blueprint, url_prefix="/__report__")
-        self.extra_params = extra_params or {'report': lambda id_: {}, 
+        self.extra_params = extra_params or {'report': lambda : {},
                                              'report_list': lambda: {}, 
                                              'data_set': lambda id_: {},
                                              'data_sets': lambda: {}}
@@ -121,11 +121,13 @@ class FlaskReport(object):
 
             html_report = report.html_template.render(data=report.data, columns=report.columns, report=report)
             from pygments import highlight
-            from pygments.lexers import PythonLexer
+            from pygments.lexers import PythonLexer, SqlLexer
             from pygments.formatters import HtmlFormatter
 
             code = report.read_literal_filter_condition()
-            params = dict(report=report, html_report=html_report, SQL=query_to_sql(report.query))
+
+            SQL_html = highlight(query_to_sql(report.query), SqlLexer(), HtmlFormatter())
+            params = dict(report=report, html_report=html_report, SQL=SQL_html)
             if code is not None:
                 customized_filter_condition = highlight(code, PythonLexer(), HtmlFormatter())
                 params['customized_filter_condition'] = customized_filter_condition

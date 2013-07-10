@@ -85,7 +85,8 @@ def query_to_sql(statement, bind=None):
             return super(LiteralCompiler, self).render_literal_value(value, type_)
 
     compiler = LiteralCompiler(dialect, statement)
-    return compiler.process(statement)
+    import sqlparse
+    return sqlparse.format(compiler.process(statement), reindent=True, keyword_case='upper')
 
 
 def get_color(idx, colors, total_length=None, rgb=True):

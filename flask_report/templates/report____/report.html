@@ -138,9 +138,7 @@
     <small>
       <div>{{ _("SQL statement") }}: </div>
       <p>
-        <code>
-          {{ SQL }}
-        </code>
+          {{ SQL|safe }}
       </p>
     </small>
   {% endif %}
