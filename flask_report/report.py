@@ -45,8 +45,8 @@ class Report(object):
                                 "eq": operator.eq, "ne": operator.ne}
         self._sum_columns = report_meta.get("sum_columns", [])
         self._avg_columns = report_meta.get("avg_columns", [])
-        self._bar = report_meta.get("bar")
-        self._pie = report_meta.get("pie")
+        self._bar = report_meta.get("bar", [])
+        self._pie = report_meta.get("pie", [])
         self._bar_charts = None
         self._pie_charts = None
 
@@ -188,7 +188,7 @@ class Report(object):
 
             self._bar_charts = []
             all_columns = self.data_set.columns
-            for bar_chart in self._bar if isinstance(self._bar, list) else [self._bar]:
+            for bar_chart in self._bar:
                 data = {}
                 bar_columns = bar_chart.get("columns", [])
                 colors = bar_chart.get("colors", [])
@@ -220,7 +220,7 @@ class Report(object):
 
             all_columns = self.data_set.columns
             self._pie_charts = []
-            for pie in self._pie if isinstance(self._pie, list) else [self._pie]:
+            for pie in self._pie:
                 pie_column_idx = pie.get("column")
                 column = all_columns[pie_column_idx]
                 colors = pie.get("colors", [])
