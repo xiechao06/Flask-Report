@@ -29,6 +29,7 @@ class FlaskReport(object):
 
         host.route("/report-list/")(self.report_list)
         host.route("/report/", methods=["GET", "POST"])(self.report)
+        host.route("/graphs/report/<int:id_>")(self.report_graphs)
         host.route("/report/<int:id_>")(self.report)
         host.route("/report_csv/<int:id_>")(self.report_csv)
         host.route("/report_pdf/<int:id_>")(self.report_pdf)
@@ -63,6 +64,11 @@ class FlaskReport(object):
                         s += ","
             s += "}"
             return s
+
+    def report_graphs(self, id_):
+        report = Report(self, id_)
+        return render_template("report____/graphs.html", url=request.args.get("url"), bar_charts=report.bar_charts,
+                               name=report.name, pie_charts=report.pie_charts)
 
     def data_set_list(self):
         data_sets = [DataSet(self, int(dir_name)) for dir_name in os.listdir(self.data_set_dir) if
