@@ -1,6 +1,8 @@
 # -*- coding: UTF-8 -*-
 import os
 import json
+import types
+
 from flask import render_template, abort, request, url_for, redirect
 from flask.ext.report.report import Report
 from flask.ext.report.data_set import DataSet
@@ -42,7 +44,10 @@ class FlaskReport(object):
                                    static_folder="static",
                                    template_folder="templates")
         app.register_blueprint(self.blueprint, url_prefix="/__report__")
-        self.extra_params = extra_params or {'report': {}, 'report_list': {}}
+        self.extra_params = extra_params or {'report': lambda id_: {}, 
+                                             'report_list': lambda: {}, 
+                                             'data_set': lambda id_: {},
+                                             'data_sets': lambda: {}}
 
         @app.template_filter("dpprint")
         def dict_pretty_print(value):
@@ -65,6 +70,8 @@ class FlaskReport(object):
         params = dict(data_sets=data_sets)
         extra_params = self.extra_params.get("data_sets")
         if extra_params:
+            if isinstance(extra_params, types.FunctionType):
+                extra_params = extra_params()
             params.update(extra_params)
         return render_template("report____/data-sets.html", **params)
 
@@ -88,6 +95,11 @@ class FlaskReport(object):
         params = dict(data_set=data_set, html=html, current_filters=current_filters,
                       current_order_by=current_order_by,
                       filters_yaml=filters_yaml, order_by_yaml=order_by_yaml)
+        extra_params = self.extra_params.get('data_set')
+        if extra_params:
+            if isinstance(extra_params, types.FunctionType):
+                extra_params = extra_params(id_)
+            params.update(extra_params)
         return render_template("report____/data-set.html", **params)
 
     def report_list(self):
@@ -97,6 +109,8 @@ class FlaskReport(object):
         params = dict(reports=reports)
         extra_params = self.extra_params.get('report_list')
         if extra_params:
+            if isinstance(extra_params, types.FunctionType):
+                extra_params = extra_params()
             params.update(extra_params)
         return render_template('report____/report-list.html', **params)
 
@@ -117,6 +131,8 @@ class FlaskReport(object):
                 params['customized_filter_condition'] = customized_filter_condition
             extra_params = self.extra_params.get("report")
             if extra_params:
+                if isinstance(extra_params, types.FunctionType):
+                    extra_params = extra_params()
                 params.update(extra_params)
             return render_template("report____/report.html", **params)
         else:
