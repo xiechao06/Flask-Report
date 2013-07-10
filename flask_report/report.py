@@ -221,7 +221,9 @@ class Report(object):
                     from flask.ext.report.utils import get_color
                     color = get_color(idx, colors, length)
                     data.append({"value": row[column["idx"]], "color": color})
-                    display_names.append({"name": row[all_columns[pie.get("display_column", 0)]["idx"]], "color": color})
+                    display_columns = pie.get("display_columns", [])
+                    name = "(" + ", ".join(unicode(row[all_columns[c]['idx']]) for c in display_columns) + ')'
+                    display_names.append({"name": name, "color": color})
                 result = {"name": pie.get("name"), "id_": uuid.uuid1(), "display_names": display_names, "data": data}
                 self._pie_charts.append(result)
         return self._pie_charts

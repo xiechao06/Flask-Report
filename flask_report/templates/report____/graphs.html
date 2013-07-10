@@ -1,0 +1,48 @@
+{% extends "report____/base_layout.html" %}
+{% block report____customized_head_block %}
+  <link rel="stylesheet" type="text/css" href="{{ url_for('report____.static', filename='css/customer.css') }}">
+  <script src="{{ url_for('report____.static', filename='js/Chart.min.js') }}"></script>
+  <script type="text/javascript">
+    $(function () {
+      $('#myTab a').click(function (e) {
+        e.preventDefault();
+        $(this).tab('show');
+      });
+      $('#myTab a:first').tab('show');
+    })
+  </script>
+{% endblock %}
+{% block body %}
+  <div>
+    <div class="alert alert-info">
+      <h1>
+        {{ name }}
+      </h1>
+    </div>
+
+    <div class="text-center">
+      <ul class="nav nav-tabs" id="myTab">
+        {% for bar_chart in bar_charts %}
+          <li><a href="#div-{{ bar_chart.id_ }}">{{ bar_chart.name }}</a></li>
+        {% endfor %}
+        {% for pie_chart in pie_charts %}
+          <li><a href="#div-{{ pie_chart.id_ }}">{{ pie_chart.name }}</a></li>
+        {% endfor %}
+      </ul>
+      <div class="tab-content">
+        {% import "report____/bar.html" as bar %}
+        {% for bar_chart in bar_charts %}
+          {{ bar.newBar(bar_chart.id_, bar_chart.name, bar_chart.data, bar_chart.display_names) }}
+        {% endfor %}
+        {% import "report____/pie-chart.html" as pie %}
+        {% for pie_chart in pie_charts %}
+          {{ pie.newPie(pie_chart.id_, pie_chart.name, pie_chart.data, pie_chart.display_names) }}
+        {% endfor %}
+      </div>
+    </div>
+    <hr>
+    <div class="row pagination-centered">
+      <a href="{{ url or url_for('.report_list') }}" class="btn btn-primary btn-large">{{ _('BACK') }}</a>
+    </div>
+  </div>
+{% endblock %}

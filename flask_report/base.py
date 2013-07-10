@@ -29,6 +29,7 @@ class FlaskReport(object):
 
         host.route("/report-list/")(self.report_list)
         host.route("/report/", methods=["GET", "POST"])(self.report)
+        host.route("/graphs/report/<int:id_>")(self.report_graphs)
         host.route("/report/<int:id_>")(self.report)
         host.route("/report_csv/<int:id_>")(self.report_csv)
         host.route("/report_pdf/<int:id_>")(self.report_pdf)
@@ -44,7 +45,7 @@ class FlaskReport(object):
                                    static_folder="static",
                                    template_folder="templates")
         app.register_blueprint(self.blueprint, url_prefix="/__report__")
-        self.extra_params = extra_params or {'report': lambda id_: {}, 
+        self.extra_params = extra_params or {'report': lambda : {},
                                              'report_list': lambda: {}, 
                                              'data_set': lambda id_: {},
                                              'data_sets': lambda: {}}
@@ -63,6 +64,11 @@ class FlaskReport(object):
                         s += ","
             s += "}"
             return s
+
+    def report_graphs(self, id_):
+        report = Report(self, id_)
+        return render_template("report____/graphs.html", url=request.args.get("url"), bar_charts=report.bar_charts,
+                               name=report.name, pie_charts=report.pie_charts)
 
     def data_set_list(self):
         data_sets = [DataSet(self, int(dir_name)) for dir_name in os.listdir(self.data_set_dir) if
@@ -121,11 +127,13 @@ class FlaskReport(object):
 
             html_report = report.html_template.render(data=report.data, columns=report.columns, report=report)
             from pygments import highlight
-            from pygments.lexers import PythonLexer
+            from pygments.lexers import PythonLexer, SqlLexer
             from pygments.formatters import HtmlFormatter
 
             code = report.read_literal_filter_condition()
-            params = dict(report=report, html_report=html_report, SQL=query_to_sql(report.query))
+
+            SQL_html = highlight(query_to_sql(report.query), SqlLexer(), HtmlFormatter())
+            params = dict(report=report, html_report=html_report, SQL=SQL_html)
             if code is not None:
                 customized_filter_condition = highlight(code, PythonLexer(), HtmlFormatter())
                 params['customized_filter_condition'] = customized_filter_condition

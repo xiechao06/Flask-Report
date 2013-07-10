@@ -17,5 +17,5 @@ avg_columns: [3]
 bar:
   {name: 各国战力图, columns: [2,4,6],  display_columns: [1]}
 pie:
-  - {name: 智力图, column: 4, display_column: 1}
-  - {name: 武力图, column: 6, display_column: 1}
+  - {name: 智力图, column: 4, display_columns: [1]}
+  - {name: 武力图, column: 6, display_columns: [1]}

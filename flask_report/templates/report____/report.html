@@ -10,7 +10,6 @@
 <script type="text/javascript" charset="utf8" src="{{ url_for('report____.static', filename='datatables/js/jquery.dataTables.min.js') }}"></script>
 <script type="text/javascript" charset="utf8" src="{{ url_for('report____.static', filename='js/sprintf-0.6.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('report____.static', filename='js/DT_bootstrap.js') }}"></script>
-<script src="{{ url_for('report____.static', filename='js/Chart.min.js') }}"></script>
 <script type="text/javascript">
   $.extend( $.fn.dataTableExt.oStdClasses, {
       "sWrapper": "dataTables_wrapper form-inline"
@@ -138,9 +137,7 @@
     <small>
       <div>{{ _("SQL statement") }}: </div>
       <p>
-        <code>
-          {{ SQL }}
-        </code>
+          {{ SQL|safe }}
       </p>
     </small>
   {% endif %}
@@ -163,7 +160,7 @@
     </div>
   </div>
   <div class='span-6 offset2'>
-    <a href="#graph" role="button" class="btn btn-inverse" data-toggle="modal">
+    <a href="{{ url_for(".report_graphs", id_=report.id_, url=request.url) }}" class="btn btn-inverse">
       <i class="icon-bar-chart"></i>
       {{ _("View Graphs") }}
     </a>
@@ -191,32 +188,4 @@
   </div>
 </div>
 
-<div class="modal hide fade" tabindex="-1" role="dialog" data-toggle="modal" id="graph">
-  <div class="modal-header">
-    <h3>{{ _('Graphs') }}</h3>
-  </div>
-  <div class="modal-body">
-    <ul class="nav nav-tabs" id="myTab">
-      {% for bar_chart in report.bar_charts %}
-        <li><a href="#div-{{ bar_chart.id_ }}">{{ bar_chart.name }}</a></li>
-      {% endfor %}
-      {% for pie_chart in report.pie_charts %}
-        <li><a href="#div-{{ pie_chart.id_ }}">{{ pie_chart.name }}</a></li>
-      {% endfor %}
-    </ul>
-    <div class="tab-content">
-      {% import "report____/bar.html" as bar %}
-      {% for bar_chart in report.bar_charts %}
-        {{ bar.newBar(bar_chart.id_, bar_chart.name, bar_chart.data, bar_chart.display_names) }}
-      {% endfor %}
-      {% import "report____/pie-chart.html" as pie %}
-      {% for pie_chart in report.pie_charts %}
-        {{ pie.newPie(pie_chart.id_, pie_chart.name, pie_chart.data, pie_chart.display_names) }}
-      {% endfor %}
-    </div>
-  </div>
-  <div class="modal-footer">
-    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-  </div>
-</div>
 {% endblock %}
