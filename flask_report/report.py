@@ -89,6 +89,16 @@ class Report(object):
         return [all_columns[i] for i in self._sum_columns]
 
     @property
+    def sum_column_index(self):
+        def generate():
+            for row in sorted(self._sum_columns):
+                for idx, column in enumerate(self.columns):
+                    if column["idx"] == row:
+                        yield idx
+        return list(generate())
+
+
+    @property
     def avg_columns(self):
         all_columns = self.data_set.columns
         return [all_columns[i] for i in self._avg_columns]
