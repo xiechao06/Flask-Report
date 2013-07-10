@@ -140,7 +140,7 @@ class FlaskReport(object):
             extra_params = self.extra_params.get("report")
             if extra_params:
                 if isinstance(extra_params, types.FunctionType):
-                    extra_params = extra_params()
+                    extra_params = extra_params(id_)
                 params.update(extra_params)
             return render_template("report____/report.html", **params)
         else:

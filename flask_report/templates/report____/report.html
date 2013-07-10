@@ -15,6 +15,15 @@
       "sWrapper": "dataTables_wrapper form-inline"
   });
   $(function () {
+      $('#report a[data-role="drill-down-link"]').click(
+          function () {
+            var modal = $('#drill-down-detail');
+            modal.find('.modal-header h3').text(sprintf('{{ _("detail of %%s") }}', $(this).attr('data-col')));
+            modal.modal('show');
+            var content = modal.find('.modal-body p')
+            content.html('<i class="icon-refresh icon-spin icon-4x"></i>');
+            content.load($(this).attr('data-target'));
+          });
 
     var sumsCallback = function (nRow, aaData, iStart, iEnd, aiDisplay) {
       var sums = [];
@@ -99,15 +108,6 @@
         }
         });
 
-      $('#report a[data-role="drill-down-link"]').click(
-          function () {
-            var modal = $('#drill-down-detail');
-            modal.find('.modal-header h3').text(sprintf('{{ _("detail of %%s") }}', $(this).attr('data-col')));
-            modal.modal('show');
-            var content = modal.find('.modal-body p')
-            content.html('<i class="icon-refresh icon-spin icon-4x"></i>');
-            content.load($(this).attr('data-target'));
-          });
   });
 </script>
 {% endblock %}
