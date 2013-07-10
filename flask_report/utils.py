@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 import sqlalchemy
 
+
 def collect_models(module):
     ret = {}
 
@@ -18,6 +19,7 @@ def get_primary_key(model):
             Model class
     """
     from sqlalchemy.schema import Table
+
     if isinstance(model, Table):
         for idx, c in enumerate(model.columns):
             if c.primary_key:
@@ -33,6 +35,7 @@ def get_primary_key(model):
 
     return None
 
+
 def get_column_operated(func):
     ret = func
     while not isinstance(ret, sqlalchemy.schema.Column):
@@ -41,6 +44,7 @@ def get_column_operated(func):
         else:
             ret = ret.clauses.clauses[0]
     return ret
+
 
 def query_to_sql(statement, bind=None):
     """
@@ -52,10 +56,11 @@ def query_to_sql(statement, bind=None):
     if not statement:
         return ""
     import sqlalchemy.orm
+
     if isinstance(statement, sqlalchemy.orm.Query):
         if bind is None:
             bind = statement.session.get_bind(
-                    statement._mapper_zero_or_none()
+                statement._mapper_zero_or_none()
             )
         statement = statement.statement
     elif bind is None:
@@ -63,14 +68,15 @@ def query_to_sql(statement, bind=None):
 
     dialect = bind.dialect
     compiler = statement._compiler(dialect)
+
     class LiteralCompiler(compiler.__class__):
         def visit_bindparam(
                 self, bindparam, within_columns_clause=False,
                 literal_binds=False, **kwargs
         ):
             return super(LiteralCompiler, self).render_literal_bindparam(
-                    bindparam, within_columns_clause=within_columns_clause,
-                    literal_binds=literal_binds, **kwargs
+                bindparam, within_columns_clause=within_columns_clause,
+                literal_binds=literal_binds, **kwargs
             )
 
         def render_literal_value(self, value, type_):
@@ -80,3 +86,21 @@ def query_to_sql(statement, bind=None):
 
     compiler = LiteralCompiler(dialect, statement)
     return compiler.process(statement)
+
+
+def get_color(idx, colors, total_length=None, rgb=True):
+    try:
+        return colors[idx]
+    except (IndexError, TypeError):
+        def _get_color(idx, length):
+            from flask.ext.report.colors import COLORS
+
+            r = int(len(COLORS) * (idx + 1) / (length + 1))
+            color = COLORS.values()[r]
+            if rgb:
+                return color
+            else:
+                return ('rgba(%s, %s, %s, 0.5)' % (int(color[1:3], 16), int(color[3:5], 16), int(color[5:7], 16)),
+                        'rgba(%s, %s, %s, 1)' % (int(color[1:3], 16), int(color[3:5], 16), int(color[5:7], 16)))
+
+        return _get_color(idx, total_length)
