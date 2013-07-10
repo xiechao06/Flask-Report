@@ -1,6 +1,6 @@
 {% macro newBar(id, name, data, displaynames) %}
   <div id="div-{{ id }}" class="tab-pane">
-    <canvas id="{{ id }}" width="500" height="330" data-type="Bar"></canvas>
+    <canvas id="{{ id }}" width="960" height="600" data-type="Bar"></canvas>
     <div>
       {% for display in displaynames %}
           <span>{{ display["name"] }} - <i style="color: {{ display["color"] }}" class="icon-sign-blank icon-large"></i></span>
