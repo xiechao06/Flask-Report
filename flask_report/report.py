@@ -45,8 +45,10 @@ class Report(object):
                                 "eq": operator.eq, "ne": operator.ne}
         self._sum_columns = report_meta.get("sum_columns", [])
         self._avg_columns = report_meta.get("avg_columns", [])
-        self._bar = report_meta.get("bar", [])
-        self._pie = report_meta.get("pie", [])
+        bars = report_meta.get("bar", [])
+        self._bar = bars if isinstance(bars, list) else [bars]
+        pies = report_meta.get("pie", [])
+        self._pie = pies if isinstance(pies, list) else [pies]
         self._bar_charts = None
         self._pie_charts = None
 
