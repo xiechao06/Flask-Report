@@ -171,20 +171,6 @@ class Report(object):
         return [{"col": column["name"], "value": sum((d[column["idx"]] or 0) for d in self.data) / len(self.data)} for column
                 in self.avg_columns]
 
-    def _get_color(self, idx, colors, length=1):
-        try:
-            return colors[idx]
-        except IndexError:
-            def _get_random_color():
-                import random
-                r = lambda: random.randint(0, 255)
-                return '#%02X%02X%02X' % (r(), r(), r())
-
-            if length == 1:
-                return _get_random_color()
-            else:
-                return [_get_random_color() for i in xrange(length)]
-
     @property
     def bar_charts(self):
         if self._bar_charts is None:
@@ -202,11 +188,13 @@ class Report(object):
                     if column["name"] not in labels:
                         labels.append(column["name"])
                 display_names = []
+                length = len(self.data)
                 for idx, i in enumerate(self.data):
-                    color1, color2 = self._get_color(idx, colors, 2)
+                    from flask.ext.report.utils import get_color
+                    color1, color2 = get_color(idx, colors, length, False)
                     dataset = {"fillColor": color1, "strokeColor": color2, "data": [int(i[c["idx"]]) for c in columns]}
-                    display_columns = bar_chart['display_columns']
-                    name = "(" + ", ".join(str(i[all_columns[c]['idx']]) for c in display_columns) + ')'
+                    display_columns = bar_chart.get("display_columns", [])
+                    name = "(" + ", ".join(unicode(i[all_columns[c]['idx']]) for c in display_columns) + ')'
                     display_names.append(
                         {"name": name, "color": color1})
                     datasets = data.setdefault("datasets", [])
@@ -225,11 +213,13 @@ class Report(object):
             for pie in self._pie if isinstance(self._pie, list) else [self._pie]:
                 pie_column_idx = pie.get("column")
                 column = all_columns[pie_column_idx]
-                colors = pie.get("colors")
+                colors = pie.get("colors", [])
                 data = []
                 display_names = []
+                length = len(self.data)
                 for idx, row in enumerate(self.data):
-                    color = self._get_color(idx, colors)
+                    from flask.ext.report.utils import get_color
+                    color = get_color(idx, colors, length)
                     data.append({"value": row[column["idx"]], "color": color})
                     display_names.append({"name": row[all_columns[pie.get("display_column", 0)]["idx"]], "color": color})
                 result = {"name": pie.get("name"), "id_": uuid.uuid1(), "display_names": display_names, "data": data}
