@@ -22,7 +22,11 @@
             modal.modal('show');
             var content = modal.find('.modal-body p')
             content.html('<i class="icon-refresh icon-spin icon-4x"></i>');
-            content.load($(this).attr('data-target'));
+            content.load($(this).attr('data-target'), function (response, status, xhr) {
+              if (status != "success") {
+                $(this).html($("<p></p>").text("Can't Load").addClass("text-error"));
+              }
+            });
           });
     var sum_columns = {{ report.sum_column_index }};
     var sumsCallback = function (nRow, aaData, iStart, iEnd, aiDisplay) {
