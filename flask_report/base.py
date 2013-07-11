@@ -99,7 +99,8 @@ class FlaskReport(object):
             temp_dir = os.path.join(self.report_dir, "0")
             if not os.path.exists(temp_dir):
                 os.mkdir(temp_dir)
-            data_set.writer_temp(temp_dir, filters_yaml, order_by_yaml)
+            self._write(temp_dir, filters=filters_yaml, order_by=order_by_yaml,
+                        columns=[c["idx"] for c in data_set.columns], data_set_id=data_set.id_)
 
         from flask.ext.report.utils import query_to_sql
         from pygments import highlight
@@ -158,24 +159,32 @@ class FlaskReport(object):
             new_dir = os.path.join(self.report_dir, str(id_))
             if not os.path.exists(new_dir):
                 os.mkdir(new_dir)
-            self._write(os.path.join(new_dir, "meta.yaml"), request.form)
-            return redirect(url_for(".report", id_=id_, _method="GET", url=request.form.get("url")))
 
-    def _write(self, file_name, form):
-        temp_report = Report(self, 0)
+
+            temp_report = Report(self, 0)
+            dict_ = dict(request.form.items())
+            url = dict_.pop("url")
+            dict_["columns"] = request.form.getlist("columns", type=int)
+            if temp_report.filters:
+                dict_["filters"] = temp_report.filters
+            else:
+                import yaml
+                dict_["filters"] = yaml.load(dict_["filters"])
+            self._write(new_dir, **dict_)
+
+            return redirect(url_for(".report", id_=id_, _method="GET", url=url))
+
+    def _write(self, to_dir, **kwargs):
         import yaml
-        dict_ = {"name": form["report_name"], "description": form["report_desc"],
-                 "data_set_id": temp_report.data_set.id_,
-                 "columns": form.getlist("report_columns", type=int)}
-        if temp_report.filters:
-            dict_["filters"] = temp_report.filters
-        if form.get("order_by"):
-            dict_["order_by"] = form["order_by"]
-        dict_["creator"] = form["report_creator"]
+
+        kwargs.setdefault("name", "temp")
+        kwargs.setdefault("description", "temp")
+        kwargs.setdefault("data_set_id", 0)
         import datetime
-        dict_["create_time"] = datetime.datetime.now()
-        with file(file_name, "w") as f:
-            yaml.safe_dump(dict_, allow_unicode=True, stream=f)
+
+        kwargs["create_time"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        with file(os.path.join(to_dir, "meta.yaml"), "w") as f:
+            yaml.safe_dump(kwargs, allow_unicode=True, stream=f)
 
     def _get_report(self, id_, ReportClass):
         from flask.ext.report.report_templates import BaseReport

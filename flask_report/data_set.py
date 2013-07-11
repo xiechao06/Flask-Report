@@ -46,14 +46,6 @@ class DataSet(object):
 
         return tuple(_make_dict(idx, c) for idx, c in enumerate(self.query.column_descriptions))
 
-    @property
-    def html_template(self):
-        report_file = os.path.join(self.report_view.data_set_dir, str(self.id_), "data_set.html")
-        if not os.path.exists(report_file):
-            # read the default report template
-            return self.report_view.app.jinja_env.get_template("report____/default_data_set_html.html")
-        return self.report_view.app.jinja_env.from_string(codecs.open(report_file, encoding='utf-8').read())
-
     def get_query(self, filters, order_by=None):
         def get_column(column):
             for c in self.columns:
@@ -157,18 +149,4 @@ class DataSet(object):
                 return order_by, "asc"
         else:
             return None
-
-    def writer_temp(self, to_dir, filter_yaml, order_by_yaml):
-        import yaml
-        import datetime
-
-        data = {"name": "temp", "description": "temp", "creator": "temp", "create_time": datetime.datetime.now(),
-                "data_set_id": self.id_, "columns": [c["idx"] for c in self.columns]}
-        if filter_yaml:
-            data["filters"] = filter_yaml
-        if order_by_yaml:
-            data["order_by"] = order_by_yaml
-
-        with file(os.path.join(to_dir, "meta.yaml"), "w") as f:
-            yaml.safe_dump(data, allow_unicode=True, stream=f)
 

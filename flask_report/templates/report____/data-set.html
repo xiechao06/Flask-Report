@@ -227,42 +227,42 @@
             <label for="report_name" class="control-label">{{ _("Report name") }}</label>
 
             <div class="controls">
-              <input type="text" name="report_name" required="required" id="report_name"/>
+              <input type="text" name="name" required="required" id="report_name"/>
             </div>
           </div>
           <div class="control-group">
             <label class="control-label" for="report_creator">{{ _("Report creator") }}</label>
 
             <div class="controls">
-              <input type="text" name="report_creator" id="report_creator"/>
+              <input type="text" name="creator" id="report_creator"/>
             </div>
           </div>
           <div class="control-group">
             <label class="control-label" for="report_desc">{{ _("Report desc") }}</label>
 
             <div class="controls">
-              <textarea name="report_desc" id="report_desc"></textarea>
+              <textarea name="description" id="report_desc"></textarea>
             </div>
           </div>
           <div class="control-group">
             <label class="control-label">{{ _("Report filters") }}</label>
 
             <div class="controls">
-              <textarea name="report_filters" readonly>{{ filters_yaml }}</textarea>
+              <textarea name="filters" readonly>{{ filters_yaml }}</textarea>
             </div>
           </div>
           <div class="control-group">
             <label class="control-label" for="report_order_by">{{ _("order by") }}</label>
 
             <div class="controls">
-              <input type="text" name="report_order_by" id="report_order_by" value="{{ order_by_yaml }}" readonly/>
+              <input type="text" name="order_by" id="report_order_by" value="{{ order_by_yaml }}" readonly/>
             </div>
           </div>
           <div class="control-group">
             <label class="control-label" for="report_columns">{{ _("columns") }}</label>
 
             <div class="controls">
-              <select name="report_columns" id="report_columns" multiple>
+              <select name="columns" id="report_columns" multiple>
                 {% for c in data_set.columns %}
                   <option value="{{ c.idx }}" selected>{{ c.name }}</option>
                 {% endfor %}
@@ -270,6 +270,7 @@
             </div>
           </div>
           <input type="hidden" name="url" value="{{ request.url }}"/>
+          <input type="hidden" name="data_set_id" value="{{ data_set.id_ }}"/>
         </fieldset>
       </div>
       <div class="modal-footer">
