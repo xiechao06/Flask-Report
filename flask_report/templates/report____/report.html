@@ -52,7 +52,6 @@
     }
       var oTable = $("#report").dataTable({
         "oLanguage": {
-            "sSearch": '{{ _("Search") }}' + " :",
             "sLengthMenu": '{{ _("Display _MENU_ records per page") }}',
             "sZeroRecords": '{{ _("Nothing found - sorry") }}',
             "sInfo": '{{ _("Showing _START_ to _END_ of _TOTAL_ records") }}',
@@ -66,6 +65,7 @@
               },
             },
         "bSortCellsTop": true,
+        "bFilter": false,
         "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>",
         "iDisplayLength": 25,
         "fnFooterCallback": sumsCallback
