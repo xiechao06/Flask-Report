@@ -99,14 +99,18 @@ class FlaskReport(object):
             temp_dir = os.path.join(self.report_dir, "0")
             if not os.path.exists(temp_dir):
                 os.mkdir(temp_dir)
-            self._write(temp_dir, filters=filters_yaml, order_by=order_by_yaml,
-                        columns=[c["idx"] for c in data_set.columns], data_set_id=data_set.id_)
+            dict_ = dict(columns=[c["idx"] for c in data_set.columns], data_set_id=data_set.id_)
+            if filters_yaml:
+                dict_["filters"] = filters_yaml
+            if order_by_yaml:
+                dict_["order_by"] = order_by_yaml
+            self._write(temp_dir, **dict_)
 
         from flask.ext.report.utils import query_to_sql
         from pygments import highlight
         from pygments.lexers import SqlLexer
         from pygments.formatters import HtmlFormatter
-        SQL_html = highlight(query_to_sql(query), SqlLexer(), HtmlFormatter())
+        SQL_html = highlight(query_to_sql(query), SqlLexer(), HtmlFormatter()) if query else ""
         from flask.ext.report.utils import dump_to_yaml
         params = dict(data_set=data_set, SQL=SQL_html, current_filters=current_filters,
                       current_order_by=current_order_by, filters_yaml=dump_to_yaml(filters_yaml),
