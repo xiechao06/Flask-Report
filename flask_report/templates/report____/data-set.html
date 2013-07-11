@@ -88,10 +88,19 @@
         }
         var td3 = $("<td></td>").html(select);
         var input_str = "<input type='text' required></input>";
-        if (type) {
-          input_str = input_str.replace("'text'", "'" + type + "'");
-        }
+
         var input = $(input_str);
+        if (type) {
+          if (type == "date") {
+            input.datetimepicker({format: 'yyyy-mm-dd', minView: "month", autoclose: true, language: "{{ g.locale }}", pickerPosition: "bottom-left"});
+          } else if (type == "datetime") {
+            input.datetimepicker({format: 'yyyy-mm-dd hh:ii', autoclose: true, language: "{{ g.locale }}", minuteStep: 1, pickerPosition: "bottom-left"})
+          } else {
+            input_str = input_str.replace("text", type);
+            input = $(input_str);
+          }
+        }
+
         if (value) {
           input.val(value)
         }
