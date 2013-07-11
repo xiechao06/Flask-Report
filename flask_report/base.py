@@ -89,22 +89,27 @@ class FlaskReport(object):
         current_order_by = None
         filters_yaml = None
         if request.args.get("filters"):
-            filters_data = json.loads(request.args.get("filters"))
+            filters_data = json.loads(request.args["filters"])
             current_filters = data_set.get_current_filters(filters_data)
             order_bys_data = request.args.get("order_bys")
             current_order_by = data_set.get_current_order_by(order_bys_data)
             filters_yaml = data_set.parse_filters(filters_data)
             order_by_yaml = data_set.parse_order_bys(order_bys_data)
             query = data_set.get_query(filters_data, current_order_by)
+            temp_dir = os.path.join(self.report_dir, "0")
+            if not os.path.exists(temp_dir):
+                os.mkdir(temp_dir)
+            data_set.writer_temp(temp_dir, filters_yaml, order_by_yaml)
+
         from flask.ext.report.utils import query_to_sql
         from pygments import highlight
         from pygments.lexers import SqlLexer
         from pygments.formatters import HtmlFormatter
         SQL_html = highlight(query_to_sql(query), SqlLexer(), HtmlFormatter())
-        html = data_set.html_template.render(columns=data_set.columns, data=query.all() if query else [], SQL=SQL_html)
-        params = dict(data_set=data_set, html=html, current_filters=current_filters,
-                      current_order_by=current_order_by,
-                      filters_yaml=filters_yaml, order_by_yaml=order_by_yaml)
+        from flask.ext.report.utils import dump_to_yaml
+        params = dict(data_set=data_set, SQL=SQL_html, current_filters=current_filters,
+                      current_order_by=current_order_by, filters_yaml=dump_to_yaml(filters_yaml),
+                      order_by_yaml=order_by_yaml)
         extra_params = self.extra_params.get('data_set')
         if extra_params:
             if isinstance(extra_params, types.FunctionType):
@@ -154,15 +159,18 @@ class FlaskReport(object):
             if not os.path.exists(new_dir):
                 os.mkdir(new_dir)
             self._write(os.path.join(new_dir, "meta.yaml"), request.form)
-            return redirect(url_for(".report", id_=id_, _method="GET"))
+            return redirect(url_for(".report", id_=id_, _method="GET", url=request.form.get("url")))
 
     def _write(self, file_name, form):
+        temp_report = Report(self, 0)
         import yaml
         dict_ = {"name": form["report_name"], "description": form["report_desc"],
-                 "data_set_id": form.get("data_set_id", type=int),
-                 "filters": yaml.load(form["report_filters"]), "columns": form.getlist("report_columns", type=int)}
-        if form.get("report_order_by"):
-            dict_["order_by"] = yaml.load(form["report_order_by"])
+                 "data_set_id": temp_report.data_set.id_,
+                 "columns": form.getlist("report_columns", type=int)}
+        if temp_report.filters:
+            dict_["filters"] = temp_report.filters
+        if form.get("order_by"):
+            dict_["order_by"] = form["order_by"]
         dict_["creator"] = form["report_creator"]
         import datetime
         dict_["create_time"] = datetime.datetime.now()

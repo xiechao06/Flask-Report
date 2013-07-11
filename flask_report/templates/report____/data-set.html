@@ -11,59 +11,8 @@
   <script type="text/javascript" src="{{ url_for('report____.static', filename='js/DT_bootstrap.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('report____.static', filename='js/jquery.autosize-min.js') }}"></script>
   <script type="text/javascript">
-    $.extend($.fn.dataTableExt.oStdClasses, {
-      "sWrapper": "dataTables_wrapper form-inline"
-    });
-    $(function () {
-      var oTable = $("#report").dataTable({
-        "oLanguage": {
-          "sSearch": '{{ _("Search") }}' + " :",
-          "sLengthMenu": '{{ _("Display _MENU_ records per page") }}',
-          "sZeroRecords": '{{ _("Nothing found - sorry") }}',
-          "sInfo": '{{ _("Showing _START_ to _END_ of _TOTAL_ records") }}',
-          "sInfoEmpty": '{{ _("Showing 0 to 0 of 0 records") }}',
-          "sInfoFiltered": "(" + '{{ _("filtered from _MAX_ total records") }}' + ")",
-          'oPaginate': {
-            "sPrevious": '{{ _("Previous") }} ',
-            "sNext": '{{ _("Next") }}',
-            "sFirst": '{{ _("First") }}',
-            'sLast': '{{ _("Last") }}'
-          }
-        },
-        "bFilter": false,
-        "bSortCellsTop": true,
-        "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>",
-        "iDisplayLength": 25
-      });
-      $("#detail").on('shown',function () {
-        $('a[data-target="#detail"]').text("{{ _('hide detail') }}" + " <<");
-      }).on('hidden', function () {
-            $('a[data-target="#detail"]').text("{{ _('show detail') }}" + " >>");
-          });
-
-
-      /* Add the events etc before DataTables hides a column */
-      $("thead input").keyup(function () {
-        /* Filter on the column (the index) of this element */
-        oTable.fnFilter(this.value, oTable.oApi._fnVisibleToColumnIndex(
-            oTable.fnSettings(), $("thead input").index(this)));
-      }).each(function (i) {
-            this.initVal = this.value;
-          }).focus(function () {
-            if (this.className == "search_init") {
-              this.className = "";
-              this.value = "";
-            }
-          }).blur(function (i) {
-            if (this.value == "") {
-              this.className = "search_init";
-              this.value = this.initVal;
-            }
-          });
-      $(".collapse").collapse();
-
-
-      jQuery.fn.addFilter = function (text, available_opts, type, op, value) {
+    $(function(){
+    jQuery.fn.addFilter = function (text, available_opts, type, op, value) {
         var tr = $("<tr name='filter'></tr>");
         var td1 = $("<td></td>").html($("<button type='button' class='btn' name='remove-tr'></button>").html($("<i class='icon-remove icon-large'></i>")));
         var td2 = $("<td></td>").text(text);
@@ -177,7 +126,7 @@
         }
       });
       $("textarea").autosize();
-    });
+    })
   </script>
 {% endblock %}
 
@@ -188,8 +137,7 @@
         {{ data_set.name }}
       </h1>
     </div>
-    <hr/>
-    <form action="{{ url_for(".data_set", id_=data_set.id_) }}">
+    <form action="{{ url_for(".data_set", id_=data_set.id_) }}" method="GET">
       <fieldset>
         <legend>{{ _("filters") }}</legend>
         <table id="clause">
@@ -240,6 +188,7 @@
     <legend>{{ _("RESULT") }}</legend>
     {% if filters_yaml %}
       <div>
+        <h4>{{ _("Filters") }}</h4>
         <code>
           filters: {{ filters_yaml }}
         </code>
@@ -247,26 +196,23 @@
     {% endif %}
     {% if order_by_yaml %}
       <div>
+        <h4>{{ _("Orders") }}</h4>
         <code>
           order_by: {{ order_by_yaml }}
         </code>
       </div>
     {% endif %}
-    <div>
-      {% if request.args.get("filters") %}
-        {{ html|safe }}
-      {% else %}
-        <div class="alert alert-warnning">
-          {{ _("please config the filters") }}
-        </div>
-      {% endif %}
-    </div>
-    <hr/>
+    {% if SQL %}
+      <div>
+        <h4>{{ _("SQL") }}</h4>
+        {{ SQL|safe }}
+      </div>
+    {% endif %}
 
     <div class="pagination-centered span12">
       <a href="{{ url_for('.data_set_list') }}" class="btn btn-primary btn-large">{{ _('BACK') }}</a>
       <button type="button" data-toggle="modal" data-target="#saveModal" class="btn btn-primary btn-large">{{ _("SAVE") }}</button>
-      <a href="" class="btn btn-primary btn-large">{{ _('REFRESH') }}</a>
+      <a href="{{ url_for('.report', id_=0, url=request.url) }}" class="btn btn-primary btn-large">{{ _('VIEW RESULTS') }}</a>
     </div>
   </div>
   <div class="modal hide fade" id="saveModal" tabindex="-1">
@@ -323,7 +269,7 @@
               </select>
             </div>
           </div>
-          <input type="hidden" name="data_set_id" value="{{ data_set.id_ }}"/>
+          <input type="hidden" name="url" value="{{ request.url }}"/>
         </fieldset>
       </div>
       <div class="modal-footer">

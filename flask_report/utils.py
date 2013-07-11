@@ -105,3 +105,14 @@ def get_color(idx, colors, total_length=None, rgb=True):
                         'rgba(%s, %s, %s, 1)' % (int(color[1:3], 16), int(color[3:5], 16), int(color[5:7], 16)))
 
         return _get_color(idx, total_length)
+
+
+def dump_to_yaml(obj):
+    import yaml
+    if obj:
+        result = yaml.safe_dump(obj, allow_unicode=True).decode("utf-8")
+        if result[-5:] == "\n...\n":
+            result = result[:-5]
+    else:
+        result = ''
+    return result

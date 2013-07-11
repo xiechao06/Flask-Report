@@ -195,7 +195,7 @@
 <hr />
 
 <div class="row pagination-centered">
-  <a href="{{ url_for('.report_list') }}" class="btn btn-primary btn-large">{{ _('BACK') }}</a>
+  <a href="{{ request.args.get("url", url_for('.report_list')) }}" class="btn btn-primary btn-large">{{ _('BACK') }}</a>
   <a href="" class="btn btn-primary btn-large">{{ _('EDIT') }}</a>
   <a href="" class="btn btn-primary btn-large">{{ _('REFRESH') }}</a>
 </div>

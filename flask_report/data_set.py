@@ -21,8 +21,8 @@ class DataSet(object):
         self.description = data_set_meta.get("description")
         self.__special_chars = {"gt": operator.gt, "lt": operator.lt, "ge": operator.ge, "le": operator.le,
                                 "eq": operator.eq, "ne": operator.ne}
-        self._filters = data_set_meta.get("filters")
-        self._order_bys = data_set_meta.get("order_bys")
+        self._filters = data_set_meta.get("filters", {})
+        self._order_bys = data_set_meta.get("order_bys", [])
 
     @cached_property
     def query(self):
@@ -84,19 +84,35 @@ class DataSet(object):
 
     @property
     def filters(self):
-        def _get_type(type):
+        def _get_column(filter_key):
+            model_name, column_name = filter_key.split(".")
+            return operator.attrgetter(column_name)(self.report_view.model_map[model_name])
+
+        def get_label_name(name, column):
+            if not name:
+                for c in self.columns:
+                    if c["key"] == str(column.expression):
+                        name = c["name"]
+            return name
+
+        def _get_type(type_, default=None):
             types = {"str": "text", "int": "number", "bool": "checkbox", "datetime": "datetime", "date": "date"}
-            return types.get(type, "text")
+            if isinstance(default, type):
+                default = types.get(default.__name__)
+            else:
+                default = "text"
+            return types.get(type_, default)
 
         filters = []
         for k, v in self._filters.items():
-            filters.append(
-                {"name": v.get("name"), "col": k, "ops": v.get("operators"), "type": _get_type(v.get("value_type"))})
+            column = _get_column(k)
+            filters.append({"name": get_label_name(v.get("name"), column), "col": k, "ops": v.get("operators"),
+                            "type": _get_type(v.get("value_type"), column.type.python_type)})
         return filters
 
     @property
     def order_bys(self):
-        return self._order_bys or []
+        return self._order_bys
 
     def get_current_filters(self, currents):
         def _match(to_matcher):
@@ -123,12 +139,15 @@ class DataSet(object):
                     val = [val]
                 val.append({'operator': current["op"], 'value': current["val"]})
                 filters[current["col"]] = val
-        return yaml.safe_dump(filters, allow_unicode=True).decode("utf-8")
+        return filters
 
     def parse_order_bys(self, order_bys_data):
-        result = yaml.safe_dump(order_bys_data, allow_unicode=True).decode("utf-8")
-        if result[-5:] == "\n...\n":
-            return result[:-5]
+        if order_bys_data:
+            result = yaml.safe_dump(order_bys_data, allow_unicode=True).decode("utf-8")
+            if result[-5:] == "\n...\n":
+                return result[:-5]
+        else:
+            return None
 
     def get_current_order_by(self, order_by):
         if order_by:
@@ -137,4 +156,19 @@ class DataSet(object):
             else:
                 return order_by, "asc"
         else:
-            return []
+            return None
+
+    def writer_temp(self, to_dir, filter_yaml, order_by_yaml):
+        import yaml
+        import datetime
+
+        data = {"name": "temp", "description": "temp", "creator": "temp", "create_time": datetime.datetime.now(),
+                "data_set_id": self.id_, "columns": [c["idx"] for c in self.columns]}
+        if filter_yaml:
+            data["filters"] = filter_yaml
+        if order_by_yaml:
+            data["order_by"] = order_by_yaml
+
+        with file(os.path.join(to_dir, "meta.yaml"), "w") as f:
+            yaml.safe_dump(data, allow_unicode=True, stream=f)
+
