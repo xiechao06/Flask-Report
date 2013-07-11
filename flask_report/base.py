@@ -97,7 +97,11 @@ class FlaskReport(object):
             order_by_yaml = data_set.parse_order_bys(order_bys_data)
             query = data_set.get_query(filters_data, current_order_by)
         from flask.ext.report.utils import query_to_sql
-        html = data_set.html_template.render(columns=data_set.columns, data=query.all() if query else [], SQL=query_to_sql(query))
+        from pygments import highlight
+        from pygments.lexers import SqlLexer
+        from pygments.formatters import HtmlFormatter
+        SQL_html = highlight(query_to_sql(query), SqlLexer(), HtmlFormatter())
+        html = data_set.html_template.render(columns=data_set.columns, data=query.all() if query else [], SQL=SQL_html)
         params = dict(data_set=data_set, html=html, current_filters=current_filters,
                       current_order_by=current_order_by,
                       filters_yaml=filters_yaml, order_by_yaml=order_by_yaml)
