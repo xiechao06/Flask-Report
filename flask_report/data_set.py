@@ -58,8 +58,11 @@ class DataSet(object):
         def get_column(column):
             for c in self.columns:
                 if column == c["name"]:
-                    model_name, column_name = c["key"].split(".")
-                    return operator.attrgetter(column_name)(self.report_view.table_map[model_name])
+                    if "(" not in c["key"] and ")" not in c["key"]:
+                        model_name, column_name = c["key"].split(".")
+                        return operator.attrgetter(column_name)(self.report_view.table_map[model_name])
+                    else:
+                        return c["expr"]
             else:
                 raise ValueError(_("no such column"))
 

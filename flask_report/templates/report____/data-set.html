@@ -89,7 +89,7 @@
         var td3 = $("<td></td>").html(select);
         var input_str = "<input type='text' required></input>";
         if (type) {
-          input_str.replace("'text'", "'" + type + "'");
+          input_str = input_str.replace("'text'", "'" + type + "'");
         }
         var input = $(input_str);
         if (value) {
@@ -127,7 +127,7 @@
 
       $("#add_order_by").change(function(){
         if ($("tr[name=order_by]").size() > 0){
-          alert("{{ _("only one order by columns supported") }}");
+          alert('{{ _("only one order by columns supported") }}');
           return false;
         }
         var e = $($(this).find(":selected"));
