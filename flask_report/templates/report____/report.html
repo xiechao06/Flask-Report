@@ -129,7 +129,7 @@
   </h1>
   <div id="detail" class="collapse">
   <p><small>{{ report.description +"<br>"|safe if report.description else "" }}{{ _('created by "%(creator)s" at %(create_time)s, using data set <span title="%(data_set_description)s">"%(data_set)s"</span>, ',
-    creator=report.creator, create_time=report.creat_time,
+    creator=report.creator, create_time=report.create_time,
     data_set_description=report.data_set.description,
     data_set=report.data_set.name) }}
     {% if report.order_by %}
