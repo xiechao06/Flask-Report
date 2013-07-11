@@ -51,6 +51,7 @@ class Report(object):
         self._pie = pies if isinstance(pies, list) else [pies]
         self._bar_charts = None
         self._pie_charts = None
+        self._searchable_columns = report_meta.get("searchable_columns", [])
 
     @cached_property
     def columns(self):
@@ -66,6 +67,8 @@ class Report(object):
             if (isinstance(col_expr, sqlalchemy.sql.expression.Function) or isinstance(col_expr,
                                                                                        sqlalchemy.sql.expression.ClauseElement)) and col_expr.name == 'sum':
                 col['get_drill_down_link'] = partial(self._gen_drill_down_link, i)
+            if not self._searchable_columns or i in self._searchable_columns:
+                col["searchable"] = True
             ret.append(col)
         return ret
 
