@@ -11,6 +11,7 @@ filters:
         - {operator: le, value: 10}
 order_by: -平均武力值
 columns: [7, 6, 5, 4, 3, 2, 1, 0]
+searchable_columns: [1,2,3,4,5,6,7]
 data_set_id: 1
 sum_columns: [3]
 avg_columns: [3]
