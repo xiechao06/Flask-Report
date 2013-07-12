@@ -14,4 +14,4 @@ Quick Start
 # ./run_example.sh
 ```
 
-then you could open "http://127.0.0.1/report/1" to see what happens.
+then you could open "http://127.0.0.1:5001/report/report/1" to see what happens.
