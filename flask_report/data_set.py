@@ -60,9 +60,14 @@ class DataSet(object):
         for filter_ in filters:
             column, op_ = get_column_operator(filter_["col"], self.columns, self.report_view)
             if op_ == "filter":
-                query = query.filter(get_operator(filter_["op"])(column, filter_["val"]))
+                method_ = query.filter
             elif op_ == "having":
-                query = query.having(get_operator(filter_["op"])(column, filter_["val"]))
+                method_ = query.having
+
+            if hasattr(column, "property") and hasattr(column.property,
+                                                      "direction"):
+                column = column.property.local_remote_pairs[1][0]
+            query = method_(get_operator(filter_["op"])(column, filter_["val"]))
         if order_by:
             all_columns = dict((c['name'], c) for c in self.columns)
             o = all_columns.get(order_by[0], None)
@@ -90,7 +95,7 @@ class DataSet(object):
             if isinstance(default, types.TypeType):
                 default = _TYPES.get(default.__name__)
             else:
-                default = "text"
+                default = default or "text"
             return _TYPES.get(type_, default)
 
         filters = []
@@ -98,12 +103,25 @@ class DataSet(object):
 
         for k, v in self._filters.items():
             column, op_ = get_column_operator(k, self.columns, self.report_view)
+            default = None
             try:
                 default = column.type.python_type
             except NotImplementedError:
-                default = "text"
-            filters.append({"name": get_label_name(v.get("name"), column), "col": k, "ops": v.get("operators"),
-                            "type": _get_type(v.get("value_type"), default)})
+                pass
+            except AttributeError:
+                default = "select"
+
+            result = {"name": get_label_name(v.get("name"), column), "col": k, "ops": v.get("operators"),
+                      "type": _get_type(v.get("value_type"), default)}
+            if hasattr(column, "property") and hasattr(column.property, "direction"):
+                def _iter_choices(column):
+                    model = column.property.mapper.class_
+                    from flask.ext.report.utils import get_primary_key
+                    pk = get_primary_key(model)
+                    for row in self.report_view.db.session.query(model):
+                        yield getattr(row, pk), unicode(row)
+                result["opts"] = list(_iter_choices(column))
+            filters.append(result)
         return filters
 
     @property
