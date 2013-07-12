@@ -12,7 +12,7 @@
   <script type="text/javascript" src="{{ url_for('report____.static', filename='js/jquery.autosize-min.js') }}"></script>
   <script type="text/javascript">
     $(function(){
-    jQuery.fn.addFilter = function (text, available_opts, type, op, value) {
+    jQuery.fn.addFilter = function (col, text, available_opts, type, op, value) {
         var tr = $("<tr name='filter'></tr>");
         var td1 = $("<td></td>").html($("<button type='button' class='btn' name='remove-tr'></button>").html($("<i class='icon-remove icon-large'></i>")));
         var td2 = $("<td></td>").text(text);
@@ -54,6 +54,7 @@
         if (value) {
           input.val(value)
         }
+        input.attr("data-col", col);
         var td4 = $("<td></td>").html(input);
         tr.append(td1, td2, td3, td4);
         this.find("tbody").append(tr);
@@ -80,7 +81,7 @@
       $("#add_filter").change(function () {
         var e = $($(this).find(":selected"));
 
-        $("#clause").addFilter(e.text(), $.parseJSON(e.attr("data-ops")), e.attr("data-type"));
+        $("#clause").addFilter(e.val(), e.text(), $.parseJSON(e.attr("data-ops")), e.attr("data-type"));
         $(this).val([]);
       });
 
@@ -96,7 +97,7 @@
 
       {% if current_filters %}
         $.each({{ current_filters|tojson|safe }}, function (idx, filter) {
-          $("#clause").addFilter(filter.name, filter.ops, filter.type, filter.op, filter.val);
+          $("#clause").addFilter(filter.col, filter.name, filter.ops, filter.type, filter.op, filter.val);
         });
       {% endif %}
 
@@ -113,7 +114,8 @@
         if (form.get(0).checkValidity()) {
           var filters = [];
           $.each(form.find("tr[name='filter']"), function (idx, tr) {
-            filters.push({"col": $($(tr).find("td")[1]).text(), "op": $($(tr).find("select")).val(), "val": $($(tr).find("input")[0]).val()});
+            var input=$($(tr).find("input")[0]);
+            filters.push({"col": input.attr("data-col"), "op": $($(tr).find("select")).val(), "val": input.val()});
           });
           var tr = form.find("tr[name=order_by]");
           var order_bys = $($(tr).find("td")[1]).text();

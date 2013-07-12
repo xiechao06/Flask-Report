@@ -1,6 +1,10 @@
 # -*- coding: UTF-8 -*-
 import sqlalchemy
+import operator
+from flask.ext.babel import _
 
+_NONE = object()
+AGGREGATE_FUNC = ["sum", "avg", "max", "min", "count"]
 
 def collect_models(module):
     ret = {}
@@ -39,7 +43,7 @@ def get_primary_key(model):
 def get_column_operated(func):
     ret = func
     while not isinstance(ret, sqlalchemy.schema.Column):
-        if isinstance(ret, sqlalchemy.sql.expression.ColumnClause): # sub query
+        if isinstance(ret, sqlalchemy.sql.expression.ColumnClause):  # sub query
             ret = list(enumerate(ret.base_columns))[0][1]
         else:
             ret = ret.clauses.clauses[0]
@@ -80,12 +84,16 @@ def query_to_sql(statement, bind=None):
             )
 
         def render_literal_value(self, value, type_):
+
             if isinstance(type_, sqlalchemy.types.DateTime) or isinstance(type_, sqlalchemy.types.Date):
-                return '"' + str(value) + '"'
+                return '"' + unicode(value) + '"'
+            elif isinstance(value, basestring):
+                value = value.decode(dialect.encoding)
             return super(LiteralCompiler, self).render_literal_value(value, type_)
 
     compiler = LiteralCompiler(dialect, statement)
     import sqlparse
+
     return sqlparse.format(compiler.process(statement), reindent=True, keyword_case='upper')
 
 
@@ -109,6 +117,7 @@ def get_color(idx, colors, total_length=None, rgb=True):
 
 def dump_to_yaml(obj):
     import yaml
+
     if obj:
         result = yaml.safe_dump(obj, allow_unicode=True).decode("utf-8")
         if result[-5:] == "\n...\n":
@@ -116,3 +125,39 @@ def dump_to_yaml(obj):
     else:
         result = ''
     return result
+
+
+def get_column_operator(filter_key, columns, report_view):
+    col = _NONE
+    try:
+        if "(" not in filter_key and ")" not in filter_key:
+            model_name, column_name = filter_key.split(".")
+            col = operator.attrgetter(column_name)(report_view.model_map[model_name])
+        else:
+            import re
+
+            model_name, column_name = re.split("[()]", filter_key)[1].split(".")
+            filter_key = filter_key.replace(model_name, report_view.model_map[model_name].__table__.name)
+            for c in columns:
+                if filter_key == c["key"]:
+                    col = c["expr"]
+                    break
+    except ValueError:
+        for c in columns:
+            if filter_key == c["name"]:
+                if "(" not in c["key"] and ")" not in c["key"]:
+                    model_name, column_name = c["key"].split(".")
+                    col = operator.attrgetter(column_name)(report_view.table_map[model_name])
+                else:
+                    col = c["expr"]
+                break
+    finally:
+        if col is _NONE:
+            raise ValueError(_("No Such Column"))
+        else:
+            try:
+                if operator.attrgetter("element.name")(col) in AGGREGATE_FUNC:
+                    return col, "having"
+            except AttributeError:
+                pass
+            return col, "filter"
