@@ -175,9 +175,9 @@ class Report(object):
             return self.report_view.app.jinja_env.get_template("report____/default_drill_down_html_report.html")
         return self.report_view.app.jinja_env.from_string(codecs.open(template_file, encoding='utf-8').read())
 
-    def get_drill_down_detail_query(self, col_id, **filters):
-        lib = import_file(os.path.join(self.report_view.report_dir, str(self.id_), "drill_downs", str(col_id), "query_def.py"))
-        return lib.query_def(self.report_view.db, self.report_view.model_map, **filters)
+    def get_drill_down_detail(self, col_id, **filters):
+        lib = import_file(os.path.join(self.report_view.report_dir, str(self.id_), "drill_downs", str(col_id), "objects.py"))
+        return lib.objects(self.report_view.db, self.report_view.model_map, **filters)
     
     @property
     def sum_fields(self):
