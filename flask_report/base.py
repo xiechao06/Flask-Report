@@ -65,12 +65,19 @@ class FlaskReport(object):
             s += "}"
             return s
 
+    def try_view_report(self):
+        pass
+
+    def try_edit_data_set(self):
+        pass
+
     def report_graphs(self, id_):
         report = Report(self, id_)
         return render_template("report____/graphs.html", url=request.args.get("url"), bar_charts=report.bar_charts,
                                name=report.name, pie_charts=report.pie_charts)
 
     def data_set_list(self):
+        self.try_edit_data_set()
         data_sets = [DataSet(self, int(dir_name)) for dir_name in os.listdir(self.data_set_dir) if
                      dir_name.isdigit() and dir_name != '0']
         params = dict(data_sets=data_sets)
@@ -82,6 +89,7 @@ class FlaskReport(object):
         return render_template("report____/data-sets.html", **params)
 
     def data_set(self, id_):
+        self.try_edit_data_set()
         order_by_yaml = None
         data_set = DataSet(self, id_)
         query = None
@@ -123,6 +131,7 @@ class FlaskReport(object):
         return render_template("report____/data-set.html", **params)
 
     def report_list(self):
+        self.try_view_report()
         # directory 0 is reserved for special purpose
         reports = [Report(self, int(dir_name)) for dir_name in os.listdir(self.report_dir) if
                    dir_name.isdigit() and dir_name != '0']
@@ -135,6 +144,7 @@ class FlaskReport(object):
         return render_template('report____/report-list.html', **params)
 
     def report(self, id_=None):
+        self.try_view_report()
         if id_ is not None:
             report = Report(self, id_)
             from flask.ext.report.utils import query_to_sql
