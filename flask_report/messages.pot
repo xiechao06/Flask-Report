@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-07-10 17:26+0800\n"
+"POT-Creation-Date: 2013-07-12 10:06+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: data_set.py:64
+#: data_set.py:59
 msgid "no such column"
 msgstr ""
 
@@ -25,111 +25,74 @@ msgstr ""
 msgid "That's all"
 msgstr ""
 
-#: templates/report____/data-set.html:20 templates/report____/data-set.html:225
-#: templates/report____/report.html:55
-msgid "Search"
-msgstr ""
-
-#: templates/report____/data-set.html:21 templates/report____/report.html:56
-msgid "Display _MENU_ records per page"
-msgstr ""
-
-#: templates/report____/data-set.html:22 templates/report____/report.html:57
-msgid "Nothing found - sorry"
-msgstr ""
-
-#: templates/report____/data-set.html:23 templates/report____/report.html:58
-msgid "Showing _START_ to _END_ of _TOTAL_ records"
-msgstr ""
-
-#: templates/report____/data-set.html:24 templates/report____/report.html:59
-msgid "Showing 0 to 0 of 0 records"
-msgstr ""
-
-#: templates/report____/data-set.html:25 templates/report____/report.html:60
-msgid "filtered from _MAX_ total records"
-msgstr ""
-
-#: templates/report____/data-set.html:27 templates/report____/report.html:62
-msgid "Previous"
-msgstr ""
-
-#: templates/report____/data-set.html:28 templates/report____/report.html:63
-msgid "Next"
-msgstr ""
-
-#: templates/report____/data-set.html:29 templates/report____/report.html:64
-msgid "First"
-msgstr ""
-
-#: templates/report____/data-set.html:30 templates/report____/report.html:65
-msgid "Last"
-msgstr ""
-
-#: templates/report____/data-set.html:38 templates/report____/report.html:74
-msgid "hide detail"
-msgstr ""
-
-#: templates/report____/data-set.html:40 templates/report____/report.html:77
-#: templates/report____/report.html:122
-msgid "show detail"
-msgstr ""
-
-#: templates/report____/data-set.html:130
+#: templates/report____/data-set.html:89
 msgid "only one order by columns supported"
 msgstr ""
 
-#: templates/report____/data-set.html:184
+#: templates/report____/data-set.html:142
 msgid "filters"
 msgstr ""
 
-#: templates/report____/data-set.html:203
-#: templates/report____/data-set.html:299
+#: templates/report____/data-set.html:161
+#: templates/report____/data-set.html:255
 msgid "order by"
 msgstr ""
 
-#: templates/report____/data-set.html:230
+#: templates/report____/data-set.html:183
+msgid "Search"
+msgstr ""
+
+#: templates/report____/data-set.html:188
 msgid "RESULT"
 msgstr ""
 
-#: templates/report____/data-set.html:250
-msgid "please config the filters"
+#: templates/report____/data-set.html:191
+msgid "Filters"
 msgstr ""
 
-#: templates/report____/data-set.html:257 templates/report____/graphs.html:45
-#: templates/report____/report.html:194
+#: templates/report____/data-set.html:199
+msgid "Orders"
+msgstr ""
+
+#: templates/report____/data-set.html:207
+#: templates/report____/default_data_set_html.html:2
+msgid "SQL"
+msgstr ""
+
+#: templates/report____/data-set.html:213 templates/report____/graphs.html:45
+#: templates/report____/report.html:198
 msgid "BACK"
 msgstr ""
 
-#: templates/report____/data-set.html:258
+#: templates/report____/data-set.html:214
 msgid "SAVE"
 msgstr ""
 
-#: templates/report____/data-set.html:259 templates/report____/report.html:196
-msgid "REFRESH"
+#: templates/report____/data-set.html:215
+msgid "VIEW RESULTS"
 msgstr ""
 
-#: templates/report____/data-set.html:271
+#: templates/report____/data-set.html:227
 msgid "Report name"
 msgstr ""
 
-#: templates/report____/data-set.html:278
+#: templates/report____/data-set.html:234
 msgid "Report creator"
 msgstr ""
 
-#: templates/report____/data-set.html:285
+#: templates/report____/data-set.html:241
 msgid "Report desc"
 msgstr ""
 
-#: templates/report____/data-set.html:292
+#: templates/report____/data-set.html:248
 msgid "Report filters"
 msgstr ""
 
-#: templates/report____/data-set.html:306
+#: templates/report____/data-set.html:262
 msgid "columns"
 msgstr ""
 
-#: templates/report____/data-set.html:321
+#: templates/report____/data-set.html:278
 msgid "SAVE REPORT"
 msgstr ""
 
@@ -137,11 +100,7 @@ msgstr ""
 msgid "Data sets"
 msgstr ""
 
-#: templates/report____/default_data_set_html.html:2
-msgid "SQL"
-msgstr ""
-
-#: templates/report____/default_data_set_html.html:19
+#: templates/report____/default_data_set_html.html:16
 #: templates/report____/default_html_report.html:11
 #, python-format
 msgid "search %(col_name)s"
@@ -171,55 +130,107 @@ msgstr ""
 msgid "detail of %%s"
 msgstr ""
 
-#: templates/report____/report.html:46
+#: templates/report____/report.html:27
+msgid "Load Error"
+msgstr ""
+
+#: templates/report____/report.html:50
 msgid "Total"
 msgstr ""
 
-#: templates/report____/report.html:127
+#: templates/report____/report.html:59
+msgid "Display _MENU_ records per page"
+msgstr ""
+
+#: templates/report____/report.html:60
+msgid "Nothing found - sorry"
+msgstr ""
+
+#: templates/report____/report.html:61
+msgid "Showing _START_ to _END_ of _TOTAL_ records"
+msgstr ""
+
+#: templates/report____/report.html:62
+msgid "Showing 0 to 0 of 0 records"
+msgstr ""
+
+#: templates/report____/report.html:63
+msgid "filtered from _MAX_ total records"
+msgstr ""
+
+#: templates/report____/report.html:65
+msgid "Previous"
+msgstr ""
+
+#: templates/report____/report.html:66
+msgid "Next"
+msgstr ""
+
+#: templates/report____/report.html:67
+msgid "First"
+msgstr ""
+
+#: templates/report____/report.html:68
+msgid "Last"
+msgstr ""
+
+#: templates/report____/report.html:78
+msgid "hide detail"
+msgstr ""
+
+#: templates/report____/report.html:81 templates/report____/report.html:126
+msgid "show detail"
+msgstr ""
+
+#: templates/report____/report.html:131
 #, python-format
 msgid ""
 "created by \"%(creator)s\" at %(create_time)s, using data set <span "
 "title=\"%(data_set_description)s\">\"%(data_set)s\"</span>, "
 msgstr ""
 
-#: templates/report____/report.html:132
+#: templates/report____/report.html:136
 #, python-format
 msgid "order by \"%(order_by)s\" %(order)s"
 msgstr ""
 
-#: templates/report____/report.html:134
+#: templates/report____/report.html:138
 msgid "descendingly"
 msgstr ""
 
-#: templates/report____/report.html:134
+#: templates/report____/report.html:138
 msgid "ascendingly"
 msgstr ""
 
-#: templates/report____/report.html:137
+#: templates/report____/report.html:141
 msgid "filter conditions are: "
 msgstr ""
 
-#: templates/report____/report.html:152
+#: templates/report____/report.html:156
 msgid "the customized filter condition is: "
 msgstr ""
 
-#: templates/report____/report.html:160
+#: templates/report____/report.html:164
 msgid "SQL statement"
 msgstr ""
 
-#: templates/report____/report.html:177
+#: templates/report____/report.html:181
 msgid "download as: "
 msgstr ""
 
-#: templates/report____/report.html:187
+#: templates/report____/report.html:191
 msgid "View Graphs"
 msgstr ""
 
-#: templates/report____/report.html:195
+#: templates/report____/report.html:199
 msgid "EDIT"
 msgstr ""
 
-#: templates/report____/report.html:209
+#: templates/report____/report.html:200
+msgid "REFRESH"
+msgstr ""
+
+#: templates/report____/report.html:213
 msgid "Close"
 msgstr ""
 
