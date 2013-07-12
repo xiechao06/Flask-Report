@@ -102,7 +102,6 @@ class Report(object):
                         yield idx
         return list(generate())
 
-
     @property
     def avg_columns(self):
         all_columns = self.data_set.columns
@@ -118,13 +117,17 @@ class Report(object):
     def query(self):
         q = self.data_set.query
         if self.filters:
+            from flask.ext.report.utils import get_column_operator
             for name, params in self.filters.items():
-                model_name, column_name = name.split('.')
+                column, op_ = get_column_operator(name, self.data_set.columns, self.report_view)
                 if not isinstance(params, list):
                     params = [params]
                 for param in params:
-                    op, value = self._get_operator_and_value(param)
-                    q = q.filter(op(operator.attrgetter(column_name)(self.report_view.model_map[model_name]), value))
+                    operator_, value = self._get_operator_and_value(param)
+                    if op_ == "filter":
+                        q = q.filter(operator_(column, value))
+                    elif op_ == "having":
+                        q = q.having(operator_(column, value))
         if self.literal_filter_condition is not None:
             q = q.filter(self.literal_filter_condition)
         all_columns = dict((c['name'], c) for c in self.data_set.columns)

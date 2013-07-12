@@ -5,7 +5,11 @@ create_time: 2013-07-02 07:30:00
 filters:
   Group.name:
     operators: [eq, ne]
-
+  User.impact:
+    name: 影响力
+    operators: [eq, ne]
+  sum(User.impact):
+    operators: [eq, ne]
 order_bys:
   - 国家
   - User.group_id
