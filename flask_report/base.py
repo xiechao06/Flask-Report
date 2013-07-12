@@ -59,7 +59,7 @@ class FlaskReport(object):
                 idx = 0
                 for k, v in val.items():
                     idx += 1
-                    s += "'%s':'%s'" % (k, v)
+                    s += "%s:%s" % (k, v)
                     if idx != len(val):
                         s += ","
             s += "}"
@@ -101,9 +101,9 @@ class FlaskReport(object):
             current_filters = data_set.get_current_filters(filters_data)
             order_bys_data = request.args.get("order_bys")
             current_order_by = data_set.get_current_order_by(order_bys_data)
-            filters_yaml = data_set.parse_filters(filters_data)
+            filters_yaml = data_set.parse_filters(current_filters)
             order_by_yaml = data_set.parse_order_bys(order_bys_data)
-            query = data_set.get_query(filters_data, current_order_by)
+            query = data_set.get_query(current_filters, current_order_by)
             temp_dir = os.path.join(self.report_dir, "0")
             if not os.path.exists(temp_dir):
                 os.mkdir(temp_dir)

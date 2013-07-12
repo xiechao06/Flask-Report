@@ -185,9 +185,8 @@ msgstr "显示详情"
 #: templates/report____/report.html:131
 #, python-format
 msgid ""
-"created by \"%(creator)s\" at %(create_time)s, using data set <span "
-"title=\"%(data_set_description)s\">\"%(data_set)s\"</span>, "
-msgstr "由用户\"%(creator)s\"在%(create_time)s创建, 使用的数据集和是\"%(data_set)s\", "
+"created by \"%(creator)s\" at %(create_time)s, using data set <a href=\"%(url)s\" title=\"%(data_set_description)s\">\"%(data_set)s\"</a>"
+msgstr "由用户\"%(creator)s\"在%(create_time)s创建, 使用的数据集和是<a href=\"%(url)s\" title=\"%(data_set_description)s\">\"%(data_set)s\"</a>"
 
 #: templates/report____/report.html:136
 #, python-format
