@@ -156,8 +156,8 @@ def get_column_operator(filter_key, columns, report_view):
             raise ValueError(_("No Such Column"))
         else:
             try:
-                if hasattr(col, "property") and hasattr(col.property, "direction"):
-                    col = col.property.local_remote_pairs[0][1]
+                #if hasattr(col, "property") and hasattr(col.property, "direction"):
+                    #col = col.property.local_remote_pairs[0][1]
                 if operator.attrgetter("element.name")(col) in AGGREGATE_FUNC:
                     return col, "having"
             except AttributeError:
