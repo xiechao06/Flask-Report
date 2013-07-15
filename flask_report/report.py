@@ -7,6 +7,8 @@ import codecs
 from collections import namedtuple
 from itertools import izip
 from functools import partial
+import datetime
+import shutil
 
 import sqlalchemy
 from flask import render_template, url_for
@@ -111,6 +113,9 @@ class Report(object):
             from flask.ext.report.utils import get_column_operator
             for name, params in self.filters.items():
                 column, op_ = get_column_operator(name, self.data_set.columns, self.report_view)
+                if hasattr(column, "property") and hasattr(column.property, "direction"):
+                    column = column.property.local_remote_pairs[0][1]
+
                 if not isinstance(params, list):
                     params = [params]
                 for param in params:
@@ -229,3 +234,36 @@ class Report(object):
                 result = {"name": pie.get("name"), "id_": uuid.uuid1(), "display_names": display_names, "data": data}
                 self._pie_charts.append(result)
         return self._pie_charts
+
+def create_report(data_set, name, description="", creator="", create_time=None, columns=None, filters=None, id=None):
+
+    create_time = create_time or datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    columns = columns or [c['idx'] for c in data_set.columns]
+    filters = filters or []
+    
+    if id is None:
+        all_report_dirs = [dir for dir in os.listdir(data_set.report_view.report_dir) if dir.isdigit()]
+        if not all_report_dirs:
+            new_report_id = 0
+        else:
+            new_report_id = max([int(dir) for dir in all_report_dirs]) + 1
+    else:
+        new_report_id = id
+
+    new_report_dir = os.path.join(data_set.report_view.report_dir, str(new_report_id))
+    if not os.path.exists(new_report_dir):
+        os.mkdir(new_report_dir)
+    with file(os.path.join(new_report_dir, "meta.yaml"), "w") as f:
+        dict_ = {
+            'name': name,
+            'data_set_id': data_set.id_,
+            'description': description,
+            'creator': creator,
+            'create_time': create_time,
+            'columns': [int(c) for c in columns],
+            'filters': filters,
+        }
+        yaml.safe_dump(dict_, allow_unicode=True, stream=f)
+    if os.path.exists(os.path.join(data_set.dir, 'drill_downs')):
+        shutil.copytree(os.path.join(data_set.dir, 'drill_downs'), os.path.join(new_report_dir, 'drill_downs'))
+    return new_report_id

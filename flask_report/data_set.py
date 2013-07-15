@@ -101,6 +101,7 @@ class DataSet(object):
 
             result = {"name": get_label_name(v.get("name"), column), "col": k, "ops": v.get("operators"),
                       "type": _get_type(v.get("value_type"), default)}
+            
             if hasattr(column, "property") and hasattr(column.property, "direction"):
                 def _iter_choices(column):
                     model = column.property.mapper.class_
@@ -111,6 +112,10 @@ class DataSet(object):
                 result["opts"] = list(_iter_choices(column))
             filters.append(result)
         return filters
+
+    @property
+    def dir(self):
+        return os.path.join(self.report_view.data_set_dir, str(self.id_))
 
     def get_current_filters(self, currents):
         def _match(to_matcher):
@@ -130,3 +135,5 @@ class DataSet(object):
                     pass
                 all.append(filter_)
         return all
+
+    

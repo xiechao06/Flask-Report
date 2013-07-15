@@ -1,22 +1,8 @@
-name: 三国文臣武将实力报告
-creator: 光荣
-description: 该报告指出了三国时期不包括吴国的另外两个国家文将之间的恩怨瓜葛
-create_time: 2013-07-02 08:30:00
-filters: 
-    User.is_lord:
-          operator: eq
-          value: false
-    User.group_id:
-        - {operator: ge, value: 1}
-        - {operator: le, value: 10}
-order_by: -平均武力值
-columns: [7, 6, 5, 4, 3, 2, 1, 0]
-searchable_columns: [1,2,3,4,5,6,7]
+columns: [0, 1, 2, 3, 4, 5, 6, 7]
+create_time: '2013-07-15 20:20:35'
+creator: ''
 data_set_id: 1
-sum_columns: [3]
-avg_columns: [3]
-bar:
-  {name: 各国战力图, columns: [2,4,6],  display_columns: [1]}
-pie:
-  - {name: 智力图, column: 4, display_columns: [1]}
-  - {name: 武力图, column: 6, display_columns: [1]}
+description: ''
+filters:
+  Group.name: {operator: eq, value: 吴}
+name: lkj
