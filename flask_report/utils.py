@@ -87,7 +87,7 @@ def query_to_sql(statement, bind=None):
 
             if isinstance(type_, sqlalchemy.types.DateTime) or isinstance(type_, sqlalchemy.types.Date):
                 return '"' + unicode(value) + '"'
-            elif isinstance(value, basestring):
+            elif isinstance(value, str):
                 value = value.decode(dialect.encoding)
             return super(LiteralCompiler, self).render_literal_value(value, type_)
 
