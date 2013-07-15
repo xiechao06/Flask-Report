@@ -2,20 +2,25 @@
 import os
 import json
 import types
+import urllib
 
+from apscheduler.scheduler import Scheduler
 from flask import render_template, abort, request, url_for, redirect
 from flask.ext.report.report import Report
 from flask.ext.report.data_set import DataSet
+from flask.ext.report.notification import Notification
 from flask.ext.report.utils import get_column_operated
+from flask.ext.mail import Mail, Message
 
 
 class FlaskReport(object):
-    def __init__(self, db, model_map, app, blueprint=None, extra_params=None, table_label_map=None):
+    def __init__(self, db, model_map, app, blueprint=None, extra_params=None, table_label_map=None, mail=None):
         self.db = db
         self.app = app
         host = blueprint or app
         self.conf_dir = app.config.get("REPORT_DIR", "report_conf")
         self.report_dir = os.path.join(self.conf_dir, "reports")
+        self.notification_dir = os.path.join(self.conf_dir, "notifications")
         self.data_set_dir = os.path.join(self.conf_dir, "data_sets")
         self.model_map = model_map # model name -> model
         self.table_label_map = table_label_map or {}
@@ -38,6 +43,12 @@ class FlaskReport(object):
 
         host.route("/data-sets/")(self.data_set_list)
         host.route("/data-set/<int:id_>")(self.data_set)
+        host.route("/notification-list")(self.notification_list)
+        host.route("/notification/<int:id_>", methods=['GET', 'POST'])(self.notification)
+        host.route("/push_notification/<int:id_>", methods=['POST'])(self.push_notification)
+        host.route("/start_notification/<int:id_>", methods=['GET'])(self.start_notification)
+        host.route("/stop_notification/<int:id_>", methods=['GET'])(self.stop_notification)
+
 
         from flask import Blueprint
         # register it for using the templates of data browser
@@ -64,6 +75,10 @@ class FlaskReport(object):
                         s += ","
             s += "}"
             return s
+
+        self.mail = mail or Mail(self.app)
+        self.sched = Scheduler()
+        self.sched.start()
 
     def try_view_report(self):
         pass
@@ -149,7 +164,7 @@ class FlaskReport(object):
             report = Report(self, id_)
             from flask.ext.report.utils import query_to_sql
 
-            html_report = report.html_template.render(data=report.data, columns=report.columns, report=report)
+            html_report = report.html_template.render(report=report)
             from pygments import highlight
             from pygments.lexers import PythonLexer, SqlLexer
             from pygments.formatters import HtmlFormatter
@@ -302,3 +317,54 @@ class FlaskReport(object):
                                                                     key=col.key, 
                                                                     model_name=model_name, 
                                                                     report=report)
+
+    def notification_list(self):
+        return ""
+
+    def notification(self, id_):
+        return ""
+
+    def push_notification(self, id_):
+        to = request.args.get('to')
+        notification = Notification(self, id_)
+        if not to:
+            senders = notification.senders
+        else:
+            senders = [to]
+
+        for sender in senders:
+            if sender not in notification.senders in senders:
+                return _('notification %(id_)s are not allowed to send to %(to)s', id_=id_, to=sender), 403
+        html = notification.template.render(notification=notification)
+        msg = Message(subject=notification.subject, 
+                      html=html,
+                      sender="lite_mms@163.com",
+                      recipients=senders)
+        self.mail.send(msg)
+        return 'ok'
+
+    def start_notification(self, id_):
+        notification = Notification(self, id_)
+        def _closure(environ):
+            def _push_notification():
+                with self.app.request_context(environ):
+                    self.push_notification(id_)
+            return _push_notification
+        job = self.sched.add_cron_job(_closure(request.environ), name='flask_report_notification' + str(id_), **notification.crontab.__dict__)
+        notification.enabled = True
+        notification.dump()
+        return 'ok'
+   
+    def stop_notification(self, id_):
+        jobs = self.sched.get_jobs()
+        for job in jobs:
+            if job.name == 'flask_report_notification' + str(id_):
+                notification = Notification(self, id_)
+                notification.enabled = False
+                notification.dump()
+                self.sched.unschedule_job(job)
+            return 'ok'
+        else:
+            return 'unknown notifiaction:' + str(id_), 404
+        
+        

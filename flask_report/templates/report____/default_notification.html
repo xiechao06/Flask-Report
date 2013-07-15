@@ -1,0 +1,92 @@
+<html>
+  <head>
+    <style type="text/css">
+      /* thanks YAHOO pure css!!!*/
+      .pure-table {
+        border: 1px solid #cbcbcb;
+        border-collapse: collapse;
+        border-spacing: 0;
+        empty-cells: show;
+      }
+
+      .pure-table caption {
+        padding: 1em 0;
+        text-align: center;
+        font: italic 85%/1 arial,sans-serif;
+        color: #000;
+      }
+
+      .pure-table td,
+      .pure-table th {
+        margin: 0;
+        padding: 6px 12px;
+        border-left: 1px solid #cbcbcb;
+        border-width: 0 0 0 1px;
+        overflow: visible;
+        font-size: inherit;
+      }
+
+      .pure-table td:first-child,
+      .pure-table th:first-child {
+        border-left-width: 0;
+      }
+
+      .pure-table thead {
+        text-align: left;
+        white-space: nowrap;
+        vertical-align: bottom;
+        color: #000;
+        background: #e0e0e0;
+      }
+
+      .pure-table td {
+        background-color: transparent;
+      }
+
+      .pure-table-odd td {
+        background-color: #f2f2f2;
+      }
+
+
+      .pure-table-bordered td {
+        border-bottom: 1px solid #cbcbcb;
+      }
+
+      .pure-table-bordered tbody>tr:last-child td,
+      .pure-table-horizontal tbody>tr:last-child td {
+        border-bottom-width: 0;
+      }
+
+    </style>
+    <head>
+      <body>
+        {% for report in notification.reports %}
+        <h1>{{ report.name }}</h1>
+        <table class='pure-table pure-table-bordered'>
+          <thead>
+            <tr>
+              {% for c in report.columns %}
+              <th>{{c.name}}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for r in report.data %} 
+            <tr>
+              {% for c in report.columns %}
+              <td>
+                {% if r[c.idx] is none %}
+                -- 
+                {% else %}
+                {{ r[c.idx] }}
+                {% endif %}
+              </td>
+              {% endfor %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% endfor %}
+      </body>
+    </html>
