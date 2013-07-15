@@ -156,7 +156,6 @@ class FlaskReport(object):
         if id_ is not None:
             report = Report(self, id_)
             from flask.ext.report.utils import query_to_sql
-
             html_report = report.html_template.render(report=report)
             from pygments import highlight
             from pygments.lexers import PythonLexer, SqlLexer
