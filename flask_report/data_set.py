@@ -63,8 +63,6 @@ class DataSet(object):
             elif op_ == "having":
                 method_ = query.having
 
-            if hasattr(column, "property") and hasattr(column.property, "direction"):
-                column = column.property.local_remote_pairs[1][0]
             query = method_(get_operator(filter_["op"])(column, filter_["val"]))
         return query
 
