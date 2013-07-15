@@ -80,13 +80,8 @@
         });
       {% endif %}
 
-
-      $("[name=remove-tr]").live("click", function () {
-        $(this).closest("tr").remove();
-      });
-
-      $("#search").click(function () {
-        var form = $(this).parents("form");
+      function getFilters() {
+        var form = $("#filter-form");
         if (form.get(0).checkValidity()) {
           var filters = [];
           $.each(form.find("tr[name='filter']"), function (idx, tr) {
@@ -99,11 +94,22 @@
             }
             filters.push({"col": input.attr("data-col"), "op": $($(tr).find("select")).val(), "val": input.val()});
           });
-          form.find("input[type=hidden][name=filters]").val(JSON.stringify(filters));
-          form.submit();
+          $("textarea[name=filters]").text(JSON.stringify(filters)).autosize();
         }
+      }
+
+      $("[name=remove-tr]").live("click", function () {
+        $(this).closest("tr").remove();
       });
-      $("textarea").autosize();
+
+      $("#saveModal").on("show", function(){
+        getFilters();
+      });
+      $("#temp-save").click(function(){
+        getFilters();
+        $("input[name=report]").val(0);
+        $("#save-form").submit();
+      });
     })
   </script>
 {% endblock %}
@@ -115,7 +121,7 @@
         {{ data_set.name }}
       </h1>
     </div>
-    <form action="{{ url_for(".data_set", id_=data_set.id_) }}" method="GET">
+    <form action="{{ url_for(".data_set", id_=data_set.id_) }}" method="GET" id="filter-form">
       <fieldset>
         <legend>{{ _("filters") }}</legend>
         <table id="clause">
@@ -134,34 +140,12 @@
           </tbody>
         </table>
       </fieldset>
-      <input type="hidden" name="filters"/>
-      <div class="control-group">
-        <div class="controls">
-          <button class="btn btn-primary" id="search"><i class="icon-search"></i>&nbsp;{{ _("Search") }}</button>
-        </div>
-      </div>
     </form>
-
-    <legend>{{ _("RESULT") }}</legend>
-    {% if filters_yaml %}
-      <div>
-        <h4>{{ _("Filters") }}</h4>
-        <code>
-          filters: {{ filters_yaml }}
-        </code>
-      </div>
-    {% endif %}
-    {% if SQL %}
-      <div>
-        <h4>{{ _("SQL") }}</h4>
-        {{ SQL|safe }}
-      </div>
-    {% endif %}
 
     <div class="pagination-centered span12">
       <a href="{{ url_for('.data_set_list') }}" class="btn btn-primary btn-large">{{ _('BACK') }}</a>
       <button type="button" data-toggle="modal" data-target="#saveModal" class="btn btn-primary btn-large">{{ _("SAVE") }}</button>
-      <a href="{{ url_for('.report', id_=0, url=request.url) }}" class="btn btn-primary btn-large">{{ _('VIEW RESULTS') }}</a>
+      <button class="btn btn-primary btn-large" id="temp-save">{{ _('VIEW RESULTS') }}</button>
     </div>
   </div>
   <div class="modal hide fade" id="saveModal" tabindex="-1">
@@ -169,7 +153,7 @@
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
       <h3>保存</h3>
     </div>
-    <form action="{{ url_for(".report") }}" method="POST">
+    <form action="{{ url_for(".report") }}" method="POST" id="save-form">
       <div class="modal-body ">
         <fieldset class="form-horizontal">
           <div class="control-group">
@@ -197,7 +181,7 @@
             <label class="control-label">{{ _("Report filters") }}</label>
 
             <div class="controls">
-              <textarea name="filters" readonly>{{ filters_yaml }}</textarea>
+              <textarea name="filters" readonly></textarea>
             </div>
           </div>
           <div class="control-group">
@@ -213,6 +197,7 @@
           </div>
           <input type="hidden" name="url" value="{{ request.url }}"/>
           <input type="hidden" name="data_set_id" value="{{ data_set.id_ }}"/>
+          <input type="hidden" name="report" value=""/>
         </fieldset>
       </div>
       <div class="modal-footer">

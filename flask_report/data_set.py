@@ -130,16 +130,3 @@ class DataSet(object):
                     pass
                 all.append(filter_)
         return all
-
-    def parse_filters(self, filters):
-        result = {}
-        for current in filters:
-            if current["col"] not in result:
-                result[current["col"]] = {'operator': current["op"], 'value': current["val"]}
-            else:
-                val = result[current["col"]]
-                if not isinstance(val, list):
-                    val = [val]
-                val.append({'operator': current["op"], 'value': current["val"]})
-                result[current["col"]] = val
-        return result

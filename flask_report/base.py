@@ -91,31 +91,8 @@ class FlaskReport(object):
     def data_set(self, id_):
         self.try_edit_data_set()
         data_set = DataSet(self, id_)
-        query = None
-        current_filters = []
-        filters_yaml = None
-        if request.args.get("filters"):
-            filters_data = json.loads(request.args["filters"])
-            current_filters = data_set.get_current_filters(filters_data)
-            filters_yaml = data_set.parse_filters(current_filters)
-            query = data_set.get_query(current_filters)
-            temp_dir = os.path.join(self.report_dir, "0")
-            if not os.path.exists(temp_dir):
-                os.mkdir(temp_dir)
-            dict_ = dict(columns=[c["idx"] for c in data_set.columns], data_set_id=data_set.id_)
-            if filters_yaml:
-                dict_["filters"] = filters_yaml
-            self._write(temp_dir, **dict_)
 
-        from flask.ext.report.utils import query_to_sql
-        from pygments import highlight
-        from pygments.lexers import SqlLexer
-        from pygments.formatters import HtmlFormatter
-        SQL_html = highlight(query_to_sql(query), SqlLexer(), HtmlFormatter()) if query else ""
-        from flask.ext.report.utils import dump_to_yaml
-
-        params = dict(data_set=data_set, SQL=SQL_html, current_filters=current_filters,
-                      filters_yaml=dump_to_yaml(filters_yaml))
+        params = dict(data_set=data_set)
         extra_params = self.extra_params.get('data_set')
         if extra_params:
             if isinstance(extra_params, types.FunctionType):
@@ -161,24 +138,35 @@ class FlaskReport(object):
                 params.update(extra_params)
             return render_template("report____/report.html", **params)
         else:
-            id_ = max([int(dir_name) for dir_name in os.listdir(self.report_dir) if
-                       dir_name.isdigit() and dir_name != '0']) + 1
+            if request.form.get("report") == "0":
+                id_ = 0
+            else:
+                id_ = max([int(dir_name) for dir_name in os.listdir(self.report_dir) if
+                           dir_name.isdigit() and dir_name != '0']) + 1
             new_dir = os.path.join(self.report_dir, str(id_))
             if not os.path.exists(new_dir):
                 os.mkdir(new_dir)
 
-
-            temp_report = Report(self, 0)
             dict_ = dict(request.form.items())
             url = dict_.pop("url")
             dict_["columns"] = request.form.getlist("columns", type=int)
-            if temp_report.filters:
-                dict_["filters"] = temp_report.filters
-            else:
-                import yaml
-                dict_["filters"] = yaml.load(dict_["filters"])
-            self._write(new_dir, **dict_)
+            filters_data = json.loads(request.form["filters"])
 
+            def parse_filters(filters):
+                result = {}
+                for current in filters:
+                    if current["col"] not in result:
+                        result[current["col"]] = {'operator': current["op"], 'value': current["val"]}
+                    else:
+                        val = result[current["col"]]
+                        if not isinstance(val, list):
+                            val = [val]
+                        val.append({'operator': current["op"], 'value': current["val"]})
+                        result[current["col"]] = val
+                return result
+
+            dict_["filters"] = parse_filters(filters_data)
+            self._write(new_dir, **dict_)
             return redirect(url_for(".report", id_=id_, _method="GET", url=url))
 
     def _write(self, to_dir, **kwargs):
