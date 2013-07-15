@@ -1,0 +1,26 @@
+{% extends "report____/base_layout.html" %}
+
+{% block report____title_block %}
+  {{ _('Notifications') }}
+{% endblock %}
+
+{% block body %}
+  <div>
+    <h1>
+      {{ _('Notifications') }}
+    </h1>
+    <hr/>
+    <div>
+      <ul>
+        {% for notification in notification_list %}
+          <li>
+            <a class="lead" href="{{ url_for('.notification', id_=notification.id_) }}">{{ notification.name }}</a>
+            <a href="#" data-toggle='popover' data-html='true' data-content='{{ notification.description }}'><i class="icon-question-sign"></i></a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <a class="btn btn-primary" href="{{ url_for(".notification", url=request.url) }}">{{ _("Add New Notification") }}</a>
+  </div>
+{% endblock %}
+

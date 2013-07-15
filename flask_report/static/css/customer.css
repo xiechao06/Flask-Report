@@ -1,8 +1,8 @@
-td.and{
+td.and {
     white-space: nowrap;
 }
 
-td label{
+td label {
     display: inline;
 }
 
@@ -11,6 +11,11 @@ form {
 }
 
 code {
-    white-space:normal;
-    word-wrap:break-word
+    white-space: normal;
+    word-wrap: break-word
+}
+
+.controls .senders:not(:last-of-type) {
+    display: block !important;
+    margin-bottom: 5px !important;
 }

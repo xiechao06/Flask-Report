@@ -1,0 +1,96 @@
+{% extends "report____/base_layout.html" %}
+{% block report____customized_head_block %}
+  {{ super() }}
+  <link rel="stylesheet" type="text/css" href="{{ url_for('report____.static', filename='css/customer.css') }}">
+
+  <script type="text/javascript">
+    $(function () {
+      $("#add-sender").click(function () {
+        if ($(this).prev().val() != "") {
+          $(this).before('<input type="email" name="sender"   class="senders"/>');
+        } else {
+          return false;
+        }
+      });
+    })
+  </script>
+{% endblock %}
+
+{% block body %}
+  <form action="{{ url_for(".notification") }}" method="POST" class="form-horizontal">
+    <legend>{{ _("Detail") }}</legend>
+    <fieldset>
+      <div class="control-group">
+        <label class="control-label" for="name">{{ _("Name") }}</label>
+
+        <div class="controls">
+          <input type="text" name="name" id="name" required="required" {% if notification %}value="{{ notification.name }}"{% endif %}/>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="sender">{{ _("Senders") }}</label>
+
+        <div class="controls">
+          {% if notification %}
+            {% for sender in notification.senders %}
+              <input type="email" name="sender" {% if loop.first %}id="sender"{% endif %} value="{{ sender }}" class="senders"/>
+            {% endfor %}
+          {% else %}
+            <input type="email" name="sender" id="sender" class="senders"/>
+          {% endif %}
+          <button class="btn btn-primary" type="button" id="add-sender"><i class="icon-plus"></i></button>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="report_ids">{{ _("reports") }}</label>
+
+        <div class="controls">
+          <select name="report_ids" id="report_ids" multiple>
+            {% for report in report_list %}
+              <option value="{{ report.id }}">{{ report.name }}</option>
+            {% endfor %}
+
+          </select>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for=""></label>
+
+        <div class="controls">
+          <input type="text" name="" id=""/></div>
+      </div>
+      <div class="control-group"><label class="control-label" for=""></label>
+
+        <div class="controls"><input type="text" name="" id=""/></div>
+      </div>
+      <div class="control-group"><label class="control-label" for=""></label>
+
+        <div class="controls"><input type="text" name="" id=""/></div>
+      </div>
+      <div class="control-group"><label class="control-label" for=""></label>
+
+        <div class="controls"><input type="text" name="" id=""/></div>
+      </div>
+      <div class="control-group"><label class="control-label" for=""></label>
+
+        <div class="controls"><input type="text" name="" id=""/></div>
+      </div>
+      <div class="control-group"><label class="control-label" for=""></label>
+
+        <div class="controls"><input type="text" name="" id=""/></div>
+      </div>
+      <div class="control-group"><label class="control-label" for=""></label>
+
+        <div class="controls"><input type="text" name="" id=""/></div>
+      </div>
+      <div class="control-group"><label class="control-label" for=""></label>
+
+        <div class="controls"><input type="text" name="" id=""/></div>
+      </div>
+    </fieldset>
+    <div class="form-actions">
+      <a href="{{ request.args.get("url", url_for(".notification_list")) }}" class="btn">{{ _("BACK") }}</a>
+      <button class="btn btn-primary">{{ _("SAVE") }}</button>
+    </div>
+  </form>
+{% endblock %}

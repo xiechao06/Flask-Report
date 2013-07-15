@@ -6,11 +6,13 @@ import urllib
 
 from apscheduler.scheduler import Scheduler
 from flask import render_template, abort, request, url_for, redirect
+from flask.ext.mail import Mail, Message
+from flask.ext.babel import _
+
 from flask.ext.report.report import Report
 from flask.ext.report.data_set import DataSet
 from flask.ext.report.notification import Notification
 from flask.ext.report.utils import get_column_operated
-from flask.ext.mail import Mail, Message
 
 
 class FlaskReport(object):
@@ -44,6 +46,7 @@ class FlaskReport(object):
         host.route("/data-sets/")(self.data_set_list)
         host.route("/data-set/<int:id_>")(self.data_set)
         host.route("/notification-list")(self.notification_list)
+        host.route("/notification/", methods=['GET', 'POST'])(self.notification)
         host.route("/notification/<int:id_>", methods=['GET', 'POST'])(self.notification)
         host.route("/push_notification/<int:id_>", methods=['POST'])(self.push_notification)
         host.route("/start_notification/<int:id_>", methods=['GET'])(self.start_notification)
@@ -138,11 +141,14 @@ class FlaskReport(object):
             params.update(extra_params)
         return render_template("report____/data-set.html", **params)
 
+    def _get_report_list(self):
+        return [Report(self, int(dir_name)) for dir_name in os.listdir(self.report_dir) if
+                dir_name.isdigit() and dir_name != '0']
+
     def report_list(self):
         self.try_view_report()
         # directory 0 is reserved for special purpose
-        reports = [Report(self, int(dir_name)) for dir_name in os.listdir(self.report_dir) if
-                   dir_name.isdigit() and dir_name != '0']
+        reports = self._get_report_list()
         params = dict(reports=reports)
         extra_params = self.extra_params.get('report_list')
         if extra_params:
@@ -200,7 +206,6 @@ class FlaskReport(object):
 
         kwargs.setdefault("name", "temp")
         kwargs.setdefault("description", "temp")
-        kwargs.setdefault("data_set_id", 0)
         import datetime
 
         kwargs["create_time"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -311,10 +316,31 @@ class FlaskReport(object):
                                                                     report=report)
 
     def notification_list(self):
-        return ""
+        notifications = [Notification(self, int(dir_name)) for dir_name in os.listdir(self.notification_dir) if
+                         dir_name.isdigit() and dir_name != '0']
+        params = dict(notification_list=notifications)
+        extra_params = self.extra_params.get("notifition_list")
+        if extra_params:
+            if isinstance(extra_params, types.FunctionType):
+                extra_params = extra_params()
+            params.update(extra_params)
+        return render_template("report____/notification-list.html", **params)
 
-    def notification(self, id_):
-        return ""
+    def notification(self, id_=None):
+        if id_ is not None:
+            notification = Notification(self, id_)
+            return render_template("report____/notification.html", notification=notification)
+        else:
+            if request.method == "POST":
+                id_ = max([int(dir_name) for dir_name in os.listdir(self.notification_dir) if
+                           dir_name.isdigit() and dir_name != '0']) + 1
+                new_dir = os.path.join(self.notification_dir, str(id_))
+                if not os.path.exists(new_dir):
+                    os.mkdir(new_dir)
+                self._write(new_dir, enabled=False, creator="temp")
+                return redirect(url_for(".notification", id_=id_))
+            else:
+                return render_template("report____/notification.html", report_list=self._get_report_list())
 
     def push_notification(self, id_):
         to = request.args.get('to')
