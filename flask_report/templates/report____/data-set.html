@@ -7,11 +7,15 @@
 {% block report____customized_head_block %}
   <link rel="stylesheet" type="text/css" href="{{ url_for('report____.static', filename='datatables/css/jquery.dataTables.css') }}">
   <link rel="stylesheet" href="{{ url_for('report____.static', filename='css/customer.css') }}"/>
+  <link rel="stylesheet" href="{{ url_for('report____.static', filename='select2-3.4.1/select2.css') }}"/>
   <script type="text/javascript" charset="utf8" src="{{ url_for('report____.static', filename='datatables/js/jquery.dataTables.min.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('report____.static', filename='js/DT_bootstrap.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('report____.static', filename='js/jquery.autosize-min.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('report____.static', filename='select2-3.4.1/select2.min.js') }}"></script>
+  <script type="text/javascript" charset="utf8" src="{{ url_for('report____.static', filename='js/sprintf-0.6.js') }}"></script>
   <script type="text/javascript">
     $(function(){
+        $('select').select2();
     jQuery.fn.addFilter = function (col, text, available_opts, type, avalialed_values, op, value) {
         var tr = $("<tr name='filter'></tr>");
         var td1 = $("<td></td>").html($("<button type='button' class='btn' name='remove-tr'></button>").html($("<i class='icon-remove icon-large'></i>")));
@@ -74,19 +78,15 @@
       });
 
 
+
       {% if current_filters %}
         $.each({{ current_filters|tojson|safe }}, function (idx, filter) {
           $("#clause").addFilter(filter.col, filter.name, filter.ops, filter.type, filter.opts, filter.op, filter.val);
         });
       {% endif %}
 
-
-      $("[name=remove-tr]").live("click", function () {
-        $(this).closest("tr").remove();
-      });
-
-      $("#search").click(function () {
-        var form = $(this).parents("form");
+      function getFilters() {
+        var form = $("#main-form");
         if (form.get(0).checkValidity()) {
           var filters = [];
           $.each(form.find("tr[name='filter']"), function (idx, tr) {
@@ -99,126 +99,157 @@
             }
             filters.push({"col": input.attr("data-col"), "op": $($(tr).find("select")).val(), "val": input.val()});
           });
-          form.find("input[type=hidden][name=filters]").val(JSON.stringify(filters));
-          form.submit();
+          $("input[name=filters]").attr('value', JSON.stringify(filters));
         }
+      }
+
+      $("[name=remove-tr]").live("click", function () {
+        $(this).closest("tr").remove();
       });
-      $("textarea").autosize();
+
+      $("#saveModal").on("show", function(){
+        getFilters();
+      });
+      $("#temp-save").click(function(){
+        getFilters();
+        $("input[name=report]").val(0);
+        $("#save-form").submit();
+        });
+
+      $('button[data-role="save-report-btn"]').click(function () {
+          var form = $("#main-form");
+          if (form.get(0).checkValidity()) {
+            getFilters();
+            $.post('{{ url_for(".new_report") }}', data=$('#main-form').serialize(), function (data) {
+              if (confirm(sprintf('{{ _("report [%%s] has been created, go to see the report?") }}', data['name']))) {
+                window.open(data['url'], '_blank');
+              };
+              $('#saveModal').modal('hide');
+              }).fail(function (data) {
+              alert('{{ _("failed to create new report, reaon is: ") }}' + data.responseText);   
+            });
+            return false;
+          }
+          }); 
+      $('button[data-role="preview-btn"]').click(function () {
+          var form = $("#main-form");
+          if (form.get(0).checkValidity()) {
+            getFilters();
+            $.post('{{ url_for(".new_report", preview=True) }}', data=$('#main-form').serialize(), function (data) {
+              window.open('{{url_for(".report", id_=0, preview=true)}}', '_blank');
+              $('#saveModal').modal('hide');
+              }).fail(function (data) {
+              alert('{{ _("failed to generate report preview, reaon is: ") }}' + data.responseText);   
+            });
+            return false;
+          }
+        }); 
+      $('button[data-role="new-filter"]').attr('data-content', $('div[data-role="filters-popover-content"]').html()).attr('data-html', true).popover('hide');
+      $('button[data-role="new-filter"]').click(function () {
+        return false;
+          });
+      $('[data-role="filters-selector"] a').live('click', function () {
+          var e = $(this);
+          $("#clause").addFilter(e.attr('data-value'), e.text(), $.parseJSON(e.attr("data-ops")), e.attr("data-type"), $.parseJSON(e.attr("data-opts")));
+          $('button[data-role="new-filter"]').popover('hide');
+        });
     })
   </script>
 {% endblock %}
 
 {% block body %}
-  <div>
+  <div class='container'>
     <div class="alert alert-info">
       <h1>
-        {{ data_set.name }}
+      <span>
+        {{data_set.name}}
+        <small>
+          <a href="#" data-toggle="collapse" data-target="#detail" class='muted'>{{ _('show detail') }} >></a>
+        </small>
+      </span>
       </h1>
+      <div id="detail" class="collapse">
+        <p>
+        <small>
+          {{ _('created by "%(creator)s" at %(create_time)s',
+          creator=data_set.creator, create_time=data_set.create_time)}}
+        </small>
+        </p>
+        {% if SQL%}
+        <small>
+          <div>{{ _("SQL statement") }}: </div>
+          <p>
+          {{ SQL|safe }}
+          </p>
+        </small>
+        {% endif %}
+      </div>
     </div>
-    <form action="{{ url_for(".data_set", id_=data_set.id_) }}" method="GET">
+    <form action="#" method="POST" id="main-form">
+      <fieldset class='form-horizontal'>
+        <legend>{{ _('basic information') }}</legend>
+        <div class="control-group">
+          <label for="report_name" class="control-label">{{ _("Report name") }} <span class='text-error'>*</span></label>
+          <div class="controls">
+            <input type="text" name="name" required="required" id="report_name"/>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="report_creator">{{ _("Report creator") }}</label>
+
+          <div class="controls">
+            <input type="text" name="creator" id="report_creator"/>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="report_desc">{{ _("Report desc") }}</label>
+
+          <div class="controls">
+            <textarea name="description" id="report_desc"></textarea>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="report_columns">{{ _("columns") }}</label>
+
+          <div class="controls">
+            <select name="columns" id="report_columns" multiple required style="width: 50%">
+              {% for c in data_set.columns %}
+              <option value="{{ c.idx }}" selected>{{ c.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <input type="hidden" name="url" value="{{ request.url }}"/>
+        <input type="hidden" name="data_set_id" value="{{ data_set.id_ }}"/>
+        <input type="hidden" name="filters" />
+      </fieldset>
       <fieldset>
-        <legend>{{ _("filters") }}</legend>
+        <legend>{{ _("filters") }}
+          <button data-toggle="popover" data-role='new-filter'>
+            <i class="icon-plus text-info"></i>
+          </button>
+        </legend>
         <table id="clause">
           <tbody>
-          <tr>
-            <td colspan="2">
-              <label for="add_filter">新增</label>
-              <select id="add_filter">
-                <option></option>
-                {% for filter in data_set.filters %}
-                  <option value="{{ filter.col }}" data-type="{{ filter.type }}" data-ops='{{ filter.ops|tojson|safe }}' {% if filter.opts %} data-opts='{{ filter.opts|tojson|safe }}' {% endif %}>{{ filter.name }}</option>
-                {% endfor %}
-              </select>
-            </td>
-          </tr>
+            <div class="control-group">
+            </div>
           </tbody>
         </table>
       </fieldset>
-      <input type="hidden" name="filters"/>
-      <div class="control-group">
-        <div class="controls">
-          <button class="btn btn-primary" id="search"><i class="icon-search"></i>&nbsp;{{ _("Search") }}</button>
-        </div>
+      <div class="pagination-centered">
+        <a href="{{ url_for('.data_set_list') }}" class="btn btn-primary btn-large">{{ _('BACK') }}</a>
+        <button class="btn btn-primary btn-large" data-role='save-report-btn'>{{ _("Save as Report") }}</button>
+        <button data-role='preview-btn' class="btn btn-primary btn-large">{{ _('Preview') }}</button>
       </div>
     </form>
 
-    <legend>{{ _("RESULT") }}</legend>
-    {% if filters_yaml %}
-      <div>
-        <h4>{{ _("Filters") }}</h4>
-        <code>
-          filters: {{ filters_yaml }}
-        </code>
-      </div>
-    {% endif %}
-    {% if SQL %}
-      <div>
-        <h4>{{ _("SQL") }}</h4>
-        {{ SQL|safe }}
-      </div>
-    {% endif %}
-
-    <div class="pagination-centered span12">
-      <a href="{{ url_for('.data_set_list') }}" class="btn btn-primary btn-large">{{ _('BACK') }}</a>
-      <button type="button" data-toggle="modal" data-target="#saveModal" class="btn btn-primary btn-large">{{ _("SAVE") }}</button>
-      <a href="{{ url_for('.report', id_=0, url=request.url) }}" class="btn btn-primary btn-large">{{ _('VIEW RESULTS') }}</a>
-    </div>
   </div>
-  <div class="modal hide fade" id="saveModal" tabindex="-1">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-      <h3>保存</h3>
-    </div>
-    <form action="{{ url_for(".report") }}" method="POST">
-      <div class="modal-body ">
-        <fieldset class="form-horizontal">
-          <div class="control-group">
-            <label for="report_name" class="control-label">{{ _("Report name") }}</label>
 
-            <div class="controls">
-              <input type="text" name="name" required="required" id="report_name"/>
-            </div>
-          </div>
-          <div class="control-group">
-            <label class="control-label" for="report_creator">{{ _("Report creator") }}</label>
-
-            <div class="controls">
-              <input type="text" name="creator" id="report_creator"/>
-            </div>
-          </div>
-          <div class="control-group">
-            <label class="control-label" for="report_desc">{{ _("Report desc") }}</label>
-
-            <div class="controls">
-              <textarea name="description" id="report_desc"></textarea>
-            </div>
-          </div>
-          <div class="control-group">
-            <label class="control-label">{{ _("Report filters") }}</label>
-
-            <div class="controls">
-              <textarea name="filters" readonly>{{ filters_yaml }}</textarea>
-            </div>
-          </div>
-          <div class="control-group">
-            <label class="control-label" for="report_columns">{{ _("columns") }}</label>
-
-            <div class="controls">
-              <select name="columns" id="report_columns" multiple>
-                {% for c in data_set.columns %}
-                  <option value="{{ c.idx }}" selected>{{ c.name }}</option>
-                {% endfor %}
-              </select>
-            </div>
-          </div>
-          <input type="hidden" name="url" value="{{ request.url }}"/>
-          <input type="hidden" name="data_set_id" value="{{ data_set.id_ }}"/>
-        </fieldset>
-      </div>
-      <div class="modal-footer">
-        <a href="#" class="btn" data-dismiss="modal">Close</a>
-        <button class="btn btn-primary">{{ _("SAVE REPORT") }}</button>
-      </div>
-    </form>
+  <div data-role='filters-popover-content' class='hide'>
+    <ul class='nav nav-pills nav-stacked' data-role='filters-selector'>
+      {% for filter in data_set.filters %}
+      <li><a data-value="{{ filter.col }}" data-type="{{ filter.type }}" data-ops='{{ filter.ops|tojson|safe }}' {% if filter.opts %} data-opts='{{ filter.opts|tojson|safe }}' {% endif %}>{{ filter.name }}</a></li>
+      {% endfor %}
+    </ul>
   </div>
 {% endblock %}
