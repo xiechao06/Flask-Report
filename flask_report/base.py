@@ -90,28 +90,21 @@ class FlaskReport(object):
 
     def data_set(self, id_):
         self.try_edit_data_set()
-        order_by_yaml = None
         data_set = DataSet(self, id_)
         query = None
         current_filters = []
-        current_order_by = None
         filters_yaml = None
         if request.args.get("filters"):
             filters_data = json.loads(request.args["filters"])
             current_filters = data_set.get_current_filters(filters_data)
-            order_bys_data = request.args.get("order_bys")
-            current_order_by = data_set.get_current_order_by(order_bys_data)
             filters_yaml = data_set.parse_filters(current_filters)
-            order_by_yaml = data_set.parse_order_bys(order_bys_data)
-            query = data_set.get_query(current_filters, current_order_by)
+            query = data_set.get_query(current_filters)
             temp_dir = os.path.join(self.report_dir, "0")
             if not os.path.exists(temp_dir):
                 os.mkdir(temp_dir)
             dict_ = dict(columns=[c["idx"] for c in data_set.columns], data_set_id=data_set.id_)
             if filters_yaml:
                 dict_["filters"] = filters_yaml
-            if order_by_yaml:
-                dict_["order_by"] = order_by_yaml
             self._write(temp_dir, **dict_)
 
         from flask.ext.report.utils import query_to_sql
@@ -120,9 +113,9 @@ class FlaskReport(object):
         from pygments.formatters import HtmlFormatter
         SQL_html = highlight(query_to_sql(query), SqlLexer(), HtmlFormatter()) if query else ""
         from flask.ext.report.utils import dump_to_yaml
+
         params = dict(data_set=data_set, SQL=SQL_html, current_filters=current_filters,
-                      current_order_by=current_order_by, filters_yaml=dump_to_yaml(filters_yaml),
-                      order_by_yaml=order_by_yaml)
+                      filters_yaml=dump_to_yaml(filters_yaml))
         extra_params = self.extra_params.get('data_set')
         if extra_params:
             if isinstance(extra_params, types.FunctionType):

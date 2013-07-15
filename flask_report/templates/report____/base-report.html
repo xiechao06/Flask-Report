@@ -133,12 +133,6 @@
     data_set_description=report.data_set.description or "",
     url=url_for(".data_set", id_=report.data_set.id_),
     data_set=report.data_set.name) }}
-    {% if report.order_by %}
-      {{ _('order by "%(order_by)s" %(order)s',
-        order_by=report.order_by.name, 
-        order=_('descendingly') if report.order_by.descend else _('ascendingly'))
-      }}
-    {% endif %}; 
     {{ _('filter conditions are: ') }}
   </small></p>
   <ul>

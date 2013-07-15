@@ -25,7 +25,6 @@ class DataSet(object):
         self.__special_chars = {"gt": operator.gt, "lt": operator.lt, "ge": operator.ge, "le": operator.le,
                                 "eq": operator.eq, "ne": operator.ne}
         self._filters = data_set_meta.get("filters", {})
-        self._order_bys = data_set_meta.get("order_bys", [])
 
     @cached_property
     def query(self):
@@ -49,13 +48,13 @@ class DataSet(object):
 
         return tuple(_make_dict(idx, c) for idx, c in enumerate(self.query.column_descriptions))
 
-    def get_query(self, filters, order_by=None):
+    def get_query(self, filters):
 
         def get_operator(op):
             return self.__special_chars[op]
 
         query = self.query
-        from flask.ext.report.utils import get_column_operator, get_column_operated
+        from flask.ext.report.utils import get_column_operator
 
         for filter_ in filters:
             column, op_ = get_column_operator(filter_["col"], self.columns, self.report_view)
@@ -64,18 +63,9 @@ class DataSet(object):
             elif op_ == "having":
                 method_ = query.having
 
-            if hasattr(column, "property") and hasattr(column.property,
-                                                      "direction"):
+            if hasattr(column, "property") and hasattr(column.property, "direction"):
                 column = column.property.local_remote_pairs[1][0]
             query = method_(get_operator(filter_["op"])(column, filter_["val"]))
-        if order_by:
-            all_columns = dict((c['name'], c) for c in self.columns)
-            o = all_columns.get(order_by[0], None)
-            if o:
-                o = o['expr']
-                if order_by[1] == "desc":
-                    o = sqlalchemy.desc(o)
-                query = query.order_by(o)
         return query
 
     @property
@@ -124,10 +114,6 @@ class DataSet(object):
             filters.append(result)
         return filters
 
-    @property
-    def order_bys(self):
-        return self._order_bys
-
     def get_current_filters(self, currents):
         def _match(to_matcher):
             result = to_matcher.copy()
@@ -159,21 +145,3 @@ class DataSet(object):
                 val.append({'operator': current["op"], 'value': current["val"]})
                 result[current["col"]] = val
         return result
-
-    def parse_order_bys(self, order_bys_data):
-        if order_bys_data:
-            result = yaml.safe_dump(order_bys_data, allow_unicode=True).decode("utf-8")
-            if result[-5:] == "\n...\n":
-                return result[:-5]
-        else:
-            return None
-
-    def get_current_order_by(self, order_by):
-        if order_by:
-            if order_by[:1] == "-":
-                return order_by[1:], "desc"
-            else:
-                return order_by, "asc"
-        else:
-            return None
-

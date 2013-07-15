@@ -29,16 +29,7 @@ class Report(object):
         self.creator = report_meta.get('creator')
         self.create_time = report_meta.get('create_time')
         self.filters = report_meta.get('filters')
-        self.order_by = report_meta.get('order_by')
         self.description = report_meta.get("description")
-        if self.order_by:
-            if self.order_by.startswith('-'):
-                name = self.order_by[1:]
-                desc_ = True
-            else:
-                name = self.order_by
-                desc_ = False
-            self.order_by = namedtuple("OrderBy", ['name', 'desc'])(name, desc_)
         self.data_set = DataSet(report_view, report_meta['data_set_id'])
         self.__columns = report_meta.get('columns')
         self.__special_chars = {"gt": operator.gt, "lt": operator.lt, "ge": operator.ge, "le": operator.le,
@@ -131,13 +122,6 @@ class Report(object):
         if self.literal_filter_condition is not None:
             q = q.filter(self.literal_filter_condition)
         all_columns = dict((c['name'], c) for c in self.data_set.columns)
-        if self.order_by:
-            order_by = all_columns.get(self.order_by.name, None)
-            if order_by:
-                order_by = order_by['expr']
-                if self.order_by.desc:
-                    order_by = desc(order_by)
-                q = q.order_by(order_by)
         return q
 
     @property

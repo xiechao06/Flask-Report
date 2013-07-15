@@ -65,23 +65,6 @@
         this.find("tbody").append(tr);
       };
 
-      jQuery.fn.addOrderBy = function (text, op){
-        var tr = $("<tr name='order_by'></tr>");
-        var td1 = $("<td></td>").html($("<button type='button' class='btn' name='remove-tr'></button>").html($("<i class='icon-remove icon-large'></i>")));
-        var td2 = $("<td></td>").text(text);
-        var td3 = $("<td></td>");
-        var select = $("<select></select>").attr("required", true);
-        $.each([{"key":"desc", "value": "desc"}, {"key": "asc", "value": "asc"}], function(idx, value){
-          select.append($("<option></option>").val(value.value).text(value.key));
-        });
-        if(op){
-          select.val(op);
-        }
-        td3.append(select);
-
-        tr.append(td1, td2, td3);
-        this.find("tbody").append(tr);
-      };
 
       $("#add_filter").change(function () {
         var e = $($(this).find(":selected"));
@@ -90,15 +73,6 @@
         $(this).val([]);
       });
 
-      $("#add_order_by").change(function(){
-        if ($("tr[name=order_by]").size() > 0){
-          alert('{{ _("only one order by columns supported") }}');
-          return false;
-        }
-        var e = $($(this).find(":selected"));
-        $("#order_by").addOrderBy(e.text());
-        $(this).val([])
-      });
 
       {% if current_filters %}
         $.each({{ current_filters|tojson|safe }}, function (idx, filter) {
@@ -106,9 +80,6 @@
         });
       {% endif %}
 
-      {% if current_order_by %}
-        $("#order_by").addOrderBy("{{ current_order_by[0]|safe }}", "{{ current_order_by[1]|safe }}");
-      {% endif %}
 
       $("[name=remove-tr]").live("click", function () {
         $(this).closest("tr").remove();
@@ -120,19 +91,15 @@
           var filters = [];
           $.each(form.find("tr[name='filter']"), function (idx, tr) {
             var finds = $(tr).find("input");
-            if (finds.length == 0){
+            if (finds.length == 0) {
               finds = $(tr).find("select");
+              var input = $(finds[1]);
+            } else {
+              input = $(finds[0]);
             }
-            var input=$(finds[1]);
             filters.push({"col": input.attr("data-col"), "op": $($(tr).find("select")).val(), "val": input.val()});
           });
-          var tr = form.find("tr[name=order_by]");
-          var order_bys = $($(tr).find("td")[1]).text();
-          if ($($(tr).find("select")).val() == "desc"){
-            order_bys = "-" + order_bys;
-          }
           form.find("input[type=hidden][name=filters]").val(JSON.stringify(filters));
-          form.find("input[type=hidden][name=order_bys]").val(order_bys);
           form.submit();
         }
       });
@@ -167,28 +134,7 @@
           </tbody>
         </table>
       </fieldset>
-      {% if data_set.order_bys %}
-      <fieldset>
-        <legend>{{ _("order by") }}</legend>
-        <table id="order_by">
-          <tbody>
-          <tr>
-            <td colspan="2">
-              <label for="add_order_by">新增</label>
-              <select id="add_order_by">
-                <option></option>
-                {% for order_by in data_set.order_bys %}
-                  <option value="{{ order_by }}">{{ order_by }}</option>
-                {% endfor %}
-              </select>
-            </td>
-          </tr>
-          </tbody>
-        </table>
-      </fieldset>
-      {% endif %}
       <input type="hidden" name="filters"/>
-      <input type="hidden" name="order_bys"/>
       <div class="control-group">
         <div class="controls">
           <button class="btn btn-primary" id="search"><i class="icon-search"></i>&nbsp;{{ _("Search") }}</button>
@@ -202,14 +148,6 @@
         <h4>{{ _("Filters") }}</h4>
         <code>
           filters: {{ filters_yaml }}
-        </code>
-      </div>
-    {% endif %}
-    {% if order_by_yaml %}
-      <div>
-        <h4>{{ _("Orders") }}</h4>
-        <code>
-          order_by: {{ order_by_yaml }}
         </code>
       </div>
     {% endif %}
@@ -260,13 +198,6 @@
 
             <div class="controls">
               <textarea name="filters" readonly>{{ filters_yaml }}</textarea>
-            </div>
-          </div>
-          <div class="control-group">
-            <label class="control-label" for="report_order_by">{{ _("order by") }}</label>
-
-            <div class="controls">
-              <input type="text" name="order_by" id="report_order_by" value="{{ order_by_yaml }}" readonly/>
             </div>
           </div>
           <div class="control-group">
