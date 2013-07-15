@@ -329,7 +329,8 @@ class FlaskReport(object):
     def notification(self, id_=None):
         if id_ is not None:
             notification = Notification(self, id_)
-            return render_template("report____/notification.html", notification=notification)
+            return render_template("report____/notification.html", notification=notification,
+                                   report_list=self._get_report_list())
         else:
             if request.method == "POST":
                 id_ = max([int(dir_name) for dir_name in os.listdir(self.notification_dir) if

@@ -15,7 +15,7 @@ code {
     word-wrap: break-word
 }
 
-.controls .senders:not(:last-of-type) {
-    display: block !important;
-    margin-bottom: 5px !important;
+.control-inline-group{
+    display: block;
+    margin-bottom: 5px;
 }

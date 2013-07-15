@@ -2,22 +2,46 @@
 {% block report____customized_head_block %}
   {{ super() }}
   <link rel="stylesheet" type="text/css" href="{{ url_for('report____.static', filename='css/customer.css') }}">
+  <link type="text/css" href="{{ url_for("report____.static", filename="gentleSelect/jquery-gentleSelect.css") }}" rel="stylesheet"/>
+  <link type="text/css" href="{{ url_for("report____.static", filename="cron/jquery-cron.css") }}" rel="stylesheet"/>
+  <script type="text/javascript" src="{{ url_for("report____.static", filename="gentleSelect/jquery-gentleSelect.js") }}"></script>
+  <script type="text/javascript" src="{{ url_for("report____.static", filename="cron/jquery-cron.js") }}"></script>
 
+  <script type="text/javascript" src="{{ url_for('report____.static', filename='js/jquery.autosize-min.js') }}"></script>
   <script type="text/javascript">
     $(function () {
       $("#add-sender").click(function () {
-        if ($(this).prev().val() != "") {
-          $(this).before('<input type="email" name="sender"   class="senders"/>');
+        input = $(this).prev().children("input");
+        if (input.val() != "") {
+          var input = '<input type="email" placeholder="{{ _("Enter E-mail") }}" name="sender" class="senders"/>';
+          var btn = '<button class="btn-danger btn" type="button" name="remove"><i class="icon-remove"></i></button>';
+          var e = $("<div></div>").addClass("control-inline-group").append(input).append("&nbsp;").append(btn);
+          $(this).before(e);
         } else {
+          input.get(0).focus();
           return false;
         }
       });
+      $("button[name=remove]").click(function () {
+        $(this).closest("div").remove();
+      });
+      $("textarea").autosize();
+      {% if notification %}
+        $("#crontab").cron({init: "{{ notification._crontab}}", onChange: function () {
+          $('#crontab-val').text($(this).cron("value"));
+        }});
+      {% else %}
+        $("#crontab").cron({onChange: function () {
+          $('#crontab-val').text($(this).cron("value"));
+        }});
+      {% endif %}
+
     })
   </script>
 {% endblock %}
 
 {% block body %}
-  <form action="{{ url_for(".notification") }}" method="POST" class="form-horizontal">
+  <form {% if notification %}action="{{ url_for(".notification", id_=notification.id_) }}"{% else %} action="{{ url_for(".notification") }}"  {% endif %} method="POST" class="form-horizontal">
     <legend>{{ _("Detail") }}</legend>
     <fieldset>
       <div class="control-group">
@@ -33,10 +57,16 @@
         <div class="controls">
           {% if notification %}
             {% for sender in notification.senders %}
-              <input type="email" name="sender" {% if loop.first %}id="sender"{% endif %} value="{{ sender }}" class="senders"/>
+              <div class="control-inline-group">
+                <input type="email" name="sender" placeholder="{{ _("Enter E-mail") }}" {% if loop.first %}id="sender"{% endif %} value="{{ sender }}" class="senders"/>
+                <button class="btn-danger btn" type="button" name="remove"><i class="icon-remove"></i></button>
+              </div>
             {% endfor %}
           {% else %}
-            <input type="email" name="sender" id="sender" class="senders"/>
+            <div class="control-inline-group">
+              <input type="email" name="sender" placeholder="{{ _("Enter E-mail") }}" id="sender" class="senders"/>
+              <button class="btn-danger btn" type="button" name="remove"><i class="icon-remove"></i></button>
+            </div>
           {% endif %}
           <button class="btn btn-primary" type="button" id="add-sender"><i class="icon-plus"></i></button>
         </div>
@@ -47,50 +77,48 @@
         <div class="controls">
           <select name="report_ids" id="report_ids" multiple>
             {% for report in report_list %}
-              <option value="{{ report.id }}">{{ report.name }}</option>
+              <option value="{{ report.id_ }}" {% if notification and report.id_ in notification.report_ids %}selected="selected"{% endif %}>{{ report.name }}</option>
             {% endfor %}
-
           </select>
         </div>
       </div>
       <div class="control-group">
-        <label class="control-label" for=""></label>
+        <label class="control-label" for="description">{{ _("description") }}</label>
 
         <div class="controls">
-          <input type="text" name="" id=""/></div>
+          <textarea name="description" id="description">
+            {%- if notification %}{{ notification.description }}{% endif -%}
+          </textarea>
+        </div>
       </div>
-      <div class="control-group"><label class="control-label" for=""></label>
+      <div class="control-group">
+        <label class="control-label" for="subject">{{ _("Subject") }}</label>
 
-        <div class="controls"><input type="text" name="" id=""/></div>
+        <div class="controls">
+          <input type="text" name="subject" id="subject" {% if notification %}value="{{ notification._Notification__subject|safe }}"
+            /> <span class="help-inline">{{ notification.subject }}</span>{% else %}/>{% endif %}
+        </div>
       </div>
-      <div class="control-group"><label class="control-label" for=""></label>
+      <div class="control-group">
+        <label class="control-label" for="crontab">{{ _("Crontab") }}</label>
 
-        <div class="controls"><input type="text" name="" id=""/></div>
+        <div class="controls">
+          <div id='crontab'></div>
+          <p id="crontab-val"></p>
+        </div>
       </div>
-      <div class="control-group"><label class="control-label" for=""></label>
 
-        <div class="controls"><input type="text" name="" id=""/></div>
-      </div>
-      <div class="control-group"><label class="control-label" for=""></label>
-
-        <div class="controls"><input type="text" name="" id=""/></div>
-      </div>
-      <div class="control-group"><label class="control-label" for=""></label>
-
-        <div class="controls"><input type="text" name="" id=""/></div>
-      </div>
-      <div class="control-group"><label class="control-label" for=""></label>
-
-        <div class="controls"><input type="text" name="" id=""/></div>
-      </div>
-      <div class="control-group"><label class="control-label" for=""></label>
-
-        <div class="controls"><input type="text" name="" id=""/></div>
+      <div class="control-group">
+        <div class="controls">
+          <label for="enabled" class="checkbox">
+            <input type="checkbox" name="enabled" id="enabled" {% if notification and notification.enabled %}checked="checked"{% endif %}/>{{ _("Enable ?") }}
+          </label>
+        </div>
       </div>
     </fieldset>
     <div class="form-actions">
-      <a href="{{ request.args.get("url", url_for(".notification_list")) }}" class="btn">{{ _("BACK") }}</a>
-      <button class="btn btn-primary">{{ _("SAVE") }}</button>
+      <a href="{{ request.args.get("url", url_for(".notification_list")) }}" class="btn btn-large">{{ _("BACK") }}</a>
+      <button class="btn btn-primary btn-large">{{ _("SAVE") }}</button>
     </div>
   </form>
 {% endblock %}
