@@ -1,0 +1,9 @@
+create_time: 2013-07-12 12:28:00
+creator: xc
+crontab: '*/1 * * * *'
+description: ""
+enabled: false
+name: "\u73ED\u7EC4\u7EE9\u6548\u6C47\u603B"
+report_ids: [2]
+senders: [abc549825@163.com]
+subject: '[{{date}}]{{ notification.name }}'
