@@ -27,7 +27,7 @@
       });
       $("textarea").autosize();
       {% if notification %}
-        $("#crontab").cron({init: "{{ notification._crontab}}", onChange: function () {
+        $("#crontab").cron({initial : "{{ notification._crontab}}", onChange: function () {
           $('#crontab-val').text($(this).cron("value"));
         }});
       {% else %}
