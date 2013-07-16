@@ -16,7 +16,7 @@
   <script type="text/javascript">
     $(function(){
         $('select').select2();
-    jQuery.fn.addFilter = function (col, text, available_opts, type, avalialed_values, op, value) {
+    jQuery.fn.addFilter = function (col, text, available_opts, type, avalialed_values, op, value, proxy) {
         var tr = $("<tr name='filter'></tr>");
         var td1 = $("<td></td>").html($("<button type='button' class='btn' name='remove-tr'></button>").html($("<i class='icon-remove icon-large'></i>")));
         var td2 = $("<td></td>").text(text);
@@ -64,26 +64,17 @@
           input.val(value)
         }
         input.attr("data-col", col);
+        input.attr('data-proxy', proxy)
         var td4 = $("<td></td>").html(input);
         tr.append(td1, td2, td3, td4);
         this.find("tbody").append(tr);
       };
 
-
-      $("#add_filter").change(function () {
-        var e = $($(this).find(":selected"));
-
-        $("#clause").addFilter(e.val(), e.text(), $.parseJSON(e.attr("data-ops")), e.attr("data-type"), $.parseJSON(e.attr("data-opts")));
-        $(this).val([]);
-      });
-
-
-
-      {% if current_filters %}
-        $.each({{ current_filters|tojson|safe }}, function (idx, filter) {
-          $("#clause").addFilter(filter.col, filter.name, filter.ops, filter.type, filter.opts, filter.op, filter.val);
-        });
-      {% endif %}
+      {% for filter in data_set.filters %}
+        {% if filter.shown %}
+        $("#clause").addFilter('{{filter.col}}', '{{filter.name}}', {{filter.ops|tojson|safe}}, '{{filter.type}}', {{filter.opts|tojson|safe}}, '{{filter.op}}', '{{filter.val}}', {{'true' if filter.proxy else 'false' }});
+        {% endif %}
+      {% endfor %}
 
       function getFilters() {
         var form = $("#main-form");
@@ -97,7 +88,7 @@
             } else {
               input = $(finds[0]);
             }
-            filters.push({"col": input.attr("data-col"), "op": $($(tr).find("select")).val(), "val": input.val()});
+            filters.push({"col": input.attr("data-col"), "op": $($(tr).find("select")).val(), "val": input.val(), 'proxy': input.attr('data-proxy')=='true'});
           });
           $("input[name=filters]").attr('value', JSON.stringify(filters));
         }
@@ -150,7 +141,7 @@
           });
       $('[data-role="filters-selector"] a').live('click', function () {
           var e = $(this);
-          $("#clause").addFilter(e.attr('data-value'), e.text(), $.parseJSON(e.attr("data-ops")), e.attr("data-type"), $.parseJSON(e.attr("data-opts")));
+          $("#clause").addFilter(e.attr('data-value'), e.text(), $.parseJSON(e.attr("data-ops")), e.attr("data-type"), $.parseJSON(e.attr("data-opts")), '', '', e.attr('data-proxy'));
           $('button[data-role="new-filter"]').popover('hide');
         });
     })
@@ -191,7 +182,7 @@
         <div class="control-group">
           <label for="report_name" class="control-label">{{ _("Report name") }} <span class='text-error'>*</span></label>
           <div class="controls">
-            <input type="text" name="name" required="required" id="report_name"/>
+            <input type="text" name="name" required="required" id="report_name" value='{{ data_set.default_report_name }}'/>
           </div>
         </div>
         <div class="control-group">
@@ -248,7 +239,12 @@
   <div data-role='filters-popover-content' class='hide'>
     <ul class='nav nav-pills nav-stacked' data-role='filters-selector'>
       {% for filter in data_set.filters %}
-      <li><a data-value="{{ filter.col }}" data-type="{{ filter.type }}" data-ops='{{ filter.ops|tojson|safe }}' {% if filter.opts %} data-opts='{{ filter.opts|tojson|safe }}' {% endif %}>{{ filter.name }}</a></li>
+      <li>
+      <a data-value="{{ filter.col }}" data-type="{{ filter.type }}" 
+        data-ops='{{ filter.ops|tojson|safe }}' 
+        {% if filter.opts %} data-opts='{{ filter.opts|tojson|safe }}'{% endif %} 
+        data-proxy={{ 'true' if filter.proxy else 'false' }}>{{ filter.name }}</a>
+      </li>
       {% endfor %}
     </ul>
   </div>
