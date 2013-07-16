@@ -9,11 +9,17 @@ from flask import render_template, abort, request, url_for, redirect, flash
 from flask.ext.mail import Mail, Message
 from flask.ext.babel import _
 
-from flask.ext.report.report import Report
-from flask.ext.report.data_set import DataSet
 from flask.ext.report.notification import Notification
-from flask.ext.report.utils import get_column_operated
+from flask import render_template, abort, request, url_for, redirect, jsonify
+from wtforms import Form, TextField, validators, IntegerField, SelectMultipleField
 
+from flask.ext.report.report import Report, create_report
+from flask.ext.report.data_set import DataSet
+from flask.ext.report.utils import get_column_operated, query_to_sql
+from flask.ext.babel import gettext as _
+from pygments import highlight
+from pygments.lexers import PythonLexer, SqlLexer
+from pygments.formatters import HtmlFormatter
 
 class FlaskReport(object):
     def __init__(self, db, model_map, app, blueprint=None, extra_params=None, table_label_map=None, mail=None):
@@ -35,9 +41,9 @@ class FlaskReport(object):
             os.makedirs(self.data_set_dir)
 
         host.route("/report-list/")(self.report_list)
-        host.route("/report/", methods=["GET", "POST"])(self.report)
+        host.route("/new-report/", methods=['POST'])(self.new_report)
         host.route("/graphs/report/<int:id_>")(self.report_graphs)
-        host.route("/report/<int:id_>")(self.report)
+        host.route("/report/<int:id_>", methods=['GET', 'POST'])(self.report)
         host.route("/report_csv/<int:id_>")(self.report_csv)
         host.route("/report_pdf/<int:id_>")(self.report_pdf)
         host.route("/report_txt/<int:id_>")(self.report_txt)
@@ -108,32 +114,8 @@ class FlaskReport(object):
     def data_set(self, id_):
         self.try_edit_data_set()
         data_set = DataSet(self, id_)
-        query = None
-        current_filters = []
-        filters_yaml = None
-        if request.args.get("filters"):
-            filters_data = json.loads(request.args["filters"])
-            current_filters = data_set.get_current_filters(filters_data)
-            filters_yaml = data_set.parse_filters(current_filters)
-            query = data_set.get_query(current_filters)
-            temp_dir = os.path.join(self.report_dir, "0")
-            if not os.path.exists(temp_dir):
-                os.mkdir(temp_dir)
-            dict_ = dict(columns=[c["idx"] for c in data_set.columns], data_set_id=data_set.id_)
-            if filters_yaml:
-                dict_["filters"] = filters_yaml
-            self._write(temp_dir, **dict_)
-
-        from flask.ext.report.utils import query_to_sql
-        from pygments import highlight
-        from pygments.lexers import SqlLexer
-        from pygments.formatters import HtmlFormatter
-
-        SQL_html = highlight(query_to_sql(query), SqlLexer(), HtmlFormatter()) if query else ""
-        from flask.ext.report.utils import dump_to_yaml
-
-        params = dict(data_set=data_set, SQL=SQL_html, current_filters=current_filters,
-                      filters_yaml=dump_to_yaml(filters_yaml))
+        SQL_html = highlight(query_to_sql(data_set.query), SqlLexer(), HtmlFormatter())
+        params = dict(data_set=data_set, SQL=SQL_html)
         extra_params = self.extra_params.get('data_set')
         if extra_params:
             if isinstance(extra_params, types.FunctionType):
@@ -161,7 +143,6 @@ class FlaskReport(object):
         self.try_view_report()
         if id_ is not None:
             report = Report(self, id_)
-            from flask.ext.report.utils import query_to_sql
 
             html_report = report.html_template.render(report=report)
             from pygments import highlight
@@ -181,28 +162,8 @@ class FlaskReport(object):
                     extra_params = extra_params(id_)
                 params.update(extra_params)
             return render_template("report____/report.html", **params)
-        else:
-            id_ = max([int(dir_name) for dir_name in os.listdir(self.report_dir) if
-                       dir_name.isdigit() and dir_name != '0']) + 1
-            new_dir = os.path.join(self.report_dir, str(id_))
-            if not os.path.exists(new_dir):
-                os.mkdir(new_dir)
 
-            temp_report = Report(self, 0)
-            dict_ = dict(request.form.items())
-            url = dict_.pop("url")
-            dict_["columns"] = request.form.getlist("columns", type=int)
-            if temp_report.filters:
-                dict_["filters"] = temp_report.filters
-            else:
-                import yaml
-
-                dict_["filters"] = yaml.load(dict_["filters"])
-            self._write(new_dir, **dict_)
-
-            return redirect(url_for(".report", id_=id_, _method="GET", url=url))
-
-    def _write(self, to_dir, **kwargs):
+    def _write_report(self, to_dir, **kwargs):
         import yaml
 
         kwargs.setdefault("name", "temp")
@@ -419,3 +380,50 @@ class FlaskReport(object):
             return 'unknown notifiaction:' + str(id_), 404
         
         
+    def new_report(self):
+
+        form = _ReportForm(self, request.form)
+
+        if form.validate():
+            def parse_filters(filters):
+                result = {}
+                for current in filters:
+                    if current["col"] not in result:
+                        result[current["col"]] = {'operator': current["op"], 'value': current["val"]}
+                    else:
+                        val = result[current["col"]]
+                        if not isinstance(val, list):
+                            val = [val]
+                        val.append({'operator': current["op"], 'value': current["val"]})
+                        result[current["col"]] = val
+                return result
+            
+            name = form.name.data
+            id = None
+            if request.args.get('preview'):
+                name += '(' + _('Preview') + ')'
+                id = 0
+            report_id = create_report(form.data_set, name=name, creator=form.creator.data, description=form.description.data, 
+                              columns=form.columns.data, filters=parse_filters(json.loads(form.filters.data)), id = id)
+            return jsonify({'id': report_id, 'name': form.name.data, 'url': url_for('.report', id_=report_id)})
+        else:
+            return jsonify({'errors': form.errors}), 403
+
+class _ReportForm(Form):  
+    def __init__(self, report_view, data):
+        self.report_view = report_view
+        super(_ReportForm, self).__init__(data)
+
+    def validate_data_set_id(self, e):
+        try:
+            self.data_set = DataSet(self.report_view, e.data)
+            self.columns.choices = [(str(c['idx']), c['name']) for c in self.data_set.columns]
+        except OSError:
+            raise validators.ValidationError('invalid dataset')
+
+    name = TextField('name', [validators.Required()])
+    creator = TextField('createor')
+    description = TextField('description')
+    data_set_id = IntegerField('data_set_id', [validators.Required()])
+    columns = SelectMultipleField('columns', [validators.Required()], choices=[])
+    filters = TextField('filters')
