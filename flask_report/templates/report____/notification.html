@@ -1,3 +1,4 @@
+{% set readonly = (notification and notification.enabled)%}
 {% extends "report____/base_layout.html" %}
 {% block report____customized_head_block %}
   {{ super() }}
@@ -83,7 +84,7 @@
         <label class="control-label" for="name">{{ _("Name") }}</label>
 
         <div class="controls">
-          <input type="text" name="name" id="name" required="required" {% if notification %}value="{{ notification.name }}"{% endif %}/>
+          <input type="text" name="name" id="name" required="required" {% if notification %}value="{{ notification.name }}"{% endif %} {% if readonly%}readonly{% endif %}/>
         </div>
       </div>
       <div class="control-group">
@@ -93,7 +94,7 @@
           {% if notification %}
             {% for sender in notification.senders %}
               <div class="control-inline-group">
-                <input type="email" name="sender" placeholder="{{ _("Enter E-mail") }}" {% if loop.first %}id="sender"{% endif %} value="{{ sender }}" class="senders"/>
+                <input type="email" name="sender" placeholder="{{ _("Enter E-mail") }}" {% if loop.first %}id="sender"{% endif %} value="{{ sender }}" class="senders" />
                 <button class="btn-danger btn" type="button" name="remove"><i class="icon-remove"></i></button>
               </div>
             {% endfor %}
@@ -110,7 +111,7 @@
         <label class="control-label" for="report_ids">{{ _("reports") }}</label>
 
         <div class="controls">
-          <select name="report_ids" id="report_ids" multiple>
+          <select name="report_ids" id="report_ids" multiple {% if readonly %}readonly{% endif %}>
             {% for report in report_list %}
               <option value="{{ report.id_ }}" {% if notification and report.id_ in notification.report_ids %}selected="selected"{% endif %}>{{ report.name }}</option>
             {% endfor %}
@@ -121,7 +122,7 @@
         <label class="control-label" for="description">{{ _("description") }}</label>
 
         <div class="controls">
-          <textarea name="description" id="description">
+          <textarea name="description" id="description" {% if readonly%}readonly{% endif %}>
             {%- if notification %}{{ notification.description }}{% endif -%}
           </textarea>
         </div>
@@ -130,14 +131,17 @@
         <label class="control-label" for="subject">{{ _("Subject") }}</label>
 
         <div class="controls">
-          <input type="text" name="subject" id="subject" value={% if notification %}"{{ notification._Notification__subject|safe }}"{% else %}'{% raw %}{{[date]}}{{notification.name}}{% endraw %}'{% endif %}/><span class="help-inline">{{ _("Only 'date' and 'notification' supported") }}</span>
+          <input type="text" name="subject" id="subject" 
+          value={% if notification %}"{{ notification._Notification__subject|safe }}"{% else %}'{% raw %}{{[date]}}{{notification.name}}{% endraw %}'{% endif %}
+          {% if readonly%}readonly{% endif %}/>
+          <span class="help-inline">{{ _("Only 'date' and 'notification' supported") }}</span>
         </div>
       </div>
       <div class="control-group">
         <label class="control-label" for="crontab">{{ _("Crontab") }}</label>
 
         <div class="controls">
-          <div id='crontab' class="control-inline-group"></div>
+          <div id='crontab' class="control-inline-group" {% if readonly%}readonly{% endif %}></div>
           <input id="crontab-val" type="hidden" name="crontab" readonly/>
         </div>
       </div>
@@ -145,7 +149,9 @@
     </fieldset>
     <div class="pagination-centered">
       <a href="{{ request.args.get("url", url_for(".notification_list")) }}" class="btn btn-large">{{ _("BACK") }}</a>
-      <button class="btn btn-primary btn-large">{{ _("Save") }}</button>
+      {% if not notification or not notification.enabled %}
+        <button class="btn btn-primary btn-large">{{ _("Save") }}</button>
+      {% endif %}
       {% if notification %}
         {% if notification.enabled %}
           <input class="btn btn-primary btn-large" data-role='enable-btn' value='{{ _("Disable") }}' name='action' type='submit' />
