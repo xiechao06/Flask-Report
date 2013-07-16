@@ -8,6 +8,8 @@ from werkzeug.utils import cached_property
 import sqlalchemy
 from flask.ext.babel import _
 
+from flask.ext.report.proxy_filter import ProxyFilter
+
 _NONE = object()
 _TYPES = {"str": "text", "int": "number", "bool": "checkbox", "datetime": "datetime", "date": "date"}
 
@@ -22,7 +24,7 @@ class DataSet(object):
         self.creator = data_set_meta.get('creator')
         self.create_time = data_set_meta.get('create_time')
         self.description = data_set_meta.get("description")
-        self.default_report_name = data_set_meta.get("default_report_name")
+        self.default_report_name = data_set_meta.get("default_report_name", '')
         self.__special_chars = {"gt": operator.gt, "lt": operator.lt, "ge": operator.ge, "le": operator.le,
                                 "eq": operator.eq, "ne": operator.ne}
         self._filters = data_set_meta.get("filters", {})
@@ -101,7 +103,7 @@ class DataSet(object):
                 default = "select"
 
             result = {"name": get_label_name(v.get("name"), column), "col": k, "ops": v.get("operators"), 'shown': v.get('shown'),
-                      "type": _get_type(v.get("value_type"), default), 'opts': []}
+                      "type": _get_type(v.get("value_type"), default), 'opts': [], 'proxy': False}
             
             if hasattr(column, "property") and hasattr(column.property, "direction"):
                 def _iter_choices(column):
@@ -112,7 +114,28 @@ class DataSet(object):
                         yield getattr(row, pk), unicode(row)
                 result["opts"] = list(_iter_choices(column))
             filters.append(result)
+
+        for k, f in self.proxy_filter_map.items():
+            filters.append({
+                'name': f.name,
+                'col': f.name,
+                'ops': f.operators,
+                'shown': f.shown,
+                'type': f.type,
+                'opts': f.options,
+                'proxy': True
+            })
         return filters
+
+    @property
+    def proxy_filter_map(self):
+        proxy_filter_file = os.path.join(self.dir, 'proxy_filters.py') 
+        ret = {}
+        if os.path.exists(proxy_filter_file):
+            lib = import_file(proxy_filter_file)
+            for filter_ in lib.__all__:
+                ret[filter_.name] = filter_
+        return ret
 
     @property
     def dir(self):

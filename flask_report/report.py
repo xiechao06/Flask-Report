@@ -253,6 +253,14 @@ def create_report(data_set, name, description="", creator="", create_time=None, 
     new_report_dir = os.path.join(data_set.report_view.report_dir, str(new_report_id))
     if not os.path.exists(new_report_dir):
         os.mkdir(new_report_dir)
+
+    converted_filters = {}
+    for k, v in filters.items():
+        if v['proxy']:
+            converted_filters.update(data_set.proxy_filter_map[k](v['value']))
+        else:
+            converted_filters[k] = v
+
     with file(os.path.join(new_report_dir, "meta.yaml"), "w") as f:
         dict_ = {
             'name': name,
@@ -261,9 +269,11 @@ def create_report(data_set, name, description="", creator="", create_time=None, 
             'creator': creator,
             'create_time': create_time,
             'columns': [int(c) for c in columns],
-            'filters': filters,
+            'filters': converted_filters,
         }
         yaml.safe_dump(dict_, allow_unicode=True, stream=f)
+
     if os.path.exists(os.path.join(data_set.dir, 'drill_downs')):
+        shutil.rmtree(os.path.join(new_report_dir, 'drill_downs'), ignore_errors=True)
         shutil.copytree(os.path.join(data_set.dir, 'drill_downs'), os.path.join(new_report_dir, 'drill_downs'))
     return new_report_id

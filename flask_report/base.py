@@ -295,12 +295,12 @@ class FlaskReport(object):
                 result = {}
                 for current in filters:
                     if current["col"] not in result:
-                        result[current["col"]] = {'operator': current["op"], 'value': current["val"]}
+                        result[current["col"]] = {'operator': current["op"], 'value': current["val"], 'proxy': current['proxy']}
                     else:
                         val = result[current["col"]]
                         if not isinstance(val, list):
                             val = [val]
-                        val.append({'operator': current["op"], 'value': current["val"]})
+                        val.append({'operator': current["op"], 'value': current["val"], 'proxy': current['proxy']})
                         result[current["col"]] = val
                 return result
             
