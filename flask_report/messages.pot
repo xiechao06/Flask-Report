@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-07-15 21:47+0800\n"
+"POT-Creation-Date: 2013-07-16 12:29+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,11 +17,28 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: base.py:310 templates/report____/data-set.html:242
+#: base.py:312
+msgid "Update Successful!"
+msgstr ""
+
+#: base.py:314 base.py:330
+msgid "Error!"
+msgstr ""
+
+#: base.py:328
+msgid "Save Successful!"
+msgstr ""
+
+#: base.py:345
+#, python-format
+msgid "notification %(id_)s are not allowed to send to %(to)s"
+msgstr ""
+
+#: base.py:404 templates/report____/data-set.html:242
 msgid "Preview"
 msgstr ""
 
-#: data_set.py:78
+#: data_set.py:80
 msgid "Unknown"
 msgstr ""
 
@@ -122,6 +139,7 @@ msgstr ""
 
 #: templates/report____/base-report.html:194
 #: templates/report____/data-set.html:240 templates/report____/graphs.html:45
+#: templates/report____/notification.html:149
 msgid "BACK"
 msgstr ""
 
@@ -211,6 +229,67 @@ msgstr ""
 msgid "%(value)s%% in avg."
 msgstr ""
 
+#: templates/report____/notification-list.html:12
+#: templates/report____/notification-list.html:21
+msgid "Notifications"
+msgstr ""
+
+#: templates/report____/notification-list.html:25
+msgid "New"
+msgstr ""
+
+#: templates/report____/notification.html:16
+#: templates/report____/notification.html:91
+#: templates/report____/notification.html:97
+msgid "Enter E-mail"
+msgstr ""
+
+#: templates/report____/notification.html:51
+#, python-format
+msgid "Editing %(notification)s"
+msgstr ""
+
+#: templates/report____/notification.html:53
+msgid "Creating notification"
+msgstr ""
+
+#: templates/report____/notification.html:78
+msgid "Name"
+msgstr ""
+
+#: templates/report____/notification.html:85
+msgid "Senders"
+msgstr ""
+
+#: templates/report____/notification.html:105
+msgid "reports"
+msgstr ""
+
+#: templates/report____/notification.html:116
+#: templates/report____/report_short_description.html:3
+msgid "description"
+msgstr ""
+
+#: templates/report____/notification.html:125
+msgid "Subject"
+msgstr ""
+
+#: templates/report____/notification.html:128
+msgid "Only 'date' and 'notification' supported"
+msgstr ""
+
+#: templates/report____/notification.html:132
+msgid "Crontab"
+msgstr ""
+
+#: templates/report____/notification.html:143
+msgid "Enable ?"
+msgstr ""
+
+#: templates/report____/notification.html:150
+msgid "SAVE"
+msgstr ""
+
 #: templates/report____/report-list.html:4
 #: templates/report____/report-list.html:18
 msgid "report list"
@@ -222,10 +301,6 @@ msgstr ""
 
 #: templates/report____/report_short_description.html:2
 msgid "create time"
-msgstr ""
-
-#: templates/report____/report_short_description.html:3
-msgid "description"
 msgstr ""
 
 #: templates/report____/report_short_description.html:4

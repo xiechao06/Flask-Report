@@ -1,14 +1,31 @@
 {% extends "report____/base_layout.html" %}
 
+{% block report____customized_head_block %}
+<style type="text/css">
+.new-notification {
+  margin-top: 10px;
+}
+</style>
+{% endblock %}
+
 {% block report____title_block %}
   {{ _('Notifications') }}
 {% endblock %}
 
 {% block body %}
-  <div>
-    <h1>
-      {{ _('Notifications') }}
-    </h1>
+  <div class='container'>
+    <div class="alert alert-info">
+      <div class='row'>
+        <div class="span3">
+          <h1>
+            {{ _('Notifications') }}
+          </h1>
+        </div>
+        <div class="span1" >
+          <a class="btn btn-primary new-notification" href="{{ url_for(".notification", url=request.url) }}"><i class="icon-plus"></i>{{ _("New") }}</a>
+        </div>
+      </div>
+    </div>
     <hr/>
     <div>
       <ul>
@@ -20,7 +37,6 @@
         {% endfor %}
       </ul>
     </div>
-    <a class="btn btn-primary" href="{{ url_for(".notification", url=request.url) }}">{{ _("Add New Notification") }}</a>
   </div>
 {% endblock %}
 

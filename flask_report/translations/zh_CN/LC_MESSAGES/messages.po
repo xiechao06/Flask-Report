@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-07-15 21:47+0800\n"
+"POT-Creation-Date: 2013-07-16 12:29+0800\n"
 "PO-Revision-Date: 2013-07-01 14:56+0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -17,11 +17,28 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: base.py:310 templates/report____/data-set.html:242
+#: base.py:312
+msgid "Update Successful!"
+msgstr "更新成功"
+
+#: base.py:314 base.py:330
+msgid "Error!"
+msgstr "错误!"
+
+#: base.py:328
+msgid "Save Successful!"
+msgstr "保存成功"
+
+#: base.py:345
+#, python-format
+msgid "notification %(id_)s are not allowed to send to %(to)s"
+msgstr "推送%(id_)s不允许发送到%(to)s"
+
+#: base.py:404 templates/report____/data-set.html:242
 msgid "Preview"
 msgstr "预览"
 
-#: data_set.py:78
+#: data_set.py:80
 msgid "Unknown"
 msgstr "未知"
 
@@ -124,6 +141,7 @@ msgstr "查看统计图"
 
 #: templates/report____/base-report.html:194
 #: templates/report____/data-set.html:240 templates/report____/graphs.html:45
+#: templates/report____/notification.html:149
 msgid "BACK"
 msgstr "返回"
 
@@ -213,6 +231,67 @@ msgstr "总计%(value)s"
 msgid "%(value)s%% in avg."
 msgstr "平均%(value)s%%"
 
+#: templates/report____/notification-list.html:12
+#: templates/report____/notification-list.html:21
+msgid "Notifications"
+msgstr "推送列表"
+
+#: templates/report____/notification-list.html:25
+msgid "New"
+msgstr "新建"
+
+#: templates/report____/notification.html:16
+#: templates/report____/notification.html:91
+#: templates/report____/notification.html:97
+msgid "Enter E-mail"
+msgstr "请输入Email"
+
+#: templates/report____/notification.html:51
+#, python-format
+msgid "Editing %(notification)s"
+msgstr "正在编辑%(notification)s"
+
+#: templates/report____/notification.html:53
+msgid "Creating notification"
+msgstr "创建推送"
+
+#: templates/report____/notification.html:78
+msgid "Name"
+msgstr "名称"
+
+#: templates/report____/notification.html:85
+msgid "Senders"
+msgstr "推送到"
+
+#: templates/report____/notification.html:105
+msgid "reports"
+msgstr "报表列表"
+
+#: templates/report____/notification.html:116
+#: templates/report____/report_short_description.html:3
+msgid "description"
+msgstr "描述"
+
+#: templates/report____/notification.html:125
+msgid "Subject"
+msgstr "标题"
+
+#: templates/report____/notification.html:128
+msgid "Only 'date' and 'notification' supported"
+msgstr "只支持变量date和notification"
+
+#: templates/report____/notification.html:132
+msgid "Crontab"
+msgstr "周期"
+
+#: templates/report____/notification.html:143
+msgid "Enable ?"
+msgstr "激活?"
+
+#: templates/report____/notification.html:150
+msgid "SAVE"
+msgstr "保存"
+
 #: templates/report____/report-list.html:4
 #: templates/report____/report-list.html:18
 msgid "report list"
@@ -226,10 +305,6 @@ msgstr "创建人"
 msgid "create time"
 msgstr "创建时间"
 
-#: templates/report____/report_short_description.html:3
-msgid "description"
-msgstr "描述"
-
 #: templates/report____/report_short_description.html:4
 msgid "data set"
 msgstr "数据集和"
@@ -237,43 +312,4 @@ msgstr "数据集和"
 #: templates/report____/report_short_description.html:5
 msgid "data set description"
 msgstr "数据集合描述"
-
-#~ msgid "only one order by columns supported"
-#~ msgstr ""
-
-#~ msgid "order by"
-#~ msgstr "排序规则"
-
-#~ msgid "Search"
-#~ msgstr "搜索"
-
-#~ msgid "RESULT"
-#~ msgstr "结果"
-
-#~ msgid "Filters"
-#~ msgstr "过滤条件"
-
-#~ msgid "Orders"
-#~ msgstr "排序规则"
-
-#~ msgid "SAVE"
-#~ msgstr "保存"
-
-#~ msgid "VIEW RESULTS"
-#~ msgstr "查看结果"
-
-#~ msgid "Report filters"
-#~ msgstr "报表列表"
-
-#~ msgid "SAVE REPORT"
-#~ msgstr "保存报表"
-
-#~ msgid "order by \"%(order_by)s\" %(order)s"
-#~ msgstr "按字段\"%(order_by)s\"进行%(order)s排列"
-
-#~ msgid "descendingly"
-#~ msgstr "降序"
-
-#~ msgid "ascendingly"
-#~ msgstr "升序"
 

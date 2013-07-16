@@ -37,12 +37,23 @@
       {% endif %}
       setTimeout(function () {
           $(".flash").fadeOut("slow");
-        }, 3000);
+          }, 3000);
+      $('select[name="report_ids"]').select2({width: 'resolve'});
     })
   </script>
 {% endblock %}
 
 {% block body %}
+<div class='container'>
+  <div class="alert alert-info">
+    <h1>
+      {% if notification %}
+      {{ _('Editing %(notification)s', notification=notification.name) }}
+      {% else %}
+      {{ _('Creating notification')}}
+      {% endif %}
+    </h1> 
+  </div>
   {% with messages = get_flashed_messages(with_categories=True) %}
     {% if messages %}
       <div class="flash">
@@ -62,7 +73,6 @@
     {% endif %}
   {% endwith %}
   <form {% if notification %}action="{{ url_for(".notification", id_=notification.id_) }}"{% else %} action="{{ url_for(".notification") }}"  {% endif %} method="POST" class="form-horizontal">
-    <legend>{{ _("Detail") }}</legend>
     <fieldset>
       <div class="control-group">
         <label class="control-label" for="name">{{ _("Name") }}</label>
@@ -115,7 +125,7 @@
         <label class="control-label" for="subject">{{ _("Subject") }}</label>
 
         <div class="controls">
-          <input type="text" name="subject" id="subject" {% if notification %}value="{{ notification._Notification__subject|safe }}"{% endif %}/><span class="help-inline">{{ _("Only 'date' and 'notification' supported") }}</span>
+          <input type="text" name="subject" id="subject" value={% if notification %}"{{ notification._Notification__subject|safe }}"{% else %}'{% raw %}{{[date]}}{{notification.name}}{% endraw %}'{% endif %}/><span class="help-inline">{{ _("Only 'date' and 'notification' supported") }}</span>
         </div>
       </div>
       <div class="control-group">
@@ -123,7 +133,7 @@
 
         <div class="controls">
           <div id='crontab' class="control-inline-group"></div>
-          <input id="crontab-val" type="text" name="crontab" readonly/>
+          <input id="crontab-val" type="hidden" name="crontab" readonly/>
         </div>
       </div>
 
@@ -135,9 +145,10 @@
         </div>
       </div>
     </fieldset>
-    <div class="form-actions">
+    <div class="pagination-centered">
       <a href="{{ request.args.get("url", url_for(".notification_list")) }}" class="btn btn-large">{{ _("BACK") }}</a>
       <button class="btn btn-primary btn-large">{{ _("SAVE") }}</button>
     </div>
   </form>
+</div>
 {% endblock %}
