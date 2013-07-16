@@ -115,8 +115,7 @@
         <label class="control-label" for="subject">{{ _("Subject") }}</label>
 
         <div class="controls">
-          <input type="text" name="subject" id="subject" {% if notification %}value="{{ notification._Notification__subject|safe }}"
-            /> <span class="help-inline">{{ notification.subject }}</span>{% else %}/>{% endif %}
+          <input type="text" name="subject" id="subject" {% if notification %}value="{{ notification._Notification__subject|safe }}"{% endif %}/><span class="help-inline">{{ _("Only 'date' and 'notification' supported") }}</span>
         </div>
       </div>
       <div class="control-group">

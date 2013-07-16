@@ -348,7 +348,7 @@ class FlaskReport(object):
             if request.method == "POST":
                 try:
                     _write(request.form, id_)
-                    flash(_("Save Successful!"))
+                    flash(_("Update Successful!"))
                 except Exception, e:
                     flash(_("Error!"), "error")
                 return redirect(url_for(".notification", id_=id_, _method="GET"))
@@ -364,7 +364,7 @@ class FlaskReport(object):
                     os.mkdir(new_dir)
                 try:
                     _write(request.form, id_)
-                    flash(_("Update Successful!"))
+                    flash(_("Save Successful!"))
                 except:
                     flash(_("Error!"), "error")
                 return redirect(url_for(".notification", id_=id_))
