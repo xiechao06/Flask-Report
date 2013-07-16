@@ -69,21 +69,11 @@
         this.find("tbody").append(tr);
       };
 
-
-      $("#add_filter").change(function () {
-        var e = $($(this).find(":selected"));
-
-        $("#clause").addFilter(e.val(), e.text(), $.parseJSON(e.attr("data-ops")), e.attr("data-type"), $.parseJSON(e.attr("data-opts")));
-        $(this).val([]);
-      });
-
-
-
-      {% if current_filters %}
-        $.each({{ current_filters|tojson|safe }}, function (idx, filter) {
-          $("#clause").addFilter(filter.col, filter.name, filter.ops, filter.type, filter.opts, filter.op, filter.val);
-        });
-      {% endif %}
+      {% for filter in data_set.filters %}
+        {% if filter.shown %}
+        $("#clause").addFilter('{{filter.col}}', '{{filter.name}}', {{filter.ops|tojson|safe}}, '{{filter.type}}', {{filter.opts|tojson|safe}}, '{{filter.op}}', '{{filter.val}}');
+        {% endif %}
+      {% endfor %}
 
       function getFilters() {
         var form = $("#main-form");
@@ -191,7 +181,7 @@
         <div class="control-group">
           <label for="report_name" class="control-label">{{ _("Report name") }} <span class='text-error'>*</span></label>
           <div class="controls">
-            <input type="text" name="name" required="required" id="report_name"/>
+            <input type="text" name="name" required="required" id="report_name" value='{{ data_set.default_report_name }}'/>
           </div>
         </div>
         <div class="control-group">

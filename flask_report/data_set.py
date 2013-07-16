@@ -22,6 +22,7 @@ class DataSet(object):
         self.creator = data_set_meta.get('creator')
         self.create_time = data_set_meta.get('create_time')
         self.description = data_set_meta.get("description")
+        self.default_report_name = data_set_meta.get("default_report_name")
         self.__special_chars = {"gt": operator.gt, "lt": operator.lt, "ge": operator.ge, "le": operator.le,
                                 "eq": operator.eq, "ne": operator.ne}
         self._filters = data_set_meta.get("filters", {})
@@ -99,8 +100,8 @@ class DataSet(object):
             except AttributeError:
                 default = "select"
 
-            result = {"name": get_label_name(v.get("name"), column), "col": k, "ops": v.get("operators"),
-                      "type": _get_type(v.get("value_type"), default)}
+            result = {"name": get_label_name(v.get("name"), column), "col": k, "ops": v.get("operators"), 'shown': v.get('shown'),
+                      "type": _get_type(v.get("value_type"), default), 'opts': []}
             
             if hasattr(column, "property") and hasattr(column.property, "direction"):
                 def _iter_choices(column):
