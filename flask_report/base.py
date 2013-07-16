@@ -5,7 +5,7 @@ import types
 import urllib
 
 from apscheduler.scheduler import Scheduler
-from flask import render_template, abort, request, url_for, redirect
+from flask import render_template, abort, request, url_for, redirect, flash
 from flask.ext.mail import Mail, Message
 from flask.ext.babel import _
 
@@ -52,7 +52,6 @@ class FlaskReport(object):
         host.route("/start_notification/<int:id_>", methods=['GET'])(self.start_notification)
         host.route("/stop_notification/<int:id_>", methods=['GET'])(self.stop_notification)
 
-
         from flask import Blueprint
         # register it for using the templates of data browser
         self.blueprint = Blueprint("report____", __name__,
@@ -60,7 +59,7 @@ class FlaskReport(object):
                                    template_folder="templates")
         app.register_blueprint(self.blueprint, url_prefix="/__report__")
         self.extra_params = extra_params or {'report': lambda id_: {},
-                                             'report_list': lambda: {}, 
+                                             'report_list': lambda: {},
                                              'data_set': lambda id_: {},
                                              'data_sets': lambda: {}}
 
@@ -129,6 +128,7 @@ class FlaskReport(object):
         from pygments import highlight
         from pygments.lexers import SqlLexer
         from pygments.formatters import HtmlFormatter
+
         SQL_html = highlight(query_to_sql(query), SqlLexer(), HtmlFormatter()) if query else ""
         from flask.ext.report.utils import dump_to_yaml
 
@@ -162,6 +162,7 @@ class FlaskReport(object):
         if id_ is not None:
             report = Report(self, id_)
             from flask.ext.report.utils import query_to_sql
+
             html_report = report.html_template.render(report=report)
             from pygments import highlight
             from pygments.lexers import PythonLexer, SqlLexer
@@ -187,7 +188,6 @@ class FlaskReport(object):
             if not os.path.exists(new_dir):
                 os.mkdir(new_dir)
 
-
             temp_report = Report(self, 0)
             dict_ = dict(request.form.items())
             url = dict_.pop("url")
@@ -196,6 +196,7 @@ class FlaskReport(object):
                 dict_["filters"] = temp_report.filters
             else:
                 import yaml
+
                 dict_["filters"] = yaml.load(dict_["filters"])
             self._write(new_dir, **dict_)
 
@@ -209,7 +210,13 @@ class FlaskReport(object):
         import datetime
 
         kwargs["create_time"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        with file(os.path.join(to_dir, "meta.yaml"), "w") as f:
+        file_name = os.path.join(to_dir, "meta.yaml")
+        if os.path.isfile(file_name):
+            new_file_name = os.path.join(to_dir, "meta.yaml~")
+            if os.path.isfile(new_file_name):
+                os.unlink(new_file_name)
+            os.rename(file_name, new_file_name)
+        with file(file_name, "w") as f:
             yaml.safe_dump(kwargs, allow_unicode=True, stream=f)
 
     def _get_report(self, id_, ReportClass):
@@ -309,10 +316,10 @@ class FlaskReport(object):
         col = report.data_set.columns[col_id]['expr']
         col = get_column_operated(getattr(col, 'element', col))
         model_name = self.get_model_label(col.table)
-        items=report.get_drill_down_detail(col_id, **filters)
+        items = report.get_drill_down_detail(col_id, **filters)
         return report.get_drill_down_detail_template(col_id).render(items=items,
-                                                                    key=col.key, 
-                                                                    model_name=model_name, 
+                                                                    key=col.key,
+                                                                    model_name=model_name,
                                                                     report=report)
 
     def notification_list(self):
@@ -327,10 +334,27 @@ class FlaskReport(object):
         return render_template("report____/notification-list.html", **params)
 
     def notification(self, id_=None):
+        def _write(form, id_):
+            kwargs = dict(name=form["name"], senders=form.getlist("sender"),
+                          report_ids=form.getlist("report_ids", type=int), description=form["description"],
+                          subject=form["subject"], crontab=form["crontab"],
+                          enabled=form.get("enabled", type=bool, default=False))
+            to_dir = os.path.join(self.notification_dir, str(id_))
+            self._write(to_dir=to_dir, **kwargs)
+
         if id_ is not None:
             notification = Notification(self, id_)
-            return render_template("report____/notification.html", notification=notification,
-                                   report_list=self._get_report_list())
+
+            if request.method == "POST":
+                try:
+                    _write(request.form, id_)
+                    flash(_("Save Successful!"))
+                except Exception, e:
+                    flash(_("Error!"), "error")
+                return redirect(url_for(".notification", id_=id_, _method="GET"))
+            else:
+                return render_template("report____/notification.html", notification=notification,
+                                       report_list=self._get_report_list())
         else:
             if request.method == "POST":
                 id_ = max([int(dir_name) for dir_name in os.listdir(self.notification_dir) if
@@ -338,7 +362,11 @@ class FlaskReport(object):
                 new_dir = os.path.join(self.notification_dir, str(id_))
                 if not os.path.exists(new_dir):
                     os.mkdir(new_dir)
-                self._write(new_dir, enabled=False, creator="temp")
+                try:
+                    _write(request.form, id_)
+                    flash(_("Update Successful!"))
+                except:
+                    flash(_("Error!"), "error")
                 return redirect(url_for(".notification", id_=id_))
             else:
                 return render_template("report____/notification.html", report_list=self._get_report_list())
@@ -355,7 +383,7 @@ class FlaskReport(object):
             if sender not in notification.senders in senders:
                 return _('notification %(id_)s are not allowed to send to %(to)s', id_=id_, to=sender), 403
         html = notification.template.render(notification=notification)
-        msg = Message(subject=notification.subject, 
+        msg = Message(subject=notification.subject,
                       html=html,
                       sender="lite_mms@163.com",
                       recipients=senders)
@@ -364,16 +392,20 @@ class FlaskReport(object):
 
     def start_notification(self, id_):
         notification = Notification(self, id_)
+
         def _closure(environ):
             def _push_notification():
                 with self.app.request_context(environ):
                     self.push_notification(id_)
+
             return _push_notification
-        job = self.sched.add_cron_job(_closure(request.environ), name='flask_report_notification' + str(id_), **notification.crontab.__dict__)
+
+        job = self.sched.add_cron_job(_closure(request.environ), name='flask_report_notification' + str(id_),
+                                      **notification.crontab.__dict__)
         notification.enabled = True
         notification.dump()
         return 'ok'
-   
+
     def stop_notification(self, id_):
         jobs = self.sched.get_jobs()
         for job in jobs:

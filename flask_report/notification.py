@@ -63,3 +63,4 @@ class Notification(object):
             'enabled': self.enabled
         }
         yaml.dump(d, open(meta_file, 'w'))
+

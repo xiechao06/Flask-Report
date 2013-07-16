@@ -28,19 +28,39 @@
       $("textarea").autosize();
       {% if notification %}
         $("#crontab").cron({initial : "{{ notification._crontab}}", onChange: function () {
-          $('#crontab-val').text($(this).cron("value"));
+          $('#crontab-val').val($(this).cron("value"));
         }});
       {% else %}
         $("#crontab").cron({onChange: function () {
-          $('#crontab-val').text($(this).cron("value"));
+          $('#crontab-val').val($(this).cron("value"));
         }});
       {% endif %}
-
+      setTimeout(function () {
+          $(".flash").fadeOut("slow");
+        }, 3000);
     })
   </script>
 {% endblock %}
 
 {% block body %}
+  {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+      <div class="flash">
+        {% for category, m in messages %}
+          {% if category == 'error' %}
+            <div class="alert alert-error">
+              <a href="#" class="close" data-dismiss="alert">x</a>
+              {{ m }}</div>
+          {% else %}
+            <div class="alert alert-success">
+              <a href="#" class="close" data-dismiss="alert">x</a>
+              {{ m }}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
   <form {% if notification %}action="{{ url_for(".notification", id_=notification.id_) }}"{% else %} action="{{ url_for(".notification") }}"  {% endif %} method="POST" class="form-horizontal">
     <legend>{{ _("Detail") }}</legend>
     <fieldset>
@@ -103,8 +123,8 @@
         <label class="control-label" for="crontab">{{ _("Crontab") }}</label>
 
         <div class="controls">
-          <div id='crontab'></div>
-          <p id="crontab-val"></p>
+          <div id='crontab' class="control-inline-group"></div>
+          <input id="crontab-val" type="text" name="crontab" readonly/>
         </div>
       </div>
 
