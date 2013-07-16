@@ -1,4 +1,7 @@
 # -*- coding: UTF-8 -*-
+import os
+
+import yaml
 import sqlalchemy
 import operator
 from flask.ext.babel import _
@@ -163,3 +166,13 @@ def get_column_operator(filter_key, columns, report_view):
             except AttributeError:
                 pass
             return col, "filter"
+
+def dump_yaml(path, **kwargs):
+    if os.path.isfile(path):
+        try:
+            os.unlink(path+"~")
+        except OSError:
+            pass
+        os.rename(path, path+"~")
+    with open(path, 'w') as f:
+        yaml.safe_dump(kwargs, allow_unicode=True, stream=f)

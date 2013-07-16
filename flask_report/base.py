@@ -2,20 +2,19 @@
 import os
 import json
 import types
-import urllib
 
 from apscheduler.scheduler import Scheduler
 from flask import render_template, abort, request, url_for, redirect, flash
 from flask.ext.mail import Mail, Message
 from flask.ext.babel import _
 
-from flask.ext.report.notification import Notification
+from flask.ext.report.notification import Notification, get_all_notifications
 from flask import render_template, abort, request, url_for, redirect, jsonify
 from wtforms import Form, TextField, validators, IntegerField, SelectMultipleField
 
 from flask.ext.report.report import Report, create_report
 from flask.ext.report.data_set import DataSet
-from flask.ext.report.utils import get_column_operated, query_to_sql
+from flask.ext.report.utils import get_column_operated, query_to_sql, dump_yaml
 from flask.ext.babel import gettext as _
 from pygments import highlight
 from pygments.lexers import PythonLexer, SqlLexer
@@ -87,6 +86,12 @@ class FlaskReport(object):
         self.mail = mail or Mail(self.app)
         self.sched = Scheduler()
         self.sched.start()
+
+        with app.test_request_context():
+            for notification in get_all_notifications(self):
+                if notification.enabled:
+                    self.start_notification(notification.id_)
+
 
     def try_view_report(self):
         pass
@@ -300,18 +305,19 @@ class FlaskReport(object):
                           report_ids=form.getlist("report_ids", type=int), description=form["description"],
                           subject=form["subject"], crontab=form["crontab"],
                           enabled=form.get("enabled", type=bool, default=False))
-            to_dir = os.path.join(self.notification_dir, str(id_))
-            self._write(to_dir=to_dir, **kwargs)
+            dump_yaml(os.path.join(self.notification_dir, str(id_), 'meta.yaml'), **kwargs)
 
         if id_ is not None:
             notification = Notification(self, id_)
 
             if request.method == "POST":
-                try:
-                    _write(request.form, id_)
-                    flash(_("Update Successful!"))
-                except Exception, e:
-                    flash(_("Error!"), "error")
+                if request.form.get('action') == _('Enable'):
+                    self.start_notification(id_)
+                else:
+                    self.stop_notification(id_) # any change will incur disable
+                    form = request.form
+                    _write(request.form, id_) 
+                flash(_("Update Successful!"))
                 return redirect(url_for(".notification", id_=id_, _method="GET"))
             else:
                 return render_template("report____/notification.html", notification=notification,
@@ -323,11 +329,8 @@ class FlaskReport(object):
                 new_dir = os.path.join(self.notification_dir, str(id_))
                 if not os.path.exists(new_dir):
                     os.mkdir(new_dir)
-                try:
-                    _write(request.form, id_)
-                    flash(_("Save Successful!"))
-                except:
-                    flash(_("Error!"), "error")
+                _write(request.form, id_)
+                flash(_("Save Successful!"))
                 return redirect(url_for(".notification", id_=id_))
             else:
                 return render_template("report____/notification.html", report_list=self._get_report_list())

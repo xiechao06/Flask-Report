@@ -49,6 +49,11 @@
     <h1>
       {% if notification %}
       {{ _('Editing %(notification)s', notification=notification.name) }}
+        {% if notification.enabled %}
+          <span class="text-success">({{_('Enabled')}})</span>
+        {% else %}
+          <span class="muted">({{_('Disabled')}})</span>
+        {% endif %}
       {% else %}
       {{ _('Creating notification')}}
       {% endif %}
@@ -137,17 +142,17 @@
         </div>
       </div>
 
-      <div class="control-group">
-        <div class="controls">
-          <label for="enabled" class="checkbox">
-            <input type="checkbox" name="enabled" id="enabled" {% if notification and notification.enabled %}checked="checked"{% endif %}/>{{ _("Enable ?") }}
-          </label>
-        </div>
-      </div>
     </fieldset>
     <div class="pagination-centered">
       <a href="{{ request.args.get("url", url_for(".notification_list")) }}" class="btn btn-large">{{ _("BACK") }}</a>
-      <button class="btn btn-primary btn-large">{{ _("SAVE") }}</button>
+      <button class="btn btn-primary btn-large">{{ _("Save") }}</button>
+      {% if notification %}
+        {% if notification.enabled %}
+          <input class="btn btn-primary btn-large" data-role='enable-btn' value='{{ _("Disable") }}' name='action' type='submit' />
+        {% else %}
+          <input class="btn btn-primary btn-large" data-role='enable-btn' value='{{ _("Enable") }}' name='action' type='submit' />
+        {% endif %}
+      {% endif %}
     </div>
   </form>
 </div>

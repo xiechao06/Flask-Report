@@ -20,7 +20,7 @@ class Notification(object):
         self.name = meta['name']
         self.creator = meta.get('creator')
         self.create_time = meta.get('create_time')
-        self.description = meta.get("description")
+        self.description = meta.get("description", '')
         self.senders = meta.get('senders')
         self.report_ids = meta.get('report_ids')
         self.__subject = meta.get('subject')
@@ -64,3 +64,6 @@ class Notification(object):
         }
         yaml.dump(d, open(meta_file, 'w'))
 
+
+def get_all_notifications(report_view):
+    return [Notification(report_view, id_) for id_ in os.listdir(report_view.notification_dir)]
