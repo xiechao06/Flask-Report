@@ -1,5 +1,5 @@
 {% set readonly = (notification and notification.enabled)%}
-{% extends "report____/base_layout.html" %}
+{% extends "report____/layout.html" %}
 {% block report____customized_head_block %}
   {{ super() }}
   <link rel="stylesheet" type="text/css" href="{{ url_for('report____.static', filename='css/customer.css') }}">

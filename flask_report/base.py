@@ -292,7 +292,7 @@ class FlaskReport(object):
         notifications = [Notification(self, int(dir_name)) for dir_name in os.listdir(self.notification_dir) if
                          dir_name.isdigit() and dir_name != '0']
         params = dict(notification_list=notifications)
-        extra_params = self.extra_params.get("notifition_list")
+        extra_params = self.extra_params.get("notification_list")
         if extra_params:
             if isinstance(extra_params, types.FunctionType):
                 extra_params = extra_params()
@@ -320,8 +320,14 @@ class FlaskReport(object):
                 flash(_("Update Successful!"))
                 return redirect(url_for(".notification", id_=id_, _method="GET"))
             else:
-                return render_template("report____/notification.html", notification=notification,
-                                       report_list=self._get_report_list())
+                params = dict(notification=notification,
+                              report_list=self._get_report_list())
+                extra_params = self.extra_params.get("notification")
+                if extra_params:
+                    if isinstance(extra_params, types.FunctionType):
+                        extra_params = extra_params()
+                    params.update(extra_params)
+                return render_template("report____/notification.html", **params)
         else:
             if request.method == "POST":
                 id_ = max([int(dir_name) for dir_name in os.listdir(self.notification_dir) if
@@ -333,7 +339,13 @@ class FlaskReport(object):
                 flash(_("Save Successful!"))
                 return redirect(url_for(".notification", id_=id_))
             else:
-                return render_template("report____/notification.html", report_list=self._get_report_list())
+                params = dict(report_list=self._get_report_list())
+                extra_params = self.extra_params.get("notification")
+                if extra_params:
+                    if isinstance(extra_params, types.FunctionType):
+                        extra_params = extra_params()
+                    params.update(extra_params)
+                return render_template("report____/notification.html", **params)
 
     def push_notification(self, id_):
         to = request.args.get('to')
