@@ -111,6 +111,8 @@ class Report(object):
             from flask.ext.report.utils import get_column_operator
             for name, params in self.filters.items():
                 column, op_ = get_column_operator(name, self.data_set.columns, self.report_view)
+                if hasattr(column, "property") and hasattr(column.property, "direction"):
+                    column = column.property.local_remote_pairs[0][1]
                 if not isinstance(params, list):
                     params = [params]
                 for param in params:
