@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-07-16 19:16+0800\n"
+"POT-Creation-Date: 2013-07-17 16:59+0800\n"
 "PO-Revision-Date: 2013-07-01 14:56+0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -17,24 +17,28 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: base.py:314 templates/report____/notification.html:153
+#: base.py:316 templates/report____/notification.html:165
 msgid "Enable"
 msgstr "激活"
 
-#: base.py:320
+#: base.py:318 templates/report____/notification.html:163
+msgid "Disable"
+msgstr "停止"
+
+#: base.py:322
 msgid "Update Successful!"
 msgstr "更新成功"
 
-#: base.py:333
+#: base.py:341
 msgid "Save Successful!"
 msgstr "保存成功"
 
-#: base.py:348
+#: base.py:362
 #, python-format
 msgid "notification %(id_)s are not allowed to send to %(to)s"
 msgstr "推送%(id_)s不允许发送到%(to)s"
 
-#: base.py:407 templates/report____/data-set.html:233
+#: base.py:421 templates/report____/data-set.html:233
 msgid "Preview"
 msgstr "预览"
 
@@ -83,33 +87,37 @@ msgstr "共0条数据"
 msgid "filtered from _MAX_ total records"
 msgstr "从_MAX_条记录中过滤产生"
 
-#: templates/report____/base-report.html:65
+#: templates/report____/base-report.html:64
+msgid "Search"
+msgstr "搜索"
+
+#: templates/report____/base-report.html:66
 msgid "Previous"
 msgstr "上一页"
 
-#: templates/report____/base-report.html:66
+#: templates/report____/base-report.html:67
 msgid "Next"
 msgstr "下一页"
 
-#: templates/report____/base-report.html:67
+#: templates/report____/base-report.html:68
 msgid "First"
 msgstr "首页"
 
-#: templates/report____/base-report.html:68
+#: templates/report____/base-report.html:69
 msgid "Last"
 msgstr "末页"
 
-#: templates/report____/base-report.html:78
+#: templates/report____/base-report.html:79
 msgid "hide detail"
 msgstr "隐藏详情"
 
-#: templates/report____/base-report.html:81
-#: templates/report____/base-report.html:126
+#: templates/report____/base-report.html:82
+#: templates/report____/base-report.html:127
 #: templates/report____/data-set.html:158
 msgid "show detail"
 msgstr "显示详情"
 
-#: templates/report____/base-report.html:131
+#: templates/report____/base-report.html:132
 #, python-format
 msgid ""
 "created by \"%(creator)s\" at %(create_time)s, using data set <a "
@@ -118,42 +126,42 @@ msgstr ""
 "由用户\"%(creator)s\"在%(create_time)s创建, 使用的数据集和是<a href=\"%(url)s\" "
 "title=\"%(data_set_description)s\">\"%(data_set)s\"</a>"
 
-#: templates/report____/base-report.html:136
+#: templates/report____/base-report.html:137
 msgid "filter conditions are: "
 msgstr "过滤条件如下:"
 
-#: templates/report____/base-report.html:151
+#: templates/report____/base-report.html:152
 msgid "the customized filter condition is: "
 msgstr "定制的过滤条件如下:"
 
-#: templates/report____/base-report.html:159
+#: templates/report____/base-report.html:160
 #: templates/report____/data-set.html:171
 msgid "SQL statement"
 msgstr "SQL语句"
 
-#: templates/report____/base-report.html:176
+#: templates/report____/base-report.html:177
 msgid "download as: "
 msgstr "以下列格式下载: "
 
-#: templates/report____/base-report.html:186
+#: templates/report____/base-report.html:187
 msgid "View Graphs"
 msgstr "查看统计图"
 
-#: templates/report____/base-report.html:194
+#: templates/report____/base-report.html:195
 #: templates/report____/data-set.html:231 templates/report____/graphs.html:45
-#: templates/report____/notification.html:147
+#: templates/report____/notification.html:157
 msgid "BACK"
 msgstr "返回"
 
-#: templates/report____/base-report.html:196
+#: templates/report____/base-report.html:197
 msgid "EDIT"
 msgstr "编辑"
 
-#: templates/report____/base-report.html:197
+#: templates/report____/base-report.html:198
 msgid "REFRESH"
 msgstr "刷新"
 
-#: templates/report____/base-report.html:211
+#: templates/report____/base-report.html:212
 msgid "Close"
 msgstr "关闭"
 
@@ -240,65 +248,66 @@ msgstr "推送列表"
 msgid "New"
 msgstr "新建"
 
-#: templates/report____/notification.html:16
-#: templates/report____/notification.html:96
-#: templates/report____/notification.html:102
+#: templates/report____/notification.html:17
+#: templates/report____/notification.html:103
+#: templates/report____/notification.html:109
 msgid "Enter E-mail"
 msgstr "请输入Email"
 
-#: templates/report____/notification.html:51
+#: templates/report____/notification.html:53
 #, python-format
 msgid "Editing %(notification)s"
 msgstr "正在编辑%(notification)s"
 
-#: templates/report____/notification.html:53
+#: templates/report____/notification.html:55
 msgid "Enabled"
 msgstr "激活"
 
-#: templates/report____/notification.html:55
+#: templates/report____/notification.html:57
 msgid "Disabled"
 msgstr "未激活"
 
-#: templates/report____/notification.html:58
+#: templates/report____/notification.html:60
 msgid "Creating notification"
 msgstr "创建推送"
 
-#: templates/report____/notification.html:83
+#: templates/report____/notification.html:66
+#, fuzzy
+msgid "Only disabled notification can be edit"
+msgstr "只支持变量date和notification"
+
+#: templates/report____/notification.html:90
 msgid "Name"
 msgstr "名称"
 
-#: templates/report____/notification.html:90
+#: templates/report____/notification.html:97
 msgid "Senders"
 msgstr "推送到"
 
-#: templates/report____/notification.html:110
+#: templates/report____/notification.html:117
 msgid "reports"
 msgstr "报表列表"
 
-#: templates/report____/notification.html:121
+#: templates/report____/notification.html:128
 #: templates/report____/report_short_description.html:3
 msgid "description"
 msgstr "描述"
 
-#: templates/report____/notification.html:130
+#: templates/report____/notification.html:137
 msgid "Subject"
 msgstr "标题"
 
-#: templates/report____/notification.html:133
+#: templates/report____/notification.html:143
 msgid "Only 'date' and 'notification' supported"
 msgstr "只支持变量date和notification"
 
-#: templates/report____/notification.html:137
+#: templates/report____/notification.html:147
 msgid "Crontab"
 msgstr "周期"
 
-#: templates/report____/notification.html:148
+#: templates/report____/notification.html:159
 msgid "Save"
 msgstr "保存"
-
-#: templates/report____/notification.html:151
-msgid "Disable"
-msgstr "停止"
 
 #: templates/report____/report-list.html:4
 #: templates/report____/report-list.html:18
@@ -320,10 +329,4 @@ msgstr "数据集和"
 #: templates/report____/report_short_description.html:5
 msgid "data set description"
 msgstr "数据集合描述"
-
-#~ msgid "Error!"
-#~ msgstr "错误!"
-
-#~ msgid "SAVE"
-#~ msgstr "保存"
 

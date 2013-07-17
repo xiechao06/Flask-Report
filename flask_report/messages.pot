@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-07-16 19:17+0800\n"
+"POT-Creation-Date: 2013-07-17 16:59+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,24 +17,28 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: base.py:314 templates/report____/notification.html:153
+#: base.py:316 templates/report____/notification.html:165
 msgid "Enable"
 msgstr ""
 
-#: base.py:320
+#: base.py:318 templates/report____/notification.html:163
+msgid "Disable"
+msgstr ""
+
+#: base.py:322
 msgid "Update Successful!"
 msgstr ""
 
-#: base.py:333
+#: base.py:341
 msgid "Save Successful!"
 msgstr ""
 
-#: base.py:348
+#: base.py:362
 #, python-format
 msgid "notification %(id_)s are not allowed to send to %(to)s"
 msgstr ""
 
-#: base.py:407 templates/report____/data-set.html:233
+#: base.py:421 templates/report____/data-set.html:233
 msgid "Preview"
 msgstr ""
 
@@ -83,75 +87,79 @@ msgstr ""
 msgid "filtered from _MAX_ total records"
 msgstr ""
 
-#: templates/report____/base-report.html:65
-msgid "Previous"
+#: templates/report____/base-report.html:64
+msgid "Search"
 msgstr ""
 
 #: templates/report____/base-report.html:66
-msgid "Next"
+msgid "Previous"
 msgstr ""
 
 #: templates/report____/base-report.html:67
-msgid "First"
+msgid "Next"
 msgstr ""
 
 #: templates/report____/base-report.html:68
+msgid "First"
+msgstr ""
+
+#: templates/report____/base-report.html:69
 msgid "Last"
 msgstr ""
 
-#: templates/report____/base-report.html:78
+#: templates/report____/base-report.html:79
 msgid "hide detail"
 msgstr ""
 
-#: templates/report____/base-report.html:81
-#: templates/report____/base-report.html:126
+#: templates/report____/base-report.html:82
+#: templates/report____/base-report.html:127
 #: templates/report____/data-set.html:158
 msgid "show detail"
 msgstr ""
 
-#: templates/report____/base-report.html:131
+#: templates/report____/base-report.html:132
 #, python-format
 msgid ""
 "created by \"%(creator)s\" at %(create_time)s, using data set <a "
 "href=\"%(url)s\" title=\"%(data_set_description)s\">\"%(data_set)s\"</a>"
 msgstr ""
 
-#: templates/report____/base-report.html:136
+#: templates/report____/base-report.html:137
 msgid "filter conditions are: "
 msgstr ""
 
-#: templates/report____/base-report.html:151
+#: templates/report____/base-report.html:152
 msgid "the customized filter condition is: "
 msgstr ""
 
-#: templates/report____/base-report.html:159
+#: templates/report____/base-report.html:160
 #: templates/report____/data-set.html:171
 msgid "SQL statement"
 msgstr ""
 
-#: templates/report____/base-report.html:176
+#: templates/report____/base-report.html:177
 msgid "download as: "
 msgstr ""
 
-#: templates/report____/base-report.html:186
+#: templates/report____/base-report.html:187
 msgid "View Graphs"
 msgstr ""
 
-#: templates/report____/base-report.html:194
+#: templates/report____/base-report.html:195
 #: templates/report____/data-set.html:231 templates/report____/graphs.html:45
-#: templates/report____/notification.html:147
+#: templates/report____/notification.html:157
 msgid "BACK"
 msgstr ""
 
-#: templates/report____/base-report.html:196
+#: templates/report____/base-report.html:197
 msgid "EDIT"
 msgstr ""
 
-#: templates/report____/base-report.html:197
+#: templates/report____/base-report.html:198
 msgid "REFRESH"
 msgstr ""
 
-#: templates/report____/base-report.html:211
+#: templates/report____/base-report.html:212
 msgid "Close"
 msgstr ""
 
@@ -238,64 +246,64 @@ msgstr ""
 msgid "New"
 msgstr ""
 
-#: templates/report____/notification.html:16
-#: templates/report____/notification.html:96
-#: templates/report____/notification.html:102
+#: templates/report____/notification.html:17
+#: templates/report____/notification.html:103
+#: templates/report____/notification.html:109
 msgid "Enter E-mail"
 msgstr ""
 
-#: templates/report____/notification.html:51
+#: templates/report____/notification.html:53
 #, python-format
 msgid "Editing %(notification)s"
 msgstr ""
 
-#: templates/report____/notification.html:53
+#: templates/report____/notification.html:55
 msgid "Enabled"
 msgstr ""
 
-#: templates/report____/notification.html:55
+#: templates/report____/notification.html:57
 msgid "Disabled"
 msgstr ""
 
-#: templates/report____/notification.html:58
+#: templates/report____/notification.html:60
 msgid "Creating notification"
 msgstr ""
 
-#: templates/report____/notification.html:83
-msgid "Name"
+#: templates/report____/notification.html:66
+msgid "Only disabled notification can be edit"
 msgstr ""
 
 #: templates/report____/notification.html:90
+msgid "Name"
+msgstr ""
+
+#: templates/report____/notification.html:97
 msgid "Senders"
 msgstr ""
 
-#: templates/report____/notification.html:110
+#: templates/report____/notification.html:117
 msgid "reports"
 msgstr ""
 
-#: templates/report____/notification.html:121
+#: templates/report____/notification.html:128
 #: templates/report____/report_short_description.html:3
 msgid "description"
 msgstr ""
 
-#: templates/report____/notification.html:130
+#: templates/report____/notification.html:137
 msgid "Subject"
 msgstr ""
 
-#: templates/report____/notification.html:133
+#: templates/report____/notification.html:143
 msgid "Only 'date' and 'notification' supported"
 msgstr ""
 
-#: templates/report____/notification.html:137
+#: templates/report____/notification.html:147
 msgid "Crontab"
 msgstr ""
 
-#: templates/report____/notification.html:148
+#: templates/report____/notification.html:159
 msgid "Save"
-msgstr ""
-
-#: templates/report____/notification.html:151
-msgid "Disable"
 msgstr ""
 
 #: templates/report____/report-list.html:4
