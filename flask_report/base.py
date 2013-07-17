@@ -316,7 +316,7 @@ class FlaskReport(object):
                 if request.form.get('action') == _('Enable'):
                     self.start_notification(id_)
                 elif request.form.get("action") == _("Disable"):
-                    self.stop_notification(id_) # any change will incur disable
+                    self.stop_notification(id_)  # any change will incur disable
                 else:
                     _write(request.form, id_)
                 flash(_("Update Successful!"))
@@ -327,7 +327,7 @@ class FlaskReport(object):
                 extra_params = self.extra_params.get("notification")
                 if extra_params:
                     if isinstance(extra_params, types.FunctionType):
-                        extra_params = extra_params()
+                        extra_params = extra_params(id_)
                     params.update(extra_params)
                 return render_template("report____/notification.html", **params)
         else:

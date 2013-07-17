@@ -19,3 +19,7 @@ code {
     display: block;
     margin-bottom: 5px;
 }
+
+.crontab-div {
+    padding-top: 5px;
+}
