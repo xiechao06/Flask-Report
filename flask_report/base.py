@@ -377,7 +377,7 @@ class FlaskReport(object):
             return _push_notification
 
         job = self.sched.add_cron_job(_closure(request.environ), name='flask_report_notification' + str(id_),
-                                      **notification.crontab.__dict__)
+                                      **notification.crontab._asdict())
         notification.enabled = True
         notification.dump()
         return 'ok'
