@@ -18,8 +18,8 @@
         $('select').select2();
     jQuery.fn.addFilter = function (col, text, available_opts, type, avalialed_values, op, value, proxy) {
         var tr = $("<tr name='filter'></tr>");
-        var td1 = $("<td></td>").html($("<button type='button' class='btn' name='remove-tr'></button>").html($("<i class='icon-remove icon-large'></i>")));
-        var td2 = $("<td></td>").text(text);
+        var td1 = $("<td></td>").html($("<button type='button' class='btn mb10' name='remove-tr'></button>").html($("<i class='icon-remove icon-large'></i>")));
+        var td2 = $("<td></td>").html($("<div class='mb10'></div>").text(text));
         var select = $("<select></select>");
         $.each([
           {"key": "eq", "value": "等于"},
