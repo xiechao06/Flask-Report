@@ -28,9 +28,10 @@
       });
       $("textarea").autosize();
       {% if notification %}
-        $("#crontab").cron({initial : "{{ notification._crontab}}", onChange: function () {
+        $("#crontab").cron({initial: "{{ notification._crontab}}", onChange: function () {
           $('#crontab-val').val($(this).cron("value"));
-        }});
+        }, {% if readonly%}disabled:true{% endif %}
+        });
       {% else %}
         $("#crontab").cron({onChange: function () {
           $('#crontab-val').val($(this).cron("value"));
@@ -60,6 +61,11 @@
       {% endif %}
     </h1> 
   </div>
+  {% if readonly %}
+     <div class="alert alert-warning">
+      {{ _("Only disabled notification can be edit") }}
+     </div>
+  {% endif %}
   {% with messages = get_flashed_messages(with_categories=True) %}
     {% if messages %}
       <div class="flash">
@@ -94,8 +100,8 @@
           {% if notification %}
             {% for sender in notification.senders %}
               <div class="control-inline-group">
-                <input type="email" name="sender" placeholder="{{ _("Enter E-mail") }}" {% if loop.first %}id="sender"{% endif %} value="{{ sender }}" class="senders" />
-                <button class="btn-danger btn" type="button" name="remove"><i class="icon-remove"></i></button>
+                <input type="email" name="sender" placeholder="{{ _("Enter E-mail") }}" {% if loop.first %}id="sender"{% endif %} value="{{ sender }}" class="senders" {% if readonly%}readonly{% endif %} />
+                <button class="btn-danger btn" type="button" name="remove" {% if readonly%}disabled{% endif %}><i class="icon-remove"></i></button>
               </div>
             {% endfor %}
           {% else %}
@@ -104,14 +110,14 @@
               <button class="btn-danger btn" type="button" name="remove"><i class="icon-remove"></i></button>
             </div>
           {% endif %}
-          <button class="btn btn-primary" type="button" id="add-sender"><i class="icon-plus"></i></button>
+          <button class="btn btn-primary" type="button" id="add-sender" {% if readonly%}disabled{% endif %}><i class="icon-plus"></i></button>
         </div>
       </div>
       <div class="control-group">
         <label class="control-label" for="report_ids">{{ _("reports") }}</label>
 
         <div class="controls">
-          <select name="report_ids" id="report_ids" multiple {% if readonly %}readonly{% endif %}>
+          <select name="report_ids" id="report_ids" multiple {% if readonly %}disabled{% endif %}>
             {% for report in report_list %}
               <option value="{{ report.id_ }}" {% if notification and report.id_ in notification.report_ids %}selected="selected"{% endif %}>{{ report.name }}</option>
             {% endfor %}
