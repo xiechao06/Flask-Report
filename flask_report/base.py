@@ -313,10 +313,10 @@ class FlaskReport(object):
             if request.method == "POST":
                 if request.form.get('action') == _('Enable'):
                     self.start_notification(id_)
-                else:
+                elif request.form.get("action") == _("Disabled"):
                     self.stop_notification(id_) # any change will incur disable
-                    form = request.form
-                    _write(request.form, id_) 
+                else:
+                    _write(request.form, id_)
                 flash(_("Update Successful!"))
                 return redirect(url_for(".notification", id_=id_, _method="GET"))
             else:

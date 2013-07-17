@@ -1,6 +1,6 @@
 create_time: 2013-07-12 12:28:00
 creator: xc
-crontab: '*/1 * * * *'
+crontab: '* * * * *'
 description: ""
 enabled: false
 name: "\u73ED\u7EC4\u7EE9\u6548\u6C47\u603B"

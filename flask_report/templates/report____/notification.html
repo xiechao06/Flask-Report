@@ -23,7 +23,7 @@
           return false;
         }
       });
-      $("button[name=remove]").click(function () {
+      $("button[name=remove]").live("click", function () {
         $(this).closest("div").remove();
       });
       $("textarea").autosize();
