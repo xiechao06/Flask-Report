@@ -238,7 +238,7 @@ def create_report(data_set, name, description="", creator="", create_time=None, 
 
     create_time = create_time or datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     columns = columns or [c['idx'] for c in data_set.columns]
-    filters = filters or []
+    filters = filters or {}
     
     if id is None:
         all_report_dirs = [dir for dir in os.listdir(data_set.report_view.report_dir) if dir.isdigit()]
