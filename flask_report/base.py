@@ -313,7 +313,7 @@ class FlaskReport(object):
             if request.method == "POST":
                 if request.form.get('action') == _('Enable'):
                     self.start_notification(id_)
-                elif request.form.get("action") == _("Disabled"):
+                elif request.form.get("action") == _("Disable"):
                     self.stop_notification(id_) # any change will incur disable
                 else:
                     _write(request.form, id_)

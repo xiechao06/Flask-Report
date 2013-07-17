@@ -62,7 +62,10 @@ class Notification(object):
             'crontab': self._crontab,
             'enabled': self.enabled
         }
-        yaml.dump(d, open(meta_file, 'w'))
+        for k, v in d.items():
+            if v is None:
+                del d[k]
+        yaml.dump(d, open(meta_file, 'w'), allow_unicode=True)
 
 
 def get_all_notifications(report_view):
