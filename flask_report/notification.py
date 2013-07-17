@@ -69,4 +69,6 @@ class Notification(object):
 
 
 def get_all_notifications(report_view):
-    return [Notification(report_view, id_) for id_ in os.listdir(report_view.notification_dir)]
+    if os.path.exists(report_view.notification_dir):
+        return [Notification(report_view, id_) for id_ in os.listdir(report_view.notification_dir)]
+    return []
