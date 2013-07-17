@@ -4,21 +4,18 @@ import json
 import types
 
 from apscheduler.scheduler import Scheduler
-from flask import render_template, abort, request, url_for, redirect, flash
+from flask import render_template, abort, request, url_for, redirect, flash, jsonify
 from flask.ext.mail import Mail, Message
 from flask.ext.babel import _
-
-from flask.ext.report.notification import Notification, get_all_notifications
-from flask import render_template, abort, request, url_for, redirect, jsonify
 from wtforms import Form, TextField, validators, IntegerField, SelectMultipleField
-
-from flask.ext.report.report import Report, create_report
-from flask.ext.report.data_set import DataSet
-from flask.ext.report.utils import get_column_operated, query_to_sql, dump_yaml
-from flask.ext.babel import gettext as _
 from pygments import highlight
 from pygments.lexers import PythonLexer, SqlLexer
 from pygments.formatters import HtmlFormatter
+
+from flask.ext.report.notification import Notification, get_all_notifications
+from flask.ext.report.report import Report, create_report
+from flask.ext.report.data_set import DataSet
+from flask.ext.report.utils import get_column_operated, query_to_sql, dump_yaml
 
 class FlaskReport(object):
     def __init__(self, db, model_map, app, blueprint=None, extra_params=None, table_label_map=None, mail=None):
@@ -29,9 +26,9 @@ class FlaskReport(object):
         self.report_dir = os.path.join(self.conf_dir, "reports")
         self.notification_dir = os.path.join(self.conf_dir, "notifications")
         self.data_set_dir = os.path.join(self.conf_dir, "data_sets")
-        self.model_map = model_map # model name -> model
+        self.model_map = model_map  # model name -> model
         self.table_label_map = table_label_map or {}
-        self.table_map = dict((model.__tablename__, model) for model in model_map.values()) # table name -> model
+        self.table_map = dict((model.__tablename__, model) for model in model_map.values())  # table name -> model
         if not os.path.exists(self.conf_dir):
             os.makedirs(self.conf_dir)
         if not os.path.exists(self.report_dir):
@@ -66,7 +63,9 @@ class FlaskReport(object):
         self.extra_params = extra_params or {'report': lambda id_: {},
                                              'report_list': lambda: {},
                                              'data_set': lambda id_: {},
-                                             'data_sets': lambda: {}}
+                                             'data_sets': lambda: {},
+                                             'notification-list': lambda: {},
+                                             'notification': lambda id_: {}}
 
         @app.template_filter("dpprint")
         def dict_pretty_print(value):
@@ -92,11 +91,13 @@ class FlaskReport(object):
                 if notification.enabled:
                     self.start_notification(notification.id_)
 
-
     def try_view_report(self):
         pass
 
     def try_edit_data_set(self):
+        pass
+
+    def try_edit_notification(self):
         pass
 
     def report_graphs(self, id_):
@@ -272,7 +273,6 @@ class FlaskReport(object):
         response.headers["Content-disposition"] = "attachment; filename={}.txt".format(str(id_))
         return response
 
-
     def get_model_label(self, table):
         return self.table_label_map.get(table.name) or self.table_map[table.name].__name__
 
@@ -300,6 +300,8 @@ class FlaskReport(object):
         return render_template("report____/notification-list.html", **params)
 
     def notification(self, id_=None):
+        self.try_edit_notification()
+
         def _write(form, id_):
             kwargs = dict(name=form["name"], senders=form.getlist("sender"),
                           report_ids=form.getlist("report_ids", type=int), description=form["description"],

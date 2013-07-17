@@ -2,15 +2,13 @@
 import os
 import codecs
 from collections import namedtuple
-
-from import_file import import_file
 from datetime import date
 
 import yaml
 from flask.ext.report.report import Report
 
-class Notification(object):
 
+class Notification(object):
     def __init__(self, report_view, id_):
         self.report_view = report_view
         self.id_ = id_
@@ -39,10 +37,9 @@ class Notification(object):
     def subject(self):
         return self.report_view.app.jinja_env.from_string(self.__subject).render(date=date.today(), notification=self)
 
-    @property 
+    @property
     def reports(self):
-        return [Report(self.report_view, id_) for id_ in self.report_ids]   
-
+        return [Report(self.report_view, id_) for id_ in self.report_ids]
 
     @property
     def crontab(self):
@@ -69,6 +66,5 @@ class Notification(object):
 
 
 def get_all_notifications(report_view):
-    if os.path.exists(report_view.notification_dir):
-        return [Notification(report_view, id_) for id_ in os.listdir(report_view.notification_dir)]
-    return []
+    return [Notification(report_view, id_) for id_ in os.listdir(report_view.notification_dir) if
+            os.path.exists(report_view.notification_dir)]
