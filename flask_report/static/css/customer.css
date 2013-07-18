@@ -24,6 +24,6 @@ code {
     padding-top: 5px;
 }
 
-.mb10 {
-    margin-bottom: 10px;
+.mb0 {
+    margin-bottom: 0 !important;
 }

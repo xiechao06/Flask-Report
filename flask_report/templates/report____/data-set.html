@@ -15,11 +15,11 @@
   <script type="text/javascript" charset="utf8" src="{{ url_for('report____.static', filename='js/sprintf-0.6.js') }}"></script>
   <script type="text/javascript">
     $(function(){
-        $('select').select2();
+      $('select').select2({width: "resolve"});
     jQuery.fn.addFilter = function (col, text, available_opts, type, avalialed_values, op, value, proxy) {
         var tr = $("<tr name='filter'></tr>");
-        var td1 = $("<td></td>").html($("<button type='button' class='btn mb10' name='remove-tr'></button>").html($("<i class='icon-remove icon-large'></i>")));
-        var td2 = $("<td></td>").html($("<div class='mb10'></div>").text(text));
+        var td1 = $("<td></td>").html($("<button type='button' class='btn' name='remove-tr'></button>").html($("<i class='icon-remove icon-large'></i>")));
+        var td2 = $("<td></td>").html($("<div ></div>").text(text));
         var select = $("<select></select>");
         $.each([
           {"key": "eq", "value": "等于"},
@@ -41,7 +41,7 @@
           select.val(op);
         }
         var td3 = $("<td></td>").html(select);
-        var input_str = "<input type='text' required></input>";
+        var input_str = "<input type='text' class='mb0' required></input>";
 
         var input = $(input_str);
         if (type) {
@@ -64,10 +64,12 @@
           input.val(value)
         }
         input.attr("data-col", col);
-        input.attr('data-proxy', proxy)
+        input.attr('data-proxy', proxy);
         var td4 = $("<td></td>").html(input);
         tr.append(td1, td2, td3, td4);
-        this.find("tbody").append(tr);
+        var div = $("<div></div>").addClass("control-label").append(tr);
+        this.find("tbody").append(div);
+        $('select').select2({width: "resolve"});
       };
 
       {% for filter in data_set.filters %}
@@ -203,7 +205,7 @@
           <label class="control-label" for="report_columns">{{ _("columns") }}</label>
 
           <div class="controls">
-            <select name="columns" id="report_columns" multiple required style="width: 50%">
+            <select name="columns" id="report_columns" multiple required>
               {% for c in data_set.columns %}
               <option value="{{ c.idx }}" selected>{{ c.name }}</option>
               {% endfor %}
@@ -222,16 +224,14 @@
         </legend>
         <table id="clause">
           <tbody>
-            <div class="control-group">
-            </div>
           </tbody>
         </table>
       </fieldset>
-      <div class="pagination-centered">
-        <a href="{{ url_for('.data_set_list') }}" class="btn btn-primary btn-large">{{ _('BACK') }}</a>
-        <button class="btn btn-primary btn-large" data-role='save-report-btn'>{{ _("Save as Report") }}</button>
-        <button data-role='preview-btn' class="btn btn-primary btn-large">{{ _('Preview') }}</button>
-      </div>
+    <div class="pagination pagination-centered">
+      <a href="{{ url_for('.data_set_list') }}" class="btn btn-primary btn-large">{{ _('BACK') }}</a>
+      <button class="btn btn-primary btn-large" data-role='save-report-btn'>{{ _("Save as Report") }}</button>
+      <button data-role='preview-btn' class="btn btn-primary btn-large">{{ _('Preview') }}</button>
+    </div>
     </form>
 
   </div>
