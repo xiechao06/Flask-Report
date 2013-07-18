@@ -151,10 +151,6 @@ class FlaskReport(object):
             report = Report(self, id_)
 
             html_report = report.html_template.render(report=report)
-            from pygments import highlight
-            from pygments.lexers import PythonLexer, SqlLexer
-            from pygments.formatters import HtmlFormatter
-
             code = report.read_literal_filter_condition()
 
             SQL_html = highlight(query_to_sql(report.query), SqlLexer(), HtmlFormatter())
