@@ -146,6 +146,7 @@
           $("#clause").addFilter(e.attr('data-value'), e.text(), $.parseJSON(e.attr("data-ops")), e.attr("data-type"), $.parseJSON(e.attr("data-opts")), '', '', e.attr('data-proxy'));
           $('button[data-role="new-filter"]').popover('hide');
         });
+      $("textarea").autosize();
     })
   </script>
 {% endblock %}
