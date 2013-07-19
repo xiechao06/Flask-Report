@@ -1,13 +1,14 @@
-name: 三国实力报告
-description: 三国时期各个国家的情况分析
-creator: 智冠 
 create_time: 2013-07-02 07:30:00
+creator: 智冠
 default_report_name: xxxx报表
+description: 三国时期各个国家的情况分析
 filters:
-  User.group:
-    name: 国家
+  Group.name:
     operators: [eq, ne]
     shown: true
+  User.impact:
+    name: 影响力
+    operators: [eq, ne]
   sum(User.impact):
     operators: [eq, ne]
-
+name: 三国实力报告

@@ -20,6 +20,7 @@ class BrowserRunner(object):
 
         Also has _open_browser and _close_browser for setup and teardown.
     """
+
     def __init__(self, hostname, scheme, port):
         self._port = port
         self._scheme = scheme
@@ -30,7 +31,7 @@ class BrowserRunner(object):
         """Create an instance of BrowserRunner using values from testconfig"""
         port = testconfig.config.get('port', 3000)
         scheme = testconfig.config.get('scheme', 'http')
-        hostname = testconfig.config.get('hostname', 'localhost') 
+        hostname = testconfig.config.get('hostname', 'localhost')
         return cls(hostname, scheme, port)
 
     @classmethod
@@ -40,8 +41,8 @@ class BrowserRunner(object):
             Used to conveniently make file level test fixtures
         """
         instance = cls.from_testconfig()
-        setup = lambda : instance._open_browser()
-        teardown = lambda : instance._close_browser()
+        setup = lambda: instance._open_browser()
+        teardown = lambda: instance._close_browser()
         return instance, setup, teardown
 
     def _open_browser(self):
@@ -74,6 +75,7 @@ class BrowserRunner(object):
 
 def init():
     """Custom TestCase that starts a browser for every test"""
+
     @before_each_feature
     def setup(feature):
         """Create our browser"""
@@ -83,4 +85,7 @@ def init():
     @after_each_feature
     def teardown(feature):
         """Make sure the browser dies"""
-        feature.browser._close_browser()
+        try:
+            feature.browser._close_browser()
+        except:
+            pass
