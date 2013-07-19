@@ -22,3 +22,4 @@ speaklater==1.3
 wsgiref==0.1.2
 APScheduler==2.1.1
 Flask-Mail==0.9.0
+nose-testconfig
