@@ -52,7 +52,7 @@ class App(object):
 
         path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "report_conf", "data_sets", "1")
         if not os.path.exists(path):
-            os.mkdir(path)
+            os.makedirs(path)
         with open(os.path.join(path, "meta.yaml"), "w") as f:
             yaml.dump(d, f, allow_unicode=True)
 
@@ -86,7 +86,7 @@ def get_query(db, model_map):
 
         path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "report_conf", "notifications", "1")
         if not os.path.exists(path):
-            os.mkdir(path)
+            os.makedirs(path)
         with open(os.path.join(path, "meta.yaml"), "w") as f:
             yaml.dump(d, f, allow_unicode=True)
 
