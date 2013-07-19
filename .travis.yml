@@ -8,7 +8,7 @@ branch:
 # command to install dependencies
 install:
     - pip install -r requirements.txt
-    - python setup.py install
+    - pip install -e .
 # command to run tests
 script:
     - cd flask_report/test/
