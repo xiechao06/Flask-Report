@@ -1,0 +1,7 @@
+crontab: 1 * * * *
+description: ''
+enabled: true
+name: NewName
+report_ids: []
+senders: [abc549825@163.com]
+subject: '[{{date}}]{{ notification.name }}'
