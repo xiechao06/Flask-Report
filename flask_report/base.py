@@ -53,6 +53,7 @@ class FlaskReport(object):
         host.route("/push_notification/<int:id_>", methods=['POST'])(self.push_notification)
         host.route("/start_notification/<int:id_>", methods=['GET'])(self.start_notification)
         host.route("/stop_notification/<int:id_>", methods=['GET'])(self.stop_notification)
+        host.route("/schedule-list")(self.get_schedules)
 
         from flask import Blueprint
         # register it for using the templates of data browser
@@ -392,7 +393,10 @@ class FlaskReport(object):
         else:
             return 'unknown notifiaction:' + str(id_), 404
         
-        
+    def get_schedules(self):
+        return json.dumps([str(job) for job in self.sched.get_jobs()])
+
+
     def new_report(self):
 
         form = _ReportForm(self, request.form)
