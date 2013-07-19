@@ -1,5 +1,6 @@
+wtforms
+nose
 sqlparse
-import_file
 geraldo
 Babel==0.9.6
 Flask==0.10.1
