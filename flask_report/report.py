@@ -224,7 +224,6 @@ class Report(object):
                 display_names = []
                 length = len(self.data)
                 total = sum(row[column["idx"]] for row in self.data)
-                d = sorted(self.data, key=lambda v: v[column["idx"]])
                 for idx, row in enumerate(self.data):
                     from flask.ext.report.utils import get_color
                     color = get_color(idx, colors, length)
