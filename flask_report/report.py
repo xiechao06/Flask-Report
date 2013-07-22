@@ -223,13 +223,15 @@ class Report(object):
                 data = []
                 display_names = []
                 length = len(self.data)
+                total = sum(row[column["idx"]] for row in self.data)
                 for idx, row in enumerate(self.data):
                     from flask.ext.report.utils import get_color
                     color = get_color(idx, colors, length)
                     data.append({"value": row[column["idx"]], "color": color})
                     display_columns = pie.get("display_columns", [])
                     name = "(" + ", ".join(unicode(row[all_columns[c]['idx']]) for c in display_columns) + ')'
-                    display_names.append({"name": name, "color": color})
+                    display_names.append({"name": name, "color": color,
+                                          "distribution": "%.2f%%" % (row[column["idx"]] * 100.0 / total)})
                 result = {"name": pie.get("name"), "id_": uuid.uuid1(), "display_names": display_names, "data": data}
                 self._pie_charts.append(result)
         return self._pie_charts

@@ -420,8 +420,9 @@ class FlaskReport(object):
             if request.args.get('preview'):
                 name += '(' + _('Preview') + ')'
                 id = 0
-            report_id = create_report(form.data_set, name=name, creator=form.creator.data, description=form.description.data, 
-                              columns=form.columns.data, filters=parse_filters(json.loads(form.filters.data)), id = id)
+            report_id = create_report(form.data_set, name=name, creator=form.creator.data,
+                                      description=form.description.data, id=id, columns=form.columns.data,
+                                      filters=parse_filters(json.loads(form.filters.data)))
             return jsonify({'id': report_id, 'name': form.name.data, 'url': url_for('.report', id_=report_id)})
         else:
             return jsonify({'errors': form.errors}), 403
