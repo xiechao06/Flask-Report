@@ -67,19 +67,22 @@ class Report(object):
 
     def _gen_drill_down_link(self, col_id, r):
         group_by_columns = self.query.statement._group_by_clause.clauses
-        params = {}
-        d = dict((col['key'], col) for col in self.data_set.columns)
+        if group_by_columns:
+            params = {}
+            d = dict((col['key'], col) for col in self.data_set.columns)
 
-        for col in group_by_columns:
-            if col.foreign_keys:
-                remote_side = list(enumerate(col.foreign_keys))[0][1].column
-                col_name = remote_side.table.name + "." + remote_side.name
-            else:
-                col_name = str(col)
-                if isinstance(col, sqlalchemy.sql.expression.Function):
-                    col_name = col_name.replace('"', '')
-            params[col_name] = r[d[col_name]['idx']]
-        return url_for('.drill_down_detail', report_id=self.id_, col_id=col_id, **params)
+            for col in group_by_columns:
+                if col.foreign_keys:
+                    remote_side = list(enumerate(col.foreign_keys))[0][1].column
+                    col_name = remote_side.table.name + "." + remote_side.name
+                else:
+                    col_name = str(col)
+                    if isinstance(col, sqlalchemy.sql.expression.Function):
+                        col_name = col_name.replace('"', '')
+                params[col_name] = r[d[col_name]['idx']]
+            return url_for('.drill_down_detail', report_id=self.id_, col_id=col_id, **params)
+        else:
+            return None
 
     @property
     def sum_columns(self):
