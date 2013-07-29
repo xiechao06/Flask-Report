@@ -84,11 +84,11 @@
           var filters = [];
           $.each(form.find("tr[name='filter']"), function (idx, tr) {
             var finds = $(tr).find("input");
-            if (finds.length == 0) {
+            if (finds.length % 2 == 0) {
               finds = $(tr).find("select");
               var input = $(finds[1]);
             } else {
-              input = $(finds[0]);
+              input = $(finds[2]);
             }
             filters.push({"col": input.attr("data-col"), "op": $($(tr).find("select")).val(), "val": input.val(), 'proxy': input.attr('data-proxy')=='true'});
           });
