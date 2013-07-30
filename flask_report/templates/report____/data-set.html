@@ -217,6 +217,7 @@
         <input type="hidden" name="data_set_id" value="{{ data_set.id_ }}"/>
         <input type="hidden" name="filters" />
       </fieldset>
+    {% if data_set.filters %}
       <fieldset>
         <legend>{{ _("filters") }}
           <button data-toggle="popover" data-role='new-filter'>
@@ -228,6 +229,7 @@
           </tbody>
         </table>
       </fieldset>
+    {% endif %}
     <div class="pagination pagination-centered">
       <a href="{{ url_for('.data_set_list') }}" class="btn btn-primary btn-large">{{ _('BACK') }}</a>
       <button class="btn btn-primary btn-large" data-role='save-report-btn'>{{ _("Save as Report") }}</button>
