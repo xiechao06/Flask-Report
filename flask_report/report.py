@@ -52,13 +52,9 @@ class Report(object):
         ret = []
         for i in self.__columns:
             col = copy.copy(all_columns[i])
-            col_expr = col['expr']
             col['get_drill_down_link'] = lambda r: None
-            if hasattr(col_expr, 'element'):
-                col_expr = col_expr.element
 
-            if (isinstance(col_expr, sqlalchemy.sql.expression.Function) or isinstance(col_expr,
-                                                                                       sqlalchemy.sql.expression.ClauseElement)) and col_expr.name == 'sum':
+            if os.path.isdir(os.path.join(self.report_view.report_dir, str(self.id_), "drill_downs", str(i))):
                 col['get_drill_down_link'] = partial(self._gen_drill_down_link, i)
             if not self._searchable_columns or i in self._searchable_columns:
                 col["searchable"] = True
