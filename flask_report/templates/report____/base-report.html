@@ -58,7 +58,7 @@
     function parse(str) {
       str = $.trim(str);
       if (!isNaN(str)) {
-        str = parseFloat(str);
+        str = Number(str);
       }
       return str;
     }
