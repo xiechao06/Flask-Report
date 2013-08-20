@@ -199,12 +199,14 @@
       {#    <a href="{{ url_for('.report_txt', id_=report.id_) }}" class="btn btn-primary btn-info">TXT</a>#}
     </div>
   </div>
-  <div class='span-6 offset2'>
-    <a href="{{ url_for(".report_graphs", id_=report.id_, url=request.url) }}" class="btn btn-inverse">
-      <i class="icon-bar-chart"></i>
-      {{ _("View Graphs") }}
-    </a>
-  </div>
+  {% if report.bar_charts or report.pie_charts %}
+    <div class='span-6 offset2'>
+      <a href="{{ url_for(".report_graphs", id_=report.id_, url=request.url) }}" class="btn btn-inverse">
+        <i class="icon-bar-chart"></i>
+        {{ _("View Graphs") }}
+      </a>
+    </div>
+  {% endif %}
 </div>
 <hr />
 
