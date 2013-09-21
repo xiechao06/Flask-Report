@@ -84,12 +84,13 @@ class FlaskReport(object):
 
         self.mail = mail or Mail(self.app)
         self.sched = Scheduler()
-        self.sched.start()
+        if app.config.get('FLASK_REPORT_SEND_NOTIFICATION'):
+            self.sched.start()
 
-        with app.test_request_context():
-            for notification in get_all_notifications(self):
-                if notification.enabled:
-                    self.start_notification(notification.id_)
+            with app.test_request_context():
+                for notification in get_all_notifications(self):
+                    if notification.enabled:
+                        self.start_notification(notification.id_)
 
     def try_view_report(self):
         pass
