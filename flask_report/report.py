@@ -52,13 +52,9 @@ class Report(object):
         ret = []
         for i in self.__columns:
             col = copy.copy(all_columns[i])
-            col_expr = col['expr']
             col['get_drill_down_link'] = lambda r: None
-            if hasattr(col_expr, 'element'):
-                col_expr = col_expr.element
 
-            if (isinstance(col_expr, sqlalchemy.sql.expression.Function) or isinstance(col_expr,
-                                                                                       sqlalchemy.sql.expression.ClauseElement)) and col_expr.name == 'sum':
+            if os.path.isdir(os.path.join(self.report_view.report_dir, str(self.id_), "drill_downs", str(i))):
                 col['get_drill_down_link'] = partial(self._gen_drill_down_link, i)
             if not self._searchable_columns or i in self._searchable_columns:
                 col["searchable"] = True
@@ -67,19 +63,22 @@ class Report(object):
 
     def _gen_drill_down_link(self, col_id, r):
         group_by_columns = self.query.statement._group_by_clause.clauses
-        params = {}
-        d = dict((col['key'], col) for col in self.data_set.columns)
+        if group_by_columns:
+            params = {}
+            d = dict((col['key'], col) for col in self.data_set.columns)
 
-        for col in group_by_columns:
-            if col.foreign_keys:
-                remote_side = list(enumerate(col.foreign_keys))[0][1].column
-                col_name = remote_side.table.name + "." + remote_side.name
-            else:
-                col_name = str(col)
-                if isinstance(col, sqlalchemy.sql.expression.Function):
-                    col_name = col_name.replace('"', '')
-            params[col_name] = r[d[col_name]['idx']]
-        return url_for('.drill_down_detail', report_id=self.id_, col_id=col_id, **params)
+            for col in group_by_columns:
+                if col.foreign_keys:
+                    remote_side = list(enumerate(col.foreign_keys))[0][1].column
+                    col_name = remote_side.table.name + "." + remote_side.name
+                else:
+                    col_name = str(col)
+                    if isinstance(col, sqlalchemy.sql.expression.Function):
+                        col_name = col_name.replace('"', '')
+                params[col_name] = r[d[col_name]['idx']]
+            return url_for('.drill_down_detail', report_id=self.id_, col_id=col_id, **params)
+        else:
+            return None
 
     @property
     def sum_columns(self):
@@ -223,13 +222,15 @@ class Report(object):
                 data = []
                 display_names = []
                 length = len(self.data)
+                total = sum(row[column["idx"]] for row in self.data)
                 for idx, row in enumerate(self.data):
                     from flask.ext.report.utils import get_color
                     color = get_color(idx, colors, length)
                     data.append({"value": row[column["idx"]], "color": color})
                     display_columns = pie.get("display_columns", [])
                     name = "(" + ", ".join(unicode(row[all_columns[c]['idx']]) for c in display_columns) + ')'
-                    display_names.append({"name": name, "color": color})
+                    display_names.append({"name": name, "color": color,
+                                          "distribution": "%.2f%%" % (row[column["idx"]] * 100.0 / total)})
                 result = {"name": pie.get("name"), "id_": uuid.uuid1(), "display_names": display_names, "data": data}
                 self._pie_charts.append(result)
         return self._pie_charts

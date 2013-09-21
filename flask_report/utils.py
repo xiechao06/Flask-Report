@@ -48,6 +48,11 @@ def get_column_operated(func):
     while not isinstance(ret, sqlalchemy.schema.Column):
         if isinstance(ret, sqlalchemy.sql.expression.ColumnClause):  # sub query
             ret = list(enumerate(ret.base_columns))[0][1]
+        if isinstance(ret, sqlalchemy.sql.expression.BinaryExpression):
+            if hasattr(ret.left, "table"):
+                ret = ret.left
+            elif hasattr(ret.right, "table"):
+                ret = ret.right
         else:
             ret = ret.clauses.clauses[0]
     return ret

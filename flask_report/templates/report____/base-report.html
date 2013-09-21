@@ -11,8 +11,8 @@
 <script type="text/javascript" charset="utf8" src="{{ url_for('report____.static', filename='js/sprintf-0.6.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('report____.static', filename='js/DT_bootstrap.js') }}"></script>
 <script type="text/javascript">
-  $.extend( $.fn.dataTableExt.oStdClasses, {
-      "sWrapper": "dataTables_wrapper form-inline"
+  $.extend($.fn.dataTableExt.oStdClasses, {
+    "sWrapper": "dataTables_wrapper form-inline"
   });
   $(function () {
     $('#report a[data-role="drill-down-link"]').click(
@@ -54,62 +54,82 @@
         }
       }
     }
-      var oTable = $("#report").dataTable({
-        "oLanguage": {
-            "sLengthMenu": '{{ _("Display _MENU_ records per page") }}',
-            "sZeroRecords": '{{ _("Nothing found - sorry") }}',
-            "sInfo": '{{ _("Showing _START_ to _END_ of _TOTAL_ records") }}',
-            "sInfoEmpty": '{{ _("Showing 0 to 0 of 0 records") }}',
-            "sInfoFiltered": "(" + '{{ _("filtered from _MAX_ total records") }}' + ")",
-            'oPaginate': {
-              "sPrevious": '{{ _("Previous") }} ',
-              "sNext": '{{ _("Next") }}',
-              "sFirst": '{{ _("First") }}',
-              'sLast': '{{ _("Last") }}',
-              },
-            },
-        "bSortCellsTop": true,
-        "sDom": "<'row'<'span6'l>r>t<'row'<'span6'i><'span6'p>>",
-        "iDisplayLength": 25,
-        "fnFooterCallback": sumsCallback
-        });
-      $("#detail").on('shown', function () {
-        $('a[data-target="#detail"]').text("{{ _('hide detail') }}" + " <<");
-        });
-      $("#detail").on('hidden', function () {
-        $('a[data-target="#detail"]').text("{{ _('show detail') }}" + " >>");
-        });
 
-	
-      /* Add the events etc before DataTables hides a column */
-      $("thead input").keyup( function () {
-          /* Filter on the column (the index) of this element */
-          oTable.fnFilter( this.value, oTable.oApi._fnVisibleToColumnIndex( 
-              oTable.fnSettings(), $("thead input").index(this) ) );
-          });
-	
-      /*
-       * Support functions to provide a little bit of 'user friendlyness' to the textboxes
-       */
-      $("thead input").each( function (i) {
-        this.initVal = this.value;
-      });
-	
-      $("thead input").focus( function () {
-        if ( this.className == "search_init" )
-        {
-          this.className = "";
-          this.value = "";
+    function parse(str) {
+      str = $.trim(str);
+      if (!isNaN(str)) {
+        str = Number(str);
+      }
+      return str;
+    }
+
+    jQuery.fn.dataTableExt.oSort['html-asc'] = function (x, y) {
+      x = parse(x);
+      y = parse(y);
+      return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+    };
+
+    jQuery.fn.dataTableExt.oSort['html-desc'] = function (x, y) {
+      x = parse(x);
+      y = parse(y);
+      return ((x < y) ? 1 : ((x > y) ? -1 : 0));
+    };
+
+    var oTable = $("#report").dataTable({
+      "oLanguage": {
+        "sLengthMenu": '{{ _("Display _MENU_ records per page") }}',
+        "sZeroRecords": '{{ _("Nothing found - sorry") }}',
+        "sInfo": '{{ _("Showing _START_ to _END_ of _TOTAL_ records") }}',
+        "sInfoEmpty": '{{ _("Showing 0 to 0 of 0 records") }}',
+        "sInfoFiltered": "(" + '{{ _("filtered from _MAX_ total records") }}' + ")",
+        'oPaginate': {
+          "sPrevious": '{{ _("Previous") }} ',
+          "sNext": '{{ _("Next") }}',
+          "sFirst": '{{ _("First") }}',
+          'sLast': '{{ _("Last") }}'
         }
-      });
-	
-      $("thead input").blur( function (i) {
-        if ( this.value == "" )
-        {
-          this.className = "search_init";
-          this.value = this.initVal;
-        }
-        });
+      },
+      "bSortCellsTop": true,
+      "sDom": "<'row'<'span6'l>r>t<'row'<'span6'i><'span6'p>>",
+      "iDisplayLength": 25,
+      "fnFooterCallback": sumsCallback
+    });
+
+    $("#detail").on('shown', function () {
+      $('a[data-target="#detail"]').text("{{ _('hide detail') }}" + " <<");
+    });
+    $("#detail").on('hidden', function () {
+      $('a[data-target="#detail"]').text("{{ _('show detail') }}" + " >>");
+    });
+
+
+    /* Add the events etc before DataTables hides a column */
+    $("thead input").keyup(function () {
+      /* Filter on the column (the index) of this element */
+      oTable.fnFilter(this.value, oTable.oApi._fnVisibleToColumnIndex(
+          oTable.fnSettings(), $("thead input").index(this)));
+    });
+
+    /*
+     * Support functions to provide a little bit of 'user friendlyness' to the textboxes
+     */
+    $("thead input").each(function (i) {
+      this.initVal = this.value;
+    });
+
+    $("thead input").focus(function () {
+      if (this.className == "search_init") {
+        this.className = "";
+        this.value = "";
+      }
+    });
+
+    $("thead input").blur(function (i) {
+      if (this.value == "") {
+        this.className = "search_init";
+        this.value = this.initVal;
+      }
+    });
 
   });
 </script>
@@ -179,12 +199,14 @@
       {#    <a href="{{ url_for('.report_txt', id_=report.id_) }}" class="btn btn-primary btn-info">TXT</a>#}
     </div>
   </div>
-  <div class='span-6 offset2'>
-    <a href="{{ url_for(".report_graphs", id_=report.id_, url=request.url) }}" class="btn btn-inverse">
-      <i class="icon-bar-chart"></i>
-      {{ _("View Graphs") }}
-    </a>
-  </div>
+  {% if report.bar_charts or report.pie_charts %}
+    <div class='span-6 offset2'>
+      <a href="{{ url_for(".report_graphs", id_=report.id_, url=request.url) }}" class="btn btn-inverse">
+        <i class="icon-bar-chart"></i>
+        {{ _("View Graphs") }}
+      </a>
+    </div>
+  {% endif %}
 </div>
 <hr />
 

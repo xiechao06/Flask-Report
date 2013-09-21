@@ -53,6 +53,7 @@ class FlaskReport(object):
         host.route("/push_notification/<int:id_>", methods=['POST'])(self.push_notification)
         host.route("/start_notification/<int:id_>", methods=['GET'])(self.start_notification)
         host.route("/stop_notification/<int:id_>", methods=['GET'])(self.stop_notification)
+        host.route("/schedule-list")(self.get_schedules)
 
         from flask import Blueprint
         # register it for using the templates of data browser
@@ -152,10 +153,6 @@ class FlaskReport(object):
             report = Report(self, id_)
 
             html_report = report.html_template.render(report=report)
-            from pygments import highlight
-            from pygments.lexers import PythonLexer, SqlLexer
-            from pygments.formatters import HtmlFormatter
-
             code = report.read_literal_filter_condition()
 
             SQL_html = highlight(query_to_sql(report.query), SqlLexer(), HtmlFormatter())
@@ -397,7 +394,10 @@ class FlaskReport(object):
         else:
             return 'unknown notifiaction:' + str(id_), 404
         
-        
+    def get_schedules(self):
+        return json.dumps([str(job) for job in self.sched.get_jobs()])
+
+
     def new_report(self):
 
         form = _ReportForm(self, request.form)
@@ -421,8 +421,9 @@ class FlaskReport(object):
             if request.args.get('preview'):
                 name += '(' + _('Preview') + ')'
                 id = 0
-            report_id = create_report(form.data_set, name=name, creator=form.creator.data, description=form.description.data, 
-                              columns=form.columns.data, filters=parse_filters(json.loads(form.filters.data)), id = id)
+            report_id = create_report(form.data_set, name=name, creator=form.creator.data,
+                                      description=form.description.data, id=id, columns=form.columns.data,
+                                      filters=parse_filters(json.loads(form.filters.data)))
             return jsonify({'id': report_id, 'name': form.name.data, 'url': url_for('.report', id_=report_id)})
         else:
             return jsonify({'errors': form.errors}), 403
