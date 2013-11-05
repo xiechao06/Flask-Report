@@ -1,51 +1,51 @@
 <table cellpadding="0" cellspacing="0" border="0" class="display" class="table table-striped table-bordered" id="report">
   <thead>
-    <tr class="info">
-      {% for c in report.columns %}
-      <th>{{c.name}}</th>
-      {% endfor %}
-    </tr>
-    <tr role="row">
-      {% for c in report.columns %}
+  <tr class="info">
+    {% for c in report.columns %}
+      <th>{{ c.name }}</th>
+    {% endfor %}
+  </tr>
+  <tr role="row">
+    {% for c in report.columns %}
       <td rowspan="1" colspan="1">
-        <input class="search_init" type="text" placeholder="{{ _('search %(col_name)s', col_name=c.name) }}" {% if not c.searchable %}style="visibility:hidden"{% endif %}>
+        <input class="search_init" type="text" placeholder="{{ gettext('search %(col_name)s', col_name=c.name) }}" {% if not c.searchable %}style="visibility:hidden"{% endif %}>
       </td>
-      {% endfor %}
-    </tr>
+    {% endfor %}
+  </tr>
   </thead>
   <tbody>
-    {% for r in report.data %} 
+  {% for r in report.data %}
     <tr>
       {% for c in report.columns %}
-      <td>
-        {% if r[c.idx] is none %}
-          0
-        {% else %}
-          {{ r[c.idx] }}
-          {% set drill_down_link = c.get_drill_down_link(r) %}
-          {% if drill_down_link %}
-            <a href="#" data-target="{{ drill_down_link }}" data-role='drill-down-link' data-col='{{ c.name }}' data-idx='{{ c.idx }}' ><i class="icon-plus-sign-alt"></i></a>
+        <td>
+          {% if r[c.idx] is none %}
+            0
+          {% else %}
+            {{ r[c.idx] }}
+            {% set drill_down_link = c.get_drill_down_link(r) %}
+            {% if drill_down_link %}
+              <a href="#" data-target="{{ drill_down_link }}" data-role='drill-down-link' data-col='{{ c.name }}' data-idx='{{ c.idx }}'><i class="fa fa-plus-square"></i></a>
+            {% endif %}
           {% endif %}
-        {% endif %}
-      </td>
+        </td>
       {% endfor %}
     </tr>
-    {% endfor %}
+  {% endfor %}
   </tbody>
   <tfoot>
-    {% for c in report.columns %}
-      <th></th>
-    {% endfor %}
+  {% for c in report.columns %}
+    <th></th>
+  {% endfor %}
   </tfoot>
 </table>
 
 <div id="statistics">
   <div id="sum-field">
     {% for sum_field in report.sum_fields %}
-        <b>
-          {{ sum_field['col'] }}: 
-        </b>
-        {{ _('%(value)s in total', value=sum_field["value"]) }};
+    <b>
+      {{ sum_field['col'] }}:
+    </b>
+{{ _('%(value)s in total', value=sum_field["value"]) }};
     {% endfor %}
   </div>
 

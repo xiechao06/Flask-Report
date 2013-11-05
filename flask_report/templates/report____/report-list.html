@@ -5,28 +5,28 @@
 {% endblock %}
 
 {% block report____customized_head_block %}
-<script type="text/javascript">
-  $(function() {
-    $('a[data-toggle]').popover();
-  });
-</script>
+  <script type="text/javascript">
+    $(function () {
+      $('a[data-toggle]').popover();
+    });
+  </script>
 {% endblock %}
 
 {% block body %}
-<div class="container">
-  <h1>
-    {{ _('report list') }}
-  </h1>
-  <hr />
-  <div>
-  	<ul>
-      {% for report in reports %}
-      <li>
-        <a class="lead" href="{{ url_for('.report', id_=report.id_) }}">{{report.name}}</a>
-        <a href="#" data-toggle='popover' data-html='true' data-content='{{ report.short_description }}'><i class="icon-question-sign"></i></a>
-      </li>
-      {% endfor %}
-  	</ul>
+  <div class="container">
+    <h1>
+      {{ _('report list') }}
+    </h1>
+    <hr/>
+    <div>
+      <ul>
+        {% for report in reports %}
+          <li>
+            <a class="lead" href="{{ url_for('.report', id_=report.id_) }}">{{ report.name }}</a>
+            <a href="#" data-toggle='popover' data-html='true' data-content='{{ report.short_description }}'><i class="fa fa-question-circle"></i></a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
   </div>
-</div>
 {% endblock %}

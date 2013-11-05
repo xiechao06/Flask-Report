@@ -5,231 +5,240 @@
 {% endblock %}
 
 {% block report____customized_head_block %}
-<link rel="stylesheet" type="text/css" href="{{ url_for('report____.static', filename='datatables/css/jquery.dataTables.css') }}">
-<link rel="stylesheet" type="text/css" href="{{ url_for('report____.static', filename='css/customer.css') }}">
-<script type="text/javascript" charset="utf8" src="{{ url_for('report____.static', filename='datatables/js/jquery.dataTables.min.js') }}"></script>
-<script type="text/javascript" charset="utf8" src="{{ url_for('report____.static', filename='js/sprintf-0.6.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('report____.static', filename='js/DT_bootstrap.js') }}"></script>
-<script type="text/javascript">
-  $.extend($.fn.dataTableExt.oStdClasses, {
-    "sWrapper": "dataTables_wrapper form-inline"
-  });
-  $(function () {
-    $('#report a[data-role="drill-down-link"]').click(
-        function () {
-          var modal = $('#drill-down-detail');
-          modal.find('.modal-header h3').text(sprintf('{{ _("detail of %%s") }}', $(this).attr('data-col')));
-          modal.modal('show');
-          var content = modal.find('.modal-body p');
-          content.html('<i class="icon-refresh icon-spin icon-4x"></i>');
-          content.load($(this).attr('data-target'), function (response, status, xhr) {
-            if (status != "success") {
-              $(this).html($("<p></p>").text("{{ _("Load Error") }}").addClass("text-error"));
-            }
+  <link rel="stylesheet" type="text/css" href="{{ url_for('report____.static', filename='datatables/css/jquery.dataTables.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('report____.static', filename='css/dataTables.bootstrap.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('report____.static', filename='css/customer.css') }}">
+  <script type="text/javascript" charset="utf8" src="{{ url_for('report____.static', filename='datatables/js/jquery.dataTables.min.js') }}"></script>
+  <script type="text/javascript" charset="utf8" src="{{ url_for('report____.static', filename='js/sprintf-0.6.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('report____.static', filename='js/dataTables.bootstrap.js') }}"></script>
+  <script type="text/javascript">
+    $.extend($.fn.dataTableExt.oStdClasses, {
+      "sWrapper": "dataTables_wrapper form"
+    });
+    $(function () {
+      $('#report a[data-role="drill-down-link"]').click(
+          function () {
+            var modal = $('#drill-down-detail');
+            modal.find('.modal-header h3').text(sprintf('{{ _("detail of %%s") }}', $(this).attr('data-col')));
+            modal.modal('show');
+            var content = modal.find('.modal-body p');
+            content.html('<i class="fa fa-refresh fa-4x"></i>');
+            content.load($(this).attr('data-target'), function (response, status, xhr) {
+              if (status != "success") {
+                $(this).html($("<p></p>").text("{{ _("Load Error") }}").addClass("text-error"));
+              }
+            });
           });
-        });
-    var sum_columns = {{ report.sum_column_index }};
-    var sumsCallback = function (nRow, aaData, iStart, iEnd, aiDisplay) {
-      var sums = [];
-      for (i = iStart; i < iEnd; i++) {
-        for (j = 0; j < aaData[aiDisplay[i]].length; j++) {
-          var num = parseFloat(aaData[aiDisplay[i]][j]);
-          if (!isNaN(num)) {
-            if (sums[j]) {
-              sums[j] += num;
+      var sum_columns = {{ report.sum_column_index }};
+      var sumsCallback = function (nRow, aaData, iStart, iEnd, aiDisplay) {
+        var sums = [];
+        for (i = iStart; i < iEnd; i++) {
+          for (j = 0; j < aaData[aiDisplay[i]].length; j++) {
+            var num = parseFloat(aaData[aiDisplay[i]][j]);
+            if (!isNaN(num)) {
+              if (sums[j]) {
+                sums[j] += num;
+              } else {
+                sums[j] = num;
+              }
+            }
+          }
+        }
+        for (var i = 0; i < sums.length; i++) {
+          var visibleIndex = this.fnSettings().oApi._fnColumnIndexToVisible(this.fnSettings(), i);
+          if (visibleIndex != null && ( sum_columns.length == 0 || $.inArray(visibleIndex, sum_columns) > -1)) {
+            if (sums[i]) {
+              $('#report tfoot th:eq(' + visibleIndex + ')').html('<b>' + '{{ _("Total") }}' + ': ' + sums[i] + '</b>');
             } else {
-              sums[j] = num;
+              $('#report tfoot th:eq(' + visibleIndex + ')').html('');
             }
           }
         }
       }
-      for (var i = 0; i < sums.length; i++) {
-        var visibleIndex = this.fnSettings().oApi._fnColumnIndexToVisible(this.fnSettings(), i);
-        if (visibleIndex != null && ( sum_columns.length == 0 || $.inArray(visibleIndex, sum_columns) > -1)) {
-          if (sums[i]) {
-            $('#report tfoot th:eq(' + visibleIndex + ')').html('<b>' + '{{ _("Total") }}' + ': ' + sums[i] + '</b>');
-          } else {
-            $('#report tfoot th:eq(' + visibleIndex + ')').html('');
+
+      function parse(str) {
+        str = $.trim(str);
+        if (!isNaN(str)) {
+          str = Number(str);
+        }
+        return str;
+      }
+
+      jQuery.fn.dataTableExt.oSort['html-asc'] = function (x, y) {
+        x = parse(x);
+        y = parse(y);
+        return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+      };
+
+      jQuery.fn.dataTableExt.oSort['html-desc'] = function (x, y) {
+        x = parse(x);
+        y = parse(y);
+        return ((x < y) ? 1 : ((x > y) ? -1 : 0));
+      };
+
+      var oTable = $("#report").dataTable({
+        "oLanguage": {
+          "sLengthMenu": '{{ _("Display _MENU_ records per page") }}',
+          "sZeroRecords": '{{ _("Nothing found - sorry") }}',
+          "sInfo": '{{ _("Showing _START_ to _END_ of _TOTAL_ records") }}',
+          "sInfoEmpty": '{{ _("Showing 0 to 0 of 0 records") }}',
+          "sInfoFiltered": "(" + '{{ _("filtered from _MAX_ total records") }}' + ")",
+          'oPaginate': {
+            "sPrevious": '{{ _("Previous") }} ',
+            "sNext": '{{ _("Next") }}',
+            "sFirst": '{{ _("First") }}',
+            'sLast': '{{ _("Last") }}'
           }
+        },
+        "bSortCellsTop": true,
+        "sDom": "<'row'<'col-lg-6'l>r>t<'row'<'col-lg-6'i><'col-lg-6'p>>",
+        "iDisplayLength": 25,
+        "fnFooterCallback": sumsCallback
+      });
+
+      $("#detail").on('shown', function () {
+        $('a[data-target="#detail"]').text("{{ _('hide detail') }}" + " <<");
+      });
+      $("#detail").on('hidden', function () {
+        $('a[data-target="#detail"]').text("{{ _('show detail') }}" + " >>");
+      });
+
+
+      /* Add the events etc before DataTables hides a column */
+      $("thead input").keyup(function () {
+        /* Filter on the column (the index) of this element */
+        oTable.fnFilter(this.value, oTable.oApi._fnVisibleToColumnIndex(
+            oTable.fnSettings(), $("thead input").index(this)));
+      });
+
+      /*
+       * Support functions to provide a little bit of 'user friendlyness' to the textboxes
+       */
+      $("thead input").each(function (i) {
+        this.initVal = this.value;
+      });
+
+      $("thead input").focus(function () {
+        if (this.className == "search_init") {
+          this.className = "";
+          this.value = "";
         }
-      }
-    }
+      });
 
-    function parse(str) {
-      str = $.trim(str);
-      if (!isNaN(str)) {
-        str = Number(str);
-      }
-      return str;
-    }
-
-    jQuery.fn.dataTableExt.oSort['html-asc'] = function (x, y) {
-      x = parse(x);
-      y = parse(y);
-      return ((x < y) ? -1 : ((x > y) ? 1 : 0));
-    };
-
-    jQuery.fn.dataTableExt.oSort['html-desc'] = function (x, y) {
-      x = parse(x);
-      y = parse(y);
-      return ((x < y) ? 1 : ((x > y) ? -1 : 0));
-    };
-
-    var oTable = $("#report").dataTable({
-      "oLanguage": {
-        "sLengthMenu": '{{ _("Display _MENU_ records per page") }}',
-        "sZeroRecords": '{{ _("Nothing found - sorry") }}',
-        "sInfo": '{{ _("Showing _START_ to _END_ of _TOTAL_ records") }}',
-        "sInfoEmpty": '{{ _("Showing 0 to 0 of 0 records") }}',
-        "sInfoFiltered": "(" + '{{ _("filtered from _MAX_ total records") }}' + ")",
-        'oPaginate': {
-          "sPrevious": '{{ _("Previous") }} ',
-          "sNext": '{{ _("Next") }}',
-          "sFirst": '{{ _("First") }}',
-          'sLast': '{{ _("Last") }}'
+      $("thead input").blur(function (i) {
+        if (this.value == "") {
+          this.className = "search_init";
+          this.value = this.initVal;
         }
-      },
-      "bSortCellsTop": true,
-      "sDom": "<'row'<'span6'l>r>t<'row'<'span6'i><'span6'p>>",
-      "iDisplayLength": 25,
-      "fnFooterCallback": sumsCallback
-    });
+      });
 
-    $("#detail").on('shown', function () {
-      $('a[data-target="#detail"]').text("{{ _('hide detail') }}" + " <<");
     });
-    $("#detail").on('hidden', function () {
-      $('a[data-target="#detail"]').text("{{ _('show detail') }}" + " >>");
-    });
-
-
-    /* Add the events etc before DataTables hides a column */
-    $("thead input").keyup(function () {
-      /* Filter on the column (the index) of this element */
-      oTable.fnFilter(this.value, oTable.oApi._fnVisibleToColumnIndex(
-          oTable.fnSettings(), $("thead input").index(this)));
-    });
-
-    /*
-     * Support functions to provide a little bit of 'user friendlyness' to the textboxes
-     */
-    $("thead input").each(function (i) {
-      this.initVal = this.value;
-    });
-
-    $("thead input").focus(function () {
-      if (this.className == "search_init") {
-        this.className = "";
-        this.value = "";
-      }
-    });
-
-    $("thead input").blur(function (i) {
-      if (this.value == "") {
-        this.className = "search_init";
-        this.value = this.initVal;
-      }
-    });
-
-  });
-</script>
+  </script>
 {% endblock %}
 
 {% block body %}
-<div class="">
-<div class="alert alert-info">
-  <h1>
-  <span>
-    {{report.name}}
-    <small>
-      <a href="#" data-toggle="collapse" data-target="#detail" class='muted'>{{ _('show detail') }} >></a>
-    </small>
-  </span>
-  </h1>
-  <div id="detail" class="collapse">
-  <p><small>{{ report.description +"<br>"|safe if report.description else "" }}{{ _('created by "%(creator)s" at %(create_time)s, using data set <a href="%(url)s" title="%(data_set_description)s">"%(data_set)s"</a>',
-    creator=report.creator, create_time=report.create_time,
-    data_set_description=report.data_set.description or "",
-    url=url_for(".data_set", id_=report.data_set.id_),
-    data_set=report.data_set.name) }}
-    {{ _('filter conditions are: ') }}
-  </small></p>
-  <ul>
-    {% if report.filters %}
-    {% for name, value in report.filters.items() %}
-    <li>
-    <small>
-      <Strong>{{ name }}</Strong> - {{ value|dpprint }}
-    </small>
-    </li>
-    {% endfor %}
-    {% endif %}
-  </ul>
-  <p>
-    <small>
-      {{ _("the customized filter condition is: ") }}
-    </small>
-  </p>
-  <p>
-    {{ customized_filter_condition|safe }}
-  </p>
-  {% if SQL%}
-    <small>
-      <div>{{ _("SQL statement") }}: </div>
-      <p>
-          {{ SQL|safe }}
-      </p>
-    </small>
-  {% endif %}
-  <p><small></small></p>
-</div>
-</div>
-<hr />
-<div>
-{{ html_report|safe }}
-</div>
-<hr />
+  <div class="panel-group">
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <h1 class="panel-title">
+          {{ report.name }}
+          <small>
+            <a href="#" data-toggle="collapse" data-target="#detail" class="text-muted">{{ _('show detail') }}
+              >></a>
+          </small>
+        </h1>
+      </div>
+      <div id="detail" class="panel-collapse collapse">
+        <p>
+          <small>{{ report.description +"<br>"|safe if report.description else "" }}{{ gettext('created by "%(creator)s" at %(create_time)s, using data set <a href="%(url)s" title="%(data_set_description)s">"%(data_set)s"</a>',
+      creator=report.creator, create_time=report.create_time,
+      data_set_description=report.data_set.description or "",
+      url=url_for(".data_set", id_=report.data_set.id_),
+      data_set=report.data_set.name) }}
+            {{ _('filter conditions are: ') }}
+          </small>
+        </p>
+        <ul>
+          {% if report.filters %}
+            {% for name, value in report.filters.items() %}
+              <li>
+                <small>
+                  <Strong>{{ name }}</Strong> - {{ value|dpprint }}
+                </small>
+              </li>
+            {% endfor %}
+          {% endif %}
+        </ul>
+        <p>
+          <small>
+            {{ _("the customized filter condition is: ") }}
+          </small>
+        </p>
+        <p>
+          {{ customized_filter_condition|safe }}
+        </p>
+        {% if SQL %}
+          <small>
+            <div>{{ _("SQL statement") }}:</div>
+            <p>
+              {{ SQL|safe }}
+            </p>
+          </small>
+        {% endif %}
+        <p>
+          <small></small>
+        </p>
+      </div>
+    </div>
+  </div>
+  <hr/>
+  <div class="col-lg-12">
+    {{ html_report|safe }}
+  </div>
+  <hr/>
 
-<div class='row'>
-  <div class='span-8'>
-    {{ _("download as: ")}}
-    <div class="btn-group pagination-centered">
+  <div class="col-lg-12">
+    {{ _("download as: ") }}
+    <div class="btn-group">
       <a href="{{ url_for('.report_pdf', id_=report.id_) }}" class="btn btn-primary btn-info">PDF</a>
       <a href="{{ url_for('.report_csv', id_=report.id_) }}" class="btn btn-primary btn-info">CSV</a>
       {#    <a href="{{ url_for('.report_txt', id_=report.id_) }}" class="btn btn-primary btn-info">TXT</a>#}
     </div>
-  </div>
-  {% if report.bar_charts or report.pie_charts %}
-    <div class='span-6 offset2'>
-      <a href="{{ url_for(".report_graphs", id_=report.id_, url=request.url) }}" class="btn btn-inverse">
-        <i class="icon-bar-chart"></i>
-        {{ _("View Graphs") }}
-      </a>
-    </div>
-  {% endif %}
-</div>
-<hr />
 
-<div class="row pagination-centered">
-  {% if not request.args.get('preview') %}
-    <a href="{{ request.args.get("url", url_for('.report_list')) }}" class="btn btn-primary btn-large">{{ _('BACK') }}</a>
+  {% if report.bar_charts or report.pie_charts %}
+    <a href="{{ url_for(".report_graphs", id_=report.id_, url=request.url) }}" class="btn btn-default">
+      <i class="fa fa-bar-chart-o fa-fw"></i>
+      {{ _("View Graphs") }}
+    </a>
   {% endif %}
-  <!--<a href="" class="btn btn-primary btn-large">{{ _('EDIT') }}</a>-->
-  <a href="" class="btn btn-primary btn-large">{{ _('REFRESH') }}</a>
-</div>
-</div>
+  </div>
+  <hr/>
+
+  <div class="col-lg-12">
+    <div class="center-block text-center">
+      {% if not request.args.get('preview') %}
+        <a href="{{ request.args.get("url", url_for('.report_list')) }}" class="btn btn-default btn-lg">{{ _('BACK') }}</a>
+      {% endif %}
+      <!--<a href="" class="btn btn-primary btn-lg">{{ _('EDIT') }}</a>-->
+      <a href="" class="btn btn-primary btn-lg">{{ _('REFRESH') }}</a>
+    </div>
+  </div>
 
   {% block drill_down %}
-    <div id="drill-down-detail" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-      <div class="modal-header">
-        <h3></h3>
-      </div>
-      <div class="modal-body">
-        <p class="pagination-centered">
-        </p>
-      </div>
-      <div class="modal-footer">
-        <button class="btn" data-dismiss="modal" aria-hidden="true">{{ _('Close') }}</button>
+    <div id="drill-down-detail" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3></h3>
+          </div>
+          <div class="modal-body">
+            <p>
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-default" data-dismiss="modal" aria-hidden="true">{{ _('Close') }}</button>
+          </div>
+        </div>
       </div>
     </div>
   {% endblock %}

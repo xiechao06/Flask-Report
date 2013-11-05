@@ -8,14 +8,14 @@
   {% block report____head_block %}
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <link href="{{ url_for('report____.static', filename='bootstrap/css/bootstrap.css') }}" rel="stylesheet" media="screen"/>
-    <link href="{{ url_for('report____.static', filename='bootstrap/css/bootstrap-responsive.css') }}" rel="stylesheet" media="screen"/>
+    <link href="{{ url_for('report____.static', filename='bootstrap/css/bootstrap.min.css') }}" rel="stylesheet" media="screen"/>
     <link href="{{ url_for('report____.static', filename='css/datetimepicker.css') }}" rel="stylesheet" media="screen"/>
-    <link rel="stylesheet" href="{{ url_for('report____.static', filename='select2-3.4.1/select2.css') }}"/>
+    <link href="{{ url_for('report____.static', filename='css/select2-bootstrap.css') }}" rel="stylesheet" media="screen"/>
+    <link rel="stylesheet" href="{{ url_for('report____.static', filename='select2-3.4.5/select2.css') }}"/>
     <link href="{{ url_for('report____.static', filename='css/font-awesome.min.css') }}" rel="stylesheet"/>
     <link href="{{ url_for('report____.static', filename='css/colorful.css') }}" rel="stylesheet"/>
     <script src="{{ url_for('report____.static', filename='js/jquery-1.8.2.min.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('report____.static', filename='select2-3.4.1/select2.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('report____.static', filename='select2-3.4.5/select2.min.js') }}"></script>
     <script src="{{ url_for('report____.static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('report____.static', filename='js/bootstrap-datetimepicker.min.js') }}"></script>
     <script src="{{ url_for('report____.static', filename='js/locales/bootstrap-datetimepicker.zh_CN.js') }}"></script>
@@ -28,7 +28,7 @@
 {% block report____nav_bar_block %}
 {% endblock %}
 {% block page_body %}
-    <div class="page-body">
+    <div class="col-lg-12">
       {% block body %}
       {% endblock %}
     </div>

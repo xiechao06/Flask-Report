@@ -4,7 +4,7 @@ import json
 import types
 
 from apscheduler.scheduler import Scheduler
-from flask import render_template, abort, request, url_for, redirect, flash, jsonify
+from flask import render_template, request, url_for, redirect, flash, jsonify
 from flask.ext.mail import Mail, Message
 from flask.ext.babel import _
 from wtforms import Form, TextField, validators, IntegerField, SelectMultipleField
@@ -16,6 +16,7 @@ from flask.ext.report.notification import Notification, get_all_notifications
 from flask.ext.report.report import Report, create_report
 from flask.ext.report.data_set import DataSet
 from flask.ext.report.utils import get_column_operated, query_to_sql, dump_yaml
+
 
 class FlaskReport(object):
     def __init__(self, db, model_map, app, blueprint=None, extra_params=None, table_label_map=None, mail=None):
@@ -91,6 +92,7 @@ class FlaskReport(object):
             for notification in get_all_notifications(self):
                 if notification.enabled:
                     self.start_notification(notification.id_)
+
 
     def try_view_report(self):
         pass
@@ -225,7 +227,8 @@ class FlaskReport(object):
             from import_file import import_file
 
             lib = import_file(filter_def_file)
-            return getattr(lib, default.__name__, None) or default
+            return getattr(lib, default.__name__, default)
+        return default
 
     def report_csv(self, id_):
         from geraldo.generators import CSVGenerator
@@ -392,10 +395,9 @@ class FlaskReport(object):
             return 'ok'
         else:
             return 'unknown notifiaction:' + str(id_), 404
-        
+
     def get_schedules(self):
         return json.dumps([str(job) for job in self.sched.get_jobs()])
-
 
     def new_report(self):
 
@@ -406,7 +408,8 @@ class FlaskReport(object):
                 result = {}
                 for current in filters:
                     if current["col"] not in result:
-                        result[current["col"]] = {'operator': current["op"], 'value': current["val"], 'proxy': current['proxy']}
+                        result[current["col"]] = {'operator': current["op"], 'value': current["val"],
+                                                  'proxy': current['proxy']}
                     else:
                         val = result[current["col"]]
                         if not isinstance(val, list):
@@ -414,7 +417,7 @@ class FlaskReport(object):
                         val.append({'operator': current["op"], 'value': current["val"], 'proxy': current['proxy']})
                         result[current["col"]] = val
                 return result
-            
+
             name = form.name.data
             id = None
             if request.args.get('preview'):
@@ -427,7 +430,8 @@ class FlaskReport(object):
         else:
             return jsonify({'errors': form.errors}), 403
 
-class _ReportForm(Form):  
+
+class _ReportForm(Form):
     def __init__(self, report_view, data):
         self.report_view = report_view
         super(_ReportForm, self).__init__(data)

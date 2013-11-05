@@ -16,8 +16,12 @@ code {
 }
 
 .control-inline-group{
-    display: block;
     margin-bottom: 5px;
+}
+
+.control-inline-group .form-control{
+    width: 84%;
+    display: inline-block;
 }
 
 .crontab-div {
