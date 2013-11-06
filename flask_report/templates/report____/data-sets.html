@@ -23,7 +23,7 @@
         {% for data_set in data_sets %}
           <li>
             <a class="lead" href="{{ url_for('.data_set', id_=data_set.id_) }}">{{ data_set.name }}</a>
-            <a href="#" data-toggle='popover' data-html='true' data-content='{{ data_set.description }}'><i class="icon-question-sign"></i></a>
+            <a href="#" data-toggle='popover' data-html='true' data-content='{{ data_set.description }}'><i class="fa fa-question-circle"></i></a>
           </li>
         {% endfor %}
       </ul>

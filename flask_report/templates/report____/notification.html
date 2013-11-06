@@ -15,7 +15,7 @@
         input = $(this).prev().children("input");
         if (input.val() != "") {
           var input = '<input type="email" placeholder="{{ _("Enter E-mail") }}" name="sender" class="senders"/>';
-          var btn = '<button class="btn-danger btn" type="button" name="remove"><i class="icon-remove"></i></button>';
+          var btn = '<button class="btn-danger btn" type="button" name="remove"><i class="fa fa-times"></i></button>';
           var e = $("<div></div>").addClass("control-inline-group").append(input).append("&nbsp;").append(btn);
           $(this).before(e);
         } else {
@@ -50,11 +50,11 @@
   <div class="alert alert-info">
     <h1>
       {% if notification %}
-      {{ _('Editing %(notification)s', notification=notification.name) }}
+      {{ gettext('Editing %(notification)s', notification=notification.name) }}
         {% if notification.enabled %}
           <span class="text-success">({{_('Enabled')}})</span>
         {% else %}
-          <span class="muted">({{_('Disabled')}})</span>
+          <span class="text-muted">({{_('Disabled')}})</span>
         {% endif %}
       {% else %}
       {{ _('Creating notification')}}
@@ -86,83 +86,83 @@
   {% endwith %}
   <form {% if notification %}action="{{ url_for(".notification", id_=notification.id_) }}"{% else %} action="{{ url_for(".notification") }}"  {% endif %} method="POST" class="form-horizontal">
     <fieldset>
-      <div class="control-group">
-        <label class="control-label" for="name">{{ _("Name") }}</label>
+      <div class="form-group">
+        <label class="control-label col-lg-2" for="name">{{ _("Name") }}</label>
 
-        <div class="controls">
-          <input type="text" name="name" id="name" required="required" {% if notification %}value="{{ notification.name }}"{% endif %} {% if readonly%}readonly{% endif %}/>
+        <div class="col-lg-3">
+          <input type="text" name="name" id="name" required="required" {% if notification %}value="{{ notification.name }}"{% endif %} {% if readonly%}readonly{% endif %} class="form-control"/>
         </div>
       </div>
-      <div class="control-group">
-        <label class="control-label" for="sender">{{ _("Senders") }}</label>
+      <div class="form-group">
+        <label class="control-label col-lg-2" for="sender">{{ _("Senders") }}</label>
 
-        <div class="controls">
+        <div class="col-lg-3">
           {% if notification %}
             {% for sender in notification.senders %}
               <div class="control-inline-group">
-                <input type="email" name="sender" placeholder="{{ _("Enter E-mail") }}" {% if loop.first %}id="sender"{% endif %} value="{{ sender }}" class="senders" {% if readonly%}readonly{% endif %} />
-                <button class="btn-danger btn" type="button" name="remove" {% if readonly%}disabled{% endif %}><i class="icon-remove"></i></button>
+                <input type="email" name="sender" placeholder="{{ _("Enter E-mail") }}" {% if loop.first %}id="sender"{% endif %} value="{{ sender }}" class="senders form-control" {% if readonly%}readonly{% endif %} />
+                <button class="btn-danger btn" type="button" name="remove" {% if readonly%}disabled{% endif %}><i class="fa fa-times"></i></button>
               </div>
             {% endfor %}
           {% else %}
             <div class="control-inline-group">
-              <input type="email" name="sender" placeholder="{{ _("Enter E-mail") }}" id="sender" class="senders"/>
-              <button class="btn-danger btn" type="button" name="remove"><i class="icon-remove"></i></button>
+              <input type="email" name="sender" placeholder="{{ _("Enter E-mail") }}" id="sender" class="senders form-control"/>
+              <button class="btn-danger btn" type="button" name="remove"><i class="fa fa-times"></i></button>
             </div>
           {% endif %}
-          <button class="btn btn-primary" type="button" id="add-sender" {% if readonly%}disabled{% endif %}><i class="icon-plus"></i></button>
+          <button class="btn btn-primary" type="button" id="add-sender" {% if readonly%}disabled{% endif %}><i class="fa fa-plus"></i></button>
         </div>
       </div>
-      <div class="control-group">
-        <label class="control-label" for="report_ids">{{ _("reports") }}</label>
+      <div class="form-group">
+        <label class="control-label col-lg-2" for="report_ids">{{ _("reports") }}</label>
 
-        <div class="controls">
-          <select name="report_ids" id="report_ids" multiple {% if readonly %}disabled{% endif %}>
+        <div class="col-lg-3">
+          <select name="report_ids" id="report_ids" multiple {% if readonly %}disabled{% endif %} class="form-control">
             {% for report in report_list %}
               <option value="{{ report.id_ }}" {% if notification and report.id_ in notification.report_ids %}selected="selected"{% endif %}>{{ report.name }}</option>
             {% endfor %}
           </select>
         </div>
       </div>
-      <div class="control-group">
-        <label class="control-label" for="description">{{ _("description") }}</label>
+      <div class="form-group">
+        <label class="control-label col-lg-2" for="description">{{ _("description") }}</label>
 
-        <div class="controls">
-          <textarea name="description" id="description" {% if readonly%}readonly{% endif %}>
+        <div class="col-lg-3">
+          <textarea name="description" id="description" {% if readonly%}readonly{% endif %} class="form-control">
             {%- if notification %}{{ notification.description }}{% endif -%}
           </textarea>
         </div>
       </div>
-      <div class="control-group">
-        <label class="control-label" for="subject">{{ _("Subject") }}</label>
+      <div class="form-group">
+        <label class="control-label col-lg-2" for="subject">{{ _("Subject") }}</label>
 
-        <div class="controls">
-          <input type="text" name="subject" id="subject" 
-          value={% if notification %}"{{ notification._Notification__subject|safe }}"{% else %}'{% raw %}{{[date]}}{{notification.name}}{% endraw %}'{% endif %}
+        <div class="col-lg-3">
+          <input type="text" name="subject" id="subject" class="form-control"
+                 value="{% if notification %}{{ notification._Notification__subject|safe }}{% else %}{% raw %}{{[date]}}{{notification.name}}{% endraw %}{% endif %}"
           {% if readonly%}readonly{% endif %}/>
-          <span class="help-inline">{{ _("Only 'date' and 'notification' supported") }}</span>
+          <span class="help-block">{{ _("Only 'date' and 'notification' supported") }}</span>
         </div>
       </div>
-      <div class="control-group">
-        <label class="control-label" for="crontab">{{ _("Crontab") }}</label>
+      <div class="form-group">
+        <label class="control-label col-lg-2" for="crontab">{{ _("Crontab") }}</label>
 
-        <div class="controls">
+        <div class="col-lg-3">
           <div id='crontab' class="crontab-div" {% if readonly%}readonly{% endif %}></div>
-          <input id="crontab-val" type="hidden" name="crontab" readonly/>
+          <input id="crontab-val" type="hidden" name="crontab" readonly class="form-control"/>
         </div>
       </div>
 
     </fieldset>
-    <div class="pagination-centered">
-      <a href="{{ request.args.get("url", url_for(".notification_list")) }}" class="btn btn-large">{{ _("BACK") }}</a>
+    <div class="col-lg-3 col-lg-offset-2">
+      <a href="{{ request.args.get("url", url_for(".notification_list")) }}" class="btn btn-lg btn-default">{{ _("BACK") }}</a>
       {% if not notification or not notification.enabled %}
-        <button class="btn btn-primary btn-large">{{ _("Save") }}</button>
+        <button class="btn btn-primary btn-lg">{{ _("Save") }}</button>
       {% endif %}
       {% if notification %}
         {% if notification.enabled %}
-          <input class="btn btn-primary btn-large" data-role='enable-btn' value='{{ _("Disable") }}' name='action' type='submit' />
+          <input class="btn btn-primary btn-lg" data-role='enable-btn' value='{{ _("Disable") }}' name='action' type='submit' />
         {% else %}
-          <input class="btn btn-primary btn-large" data-role='enable-btn' value='{{ _("Enable") }}' name='action' type='submit' />
+          <input class="btn btn-primary btn-lg" data-role='enable-btn' value='{{ _("Enable") }}' name='action' type='submit' />
         {% endif %}
       {% endif %}
     </div>

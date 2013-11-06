@@ -16,13 +16,13 @@
   <div class='container'>
     <div class="alert alert-info">
       <div class='row'>
-        <div class="span3">
+        <div class="col-lg-3">
           <h1>
             {{ _('Notifications') }}
           </h1>
         </div>
-        <div class="span1" >
-          <a class="btn btn-primary new-notification" href="{{ url_for(".notification", url=request.url) }}"><i class="icon-plus"></i>{{ _("New") }}</a>
+        <div class="col-lg-1" >
+          <a class="btn btn-primary new-notification" href="{{ url_for(".notification", url=request.url) }}"><i class="fa fa-plus fa-fw"></i>{{ _("New") }}</a>
         </div>
       </div>
     </div>
@@ -32,7 +32,7 @@
         {% for notification in notification_list %}
           <li>
             <a class="lead" href="{{ url_for('.notification', id_=notification.id_) }}">{{ notification.name }}</a>
-            <a href="#" data-toggle='popover' data-html='true' data-content='{{ notification.description }}'><i class="icon-question-sign"></i></a>
+            <a href="#" data-toggle='popover' data-html='true' data-content='{{ notification.description }}'><i class="fa fa-question-circle"></i></a>
           </li>
         {% endfor %}
       </ul>

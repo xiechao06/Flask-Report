@@ -5,21 +5,16 @@
 {% endblock %}
 
 {% block report____customized_head_block %}
-  <link rel="stylesheet" type="text/css" href="{{ url_for('report____.static', filename='datatables/css/jquery.dataTables.css') }}">
-  <link rel="stylesheet" href="{{ url_for('report____.static', filename='css/customer.css') }}"/>
-  <link rel="stylesheet" href="{{ url_for('report____.static', filename='select2-3.4.1/select2.css') }}"/>
-  <script type="text/javascript" charset="utf8" src="{{ url_for('report____.static', filename='datatables/js/jquery.dataTables.min.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('report____.static', filename='js/DT_bootstrap.js') }}"></script>
+  {{ super() }}
   <script type="text/javascript" src="{{ url_for('report____.static', filename='js/jquery.autosize-min.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('report____.static', filename='select2-3.4.1/select2.min.js') }}"></script>
   <script type="text/javascript" charset="utf8" src="{{ url_for('report____.static', filename='js/sprintf-0.6.js') }}"></script>
   <script type="text/javascript">
-    $(function(){
+    $(function () {
       $('select').select2({width: "resolve"});
-    jQuery.fn.addFilter = function (col, text, available_opts, type, avalialed_values, op, value, proxy) {
-        var tr = $("<tr name='filter'></tr>");
-        var td1 = $("<td></td>").html($("<button type='button' class='btn' name='remove-tr'></button>").html($("<i class='icon-remove icon-large'></i>")));
-        var td2 = $("<td></td>").html($("<div ></div>").text(text));
+      jQuery.fn.addFilter = function (col, text, available_opts, type, avalialed_values, op, value, proxy) {
+        var label = $("<div></div>").addClass("control-label col-lg-2").html(
+            $("<button type='button' class='btn btn-danger' name='remove-tr'></button>").html(
+            $("<i class='fa fa-times'></i>"))).append(text);
         var select = $("<select></select>");
         $.each([
           {"key": "eq", "value": "等于"},
@@ -40,7 +35,8 @@
         if (op) {
           select.val(op);
         }
-        var td3 = $("<td></td>").html(select);
+        select.addClass("form-control");
+        var control = $("<div></div>").addClass("col-lg-3").html(select);
         var input_str = "<input type='text' class='mb0' required></input>";
 
         var input = $(input_str);
@@ -51,7 +47,7 @@
             input.datetimepicker({format: 'yyyy-mm-dd hh:ii', autoclose: true, language: "{{ g.locale }}", minuteStep: 1, pickerPosition: "bottom-left"})
           } else if (type == "select" && avalialed_values) {
             input = $("<select></select>");
-            $.each(avalialed_values, function(idx, option){
+            $.each(avalialed_values, function (idx, option) {
               input.append($("<option></option>").val(option[0]).text(option[1]));
             });
           } else {
@@ -65,16 +61,16 @@
         }
         input.attr("data-col", col);
         input.attr('data-proxy', proxy);
-        var td4 = $("<td></td>").html(input);
-        tr.append(td1, td2, td3, td4);
-        var div = $("<div></div>").addClass("control-label").append(tr);
-        this.find("tbody").append(div);
+        input.addClass("form-control");
+        control.append(input);
+        var div = $("<div name='filter'></div>").addClass("form-group").append(label, control);
+        $("#clause").append(div);
         $('select').select2({width: "resolve"});
       };
 
       {% for filter in data_set.filters %}
         {% if filter.shown %}
-        $("#clause").addFilter('{{filter.col}}', '{{filter.name}}', {{filter.ops|tojson|safe}}, '{{filter.type}}', {{filter.opts|tojson|safe}}, '{{filter.op}}', '{{filter.val}}', {{'true' if filter.proxy else 'false' }});
+          $("#clause").addFilter('{{filter.col}}', '{{filter.name}}', {{filter.ops|tojson|safe}}, '{{filter.type}}', {{filter.opts|tojson|safe}}, '{{filter.op}}', '{{filter.val}}', {{'true' if filter.proxy else 'false' }});
         {% endif %}
       {% endfor %}
 
@@ -82,7 +78,7 @@
         var form = $("#main-form");
         if (form.get(0).checkValidity()) {
           var filters = [];
-          $.each(form.find("tr[name='filter']"), function (idx, tr) {
+          $.each(form.find("[name='filter']"), function (idx, tr) {
             var finds = $(tr).find("input");
             if (finds.length % 2 == 0) {
               finds = $(tr).find("select");
@@ -90,164 +86,156 @@
             } else {
               input = $(finds[2]);
             }
-            filters.push({"col": input.attr("data-col"), "op": $($(tr).find("select")).val(), "val": input.val(), 'proxy': input.attr('data-proxy')=='true'});
+            filters.push({"col": input.attr("data-col"), "op": $($(tr).find("select")).val(), "val": input.val(), 'proxy': input.attr('data-proxy') == 'true'});
           });
           $("input[name=filters]").attr('value', JSON.stringify(filters));
         }
       }
 
       $("[name=remove-tr]").live("click", function () {
-        $(this).closest("tr").remove();
+        $(this).closest("[name=filter]").remove();
       });
 
-      $("#saveModal").on("show", function(){
-        getFilters();
-      });
-      $("#temp-save").click(function(){
+      $("#temp-save").click(function () {
         getFilters();
         $("input[name=report]").val(0);
         $("#save-form").submit();
-        });
+      });
 
       $('button[data-role="save-report-btn"]').click(function () {
-          var form = $("#main-form");
-          if (form.get(0).checkValidity()) {
-            getFilters();
-            $.post('{{ url_for(".new_report") }}', data=$('#main-form').serialize(), function (data) {
-              if (confirm(sprintf('{{ _("report [%%s] has been created, go to see the report?") }}', data['name']))) {
-                window.open(data['url'], '_blank');
-              };
-              $('#saveModal').modal('hide');
-              }).fail(function (data) {
-              alert('{{ _("failed to create new report, reaon is: ") }}' + data.responseText);   
-            });
-            return false;
-          }
-          }); 
+        var form = $("#main-form");
+        if (form.get(0).checkValidity()) {
+          getFilters();
+          $.post('{{ url_for(".new_report") }}', data = $('#main-form').serialize(),function (data) {
+            if (confirm(sprintf('{{ _("report [%%s] has been created, go to see the report?") }}', data['name']))) {
+              window.open(data['url']);
+            }
+          }).fail(function (data) {
+                alert('{{ _("failed to create new report, reaon is: ") }}' + data.responseText);
+              });
+          return false;
+        }
+      });
       $('button[data-role="preview-btn"]').click(function () {
-          var form = $("#main-form");
-          if (form.get(0).checkValidity()) {
-            getFilters();
-            $.post('{{ url_for(".new_report", preview=True) }}', data=$('#main-form').serialize(), function (data) {
-              window.open('{{url_for(".report", id_=0, preview=true)}}', '_blank');
-              $('#saveModal').modal('hide');
-              }).fail(function (data) {
-              alert('{{ _("failed to generate report preview, reaon is: ") }}' + data.responseText);   
-            });
-            return false;
-          }
-        }); 
+        var form = $("#main-form");
+        if (form.get(0).checkValidity()) {
+          getFilters();
+          $.post('{{ url_for(".new_report", preview=True) }}', data = $('#main-form').serialize(),function (data) {
+            window.open('{{url_for(".report", id_=0, preview=true)}}');
+          }).fail(function (data) {
+                alert('{{ _("failed to generate report preview, reaon is: ") }}' + data.responseText);
+              });
+          return false;
+        }
+      });
       $('button[data-role="new-filter"]').attr('data-content', $('div[data-role="filters-popover-content"]').html()).attr('data-html', true).popover('hide');
       $('button[data-role="new-filter"]').click(function () {
         return false;
-          });
+      });
       $('[data-role="filters-selector"] a').live('click', function () {
-          var e = $(this);
-          $("#clause").addFilter(e.attr('data-value'), e.text(), $.parseJSON(e.attr("data-ops")), e.attr("data-type"), $.parseJSON(e.attr("data-opts")), '', '', e.attr('data-proxy'));
-          $('button[data-role="new-filter"]').popover('hide');
-        });
+        var e = $(this);
+        $("#clause").addFilter(e.attr('data-value'), e.text(), $.parseJSON(e.attr("data-ops")), e.attr("data-type"), $.parseJSON(e.attr("data-opts")), '', '', e.attr('data-proxy'));
+        $('button[data-role="new-filter"]').popover('hide');
+      });
       $("textarea").autosize();
     })
   </script>
 {% endblock %}
 
 {% block body %}
-  <div class='container'>
-    <div class="alert alert-info">
-      <h1>
-      <span>
-        {{data_set.name}}
+  <div class="panel panel-info">
+    <div class="panel-heading">
+      <h1 class="panel-title">
+        {{ data_set.name }}
         <small>
-          <a href="#" data-toggle="collapse" data-target="#detail" class='muted'>{{ _('show detail') }} >></a>
+          <a href="#" data-toggle="collapse" data-target="#detail" class='text-muted'>{{ _('show detail') }} >></a>
         </small>
-      </span>
       </h1>
-      <div id="detail" class="collapse">
-        <p>
+    </div>
+    <div id="detail" class="collapse panel-collapse">
+      <p>
         <small>
-          {{ _('created by "%(creator)s" at %(create_time)s',
-          creator=data_set.creator, create_time=data_set.create_time)}}
+          {{ gettext('created by "%(creator)s" at %(create_time)s', creator=data_set.creator, create_time=data_set.create_time) }}
         </small>
-        </p>
-        {% if SQL%}
+      </p>
+      {% if SQL %}
         <small>
-          <div>{{ _("SQL statement") }}: </div>
+          <div>{{ _("SQL statement") }}:</div>
           <p>
-          {{ SQL|safe }}
+            {{ SQL|safe }}
           </p>
         </small>
-        {% endif %}
-      </div>
+      {% endif %}
     </div>
-    <form action="#" method="POST" id="main-form">
-      <fieldset class='form-horizontal'>
-        <legend>{{ _('basic information') }}</legend>
-        <div class="control-group">
-          <label for="report_name" class="control-label">{{ _("Report name") }} <span class='text-error'>*</span></label>
-          <div class="controls">
-            <input type="text" name="name" required="required" id="report_name" value='{{ data_set.default_report_name }}'/>
-          </div>
-        </div>
-        <div class="control-group">
-          <label class="control-label" for="report_creator">{{ _("Report creator") }}</label>
+  </div>
+  <form action="#" method="POST" id="main-form" class='form-horizontal col-lg-12'>
+    <fieldset>
+      <legend>{{ _('basic information') }}</legend>
+      <div class="form-group">
+        <label for="report_name" class="control-label col-lg-2">{{ _("Report name") }}
+          <span class='text-error'>*</span></label>
 
-          <div class="controls">
-            <input type="text" name="creator" id="report_creator"/>
-          </div>
+        <div class="col-lg-3">
+          <input type="text" name="name" required="required" id="report_name" value='{{ data_set.default_report_name }}' class="form-control"/>
         </div>
-        <div class="control-group">
-          <label class="control-label" for="report_desc">{{ _("Report desc") }}</label>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-lg-2" for="report_creator">{{ _("Report creator") }}</label>
 
-          <div class="controls">
-            <textarea name="description" id="report_desc"></textarea>
-          </div>
+        <div class="col-lg-3">
+          <input type="text" name="creator" id="report_creator" class="form-control"/>
         </div>
-        <div class="control-group">
-          <label class="control-label" for="report_columns">{{ _("columns") }}</label>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-lg-2" for="report_desc">{{ _("Report desc") }}</label>
 
-          <div class="controls">
-            <select name="columns" id="report_columns" multiple required>
-              {% for c in data_set.columns %}
+        <div class="col-lg-3">
+          <textarea name="description" id="report_desc" class="form-control"></textarea>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-lg-2" for="report_columns">{{ _("columns") }}</label>
+
+        <div class="col-lg-3">
+          <select name="columns" id="report_columns" multiple required class="form-control">
+            {% for c in data_set.columns %}
               <option value="{{ c.idx }}" selected>{{ c.name }}</option>
-              {% endfor %}
-            </select>
-          </div>
+            {% endfor %}
+          </select>
         </div>
-        <input type="hidden" name="url" value="{{ request.url }}"/>
-        <input type="hidden" name="data_set_id" value="{{ data_set.id_ }}"/>
-        <input type="hidden" name="filters" />
-      </fieldset>
+      </div>
+      <input type="hidden" name="url" value="{{ request.url }}"/>
+      <input type="hidden" name="data_set_id" value="{{ data_set.id_ }}"/>
+      <input type="hidden" name="filters"/>
+    </fieldset>
     {% if data_set.filters %}
       <fieldset>
         <legend>{{ _("filters") }}
-          <button data-toggle="popover" data-role='new-filter'>
-            <i class="icon-plus text-info"></i>
+          <button data-toggle="popover" data-role='new-filter' class="btn btn-default">
+            <i class="fa fa-plus text-info"></i>
           </button>
         </legend>
-        <table id="clause">
-          <tbody>
-          </tbody>
-        </table>
+        <div id="clause">
+
+        </div>
       </fieldset>
     {% endif %}
-    <div class="pagination pagination-centered">
-      <a href="{{ url_for('.data_set_list') }}" class="btn btn-primary btn-large">{{ _('BACK') }}</a>
-      <button class="btn btn-primary btn-large" data-role='save-report-btn'>{{ _("Save as Report") }}</button>
-      <button data-role='preview-btn' class="btn btn-primary btn-large">{{ _('Preview') }}</button>
+    <div class="text-center">
+      <a href="{{ url_for('.data_set_list') }}" class="btn btn-default btn-lg">{{ _('BACK') }}</a>
+      <button class="btn btn-primary btn-lg" data-role='save-report-btn' type="button">{{ _("Save as Report") }}</button>
+      <button data-role='preview-btn' class="btn btn-primary btn-lg" type="button">{{ _('Preview') }}</button>
     </div>
-    </form>
-
-  </div>
+  </form>
 
   <div data-role='filters-popover-content' class='hide'>
     <ul class='nav nav-pills nav-stacked' data-role='filters-selector'>
       {% for filter in data_set.filters %}
-      <li>
-      <a data-value="{{ filter.col }}" data-type="{{ filter.type }}" 
-        data-ops='{{ filter.ops|tojson|safe }}' 
-        {% if filter.opts %} data-opts='{{ filter.opts|tojson|safe }}'{% endif %} 
-        data-proxy={{ 'true' if filter.proxy else 'false' }}>{{ filter.name }}</a>
-      </li>
+        <li>
+          <a data-value="{{ filter.col }}" data-type="{{ filter.type }}"
+             data-ops='{{ filter.ops|tojson|safe }}'
+              {% if filter.opts %} data-opts='{{ filter.opts|tojson|safe }}'{% endif %}
+             data-proxy={{ 'true' if filter.proxy else 'false' }}>{{ filter.name }}</a>
+        </li>
       {% endfor %}
     </ul>
   </div>
