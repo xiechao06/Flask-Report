@@ -31,3 +31,9 @@ code {
 .mb0 {
     margin-bottom: 0 !important;
 }
+
+@media print {
+    body {
+        height: auto !important;
+    }	
+}

@@ -21,7 +21,7 @@
             var modal = $('#drill-down-detail');
             modal.find('.modal-header h3').text(sprintf('{{ _("detail of %%s") }}', $(this).attr('data-col')));
             modal.modal('show');
-            var content = modal.find('.modal-body div');
+            var content = modal.find('.modal-body p');
             content.html('<i class="fa fa-refresh fa-4x"></i>');
             content.load($(this).attr('data-target'), function (response, status, xhr) {
               if (status != "success") {
