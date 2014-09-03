@@ -4,5 +4,5 @@ creator: ''
 data_set_id: 1
 description: ''
 filters:
-  Group.name: {operator: eq, value: 吴}
+  Group.name: {operator: eq, value: 魏}
 name: lkj

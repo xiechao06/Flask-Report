@@ -3,7 +3,7 @@ import os
 import json
 import types
 
-from apscheduler.scheduler import Scheduler
+from apscheduler.schedulers.background import BackgroundScheduler
 from flask import render_template, request, url_for, redirect, flash, jsonify
 from flask.ext.mail import Mail, Message
 from flask.ext.babel import _
@@ -85,7 +85,7 @@ class FlaskReport(object):
             return s
 
         self.mail = mail or Mail(self.app)
-        self.sched = Scheduler()
+        self.sched = BackgroundScheduler()
         if app.config.get('FLASK_REPORT_SEND_NOTIFICATION'):
             self.sched.start()
 

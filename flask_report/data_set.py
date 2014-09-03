@@ -106,7 +106,7 @@ class DataSet(object):
 
             result = {"name": get_label_name(v.get("name"), column), "col": k, "ops": v.get("operators"), 'shown': v.get('shown'),
                       "type": _get_type(v.get("value_type"), default), 'opts': [], 'proxy': False}
-            
+
             if hasattr(column, "property") and hasattr(column.property, "direction"):
                 def _iter_choices(column):
                     model = column.property.mapper.class_
@@ -131,7 +131,7 @@ class DataSet(object):
 
     @property
     def proxy_filter_map(self):
-        proxy_filter_file = os.path.join(self.dir, 'proxy_filters.py') 
+        proxy_filter_file = os.path.join(self.dir, 'proxy_filters.py')
         ret = {}
         if os.path.exists(proxy_filter_file):
             lib = import_file(proxy_filter_file)
@@ -162,4 +162,4 @@ class DataSet(object):
                 all.append(filter_)
         return all
 
-    
+
