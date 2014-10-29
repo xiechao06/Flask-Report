@@ -34,3 +34,6 @@ nosetests.xml
 .pydevproject
 .Session.vim
 tags
+env
+*.sw[p|o]
+example/temp.db
